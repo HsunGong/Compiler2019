@@ -1,0 +1,4 @@
+{
+    "scss.lint.important": "warning",
+    "less.lint.important": "warning"
+}

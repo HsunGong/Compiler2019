@@ -1,0 +1,14 @@
+Projects:
+	☐ lexer analysis @started(19-03-05 18:58)
+	☐ syntax analysis
+	☐ AST tree generate
+	☐ Semantic analysis
+	☐ IR generate
+	☐ code optimize
+
+Main:
+	☐ Generate Simple antlr @started(19-03-04 17:14)
+
+Parser: @high @today 
+	✔ change antlr extension to use @started(19-03-05 18:04) @done(19-03-05 18:58) @lasted(54m24s)
+
