@@ -17,27 +17,9 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStart(MxParser.StartContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#function}.
+	 * Visit a parse tree produced by {@link MxParser#build}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitFunction(MxParser.FunctionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#typeDeclaration}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTypeDeclaration(MxParser.TypeDeclarationContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#primaryExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrimaryExpression(MxParser.PrimaryExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#x}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitX(MxParser.XContext ctx);
+	T visitBuild(MxParser.BuildContext ctx);
 }
