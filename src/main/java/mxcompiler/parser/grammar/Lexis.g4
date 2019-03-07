@@ -108,4 +108,4 @@ NotEqual: '!=';
 Arrow: '->';
 Dot: '.';
 Ellipsis: '...';
-
+New: 'new';
