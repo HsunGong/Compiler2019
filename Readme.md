@@ -48,14 +48,17 @@ IR向量化
 ```
 
 - start
-    - primary
-    - type
+    - class
+    - globleVarible
     - function
 
+grun 之前一定记得javac *
 
+antlr4
+import, fragment, lexer, parser, grammar, returns,
+locals, throws, catch, finally, mode, options, tokens
 
-
-
+要将操作限制为生成的解析器或词法分析器，请使用@parser::name或@lexer::name。
 
 
 [C.g4]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/C.g4

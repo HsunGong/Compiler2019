@@ -1,160 +1,111 @@
-lexer grammar Lexis;
+lexer grammar Lexis
+	;
 
 Identifier
-	:	IdentifierNondigit
-		(	IdentifierNondigit
-		|	Digit
-		)*
+	: Letter (
+		(Letter | '_') // Nondigit
+		| Digit
+	)*
 	;
 
-fragment IdentifierNondigit
-	:	Nondigit
-	|	UniversalCharacterName
-	;
-
-fragment Nondigit
-	: [a-zA-Z_]
-	;
-
-fragment Digit
-	: [0-9]
-	;
-
-fragment UniversalCharacterName
-	:	'\\u' HexQuad
-	|	'\\U' HexQuad HexQuad
-	;
-
-// FIX
-fragment HexQuad
-	: HexadecimalDigit HexadecimalDigit HexadecimalDigit HexadecimalDigit
-	;
-
-Constant
-	:	IntegerConstant
-	|	StringConstant // FIX
-	;
+fragment Letter: [a-zA-Z];
+fragment Digit: [0-9];
 
 
-// FIX
-fragment IntegerConstant
+
+// TODO: have octal, binary ... support
+IntegerLiteral
 	: DecimalConstant IntegerSuffix?
-	| OctalConstant IntegerSuffix?
-	| HexadecimalConstant IntegerSuffix?
-	| BinaryConstant
 	;
 
-	//@Deprecated
-
-fragment BinaryConstant
-	:	'0' [bB] [0-1]+
-	;
-		//@Deprecated
-
-fragment HexadecimalConstant
-	:	'0' [xX] [0-9a-fA-F]+
-	;
-	//@Deprecated
-	fragment OctalConstant
-	:	'0' [0-7]*
+fragment DecimalConstant
+	: [1-9] Digit*
 	;
 
-	fragment DecimalConstant
-	:	[1-9] Digit*
+// @Deprecated
+fragment IntegerSuffix
+	: [uU] [lL]?
+	| [uU] ('ll' | 'LL')
+	| [Ll] [uU]?
+	| ('ll' | 'LL') [uU]?
 	;
 
-	//@Deprecated
-	fragment IntegerSuffix
-	:	[uU] [lL]?
-	|	[uU] ('ll' | 'LL')
-	|	[Ll] [uU]?
-	|	('ll' | 'LL') [uU]?
+
+StringLiteral: '"' (Char+)? '"';
+
+fragment Char
+	: ~["\r\n\\]
+	| '\\\n'
+	| '\\\r\n'
+	| EscapeSequence
 	;
 
-	fragment StringConstant
-	:	'"' Char '"'
+fragment EscapeSequence
+	: '\\' ['"?abfnrtv\\]
 	;
 
-	fragment Char
-	:	~['\r\n\\]
-	|	EscapeSequence
-	;
-
-	fragment EscapeSequence
-	:
 
 
+Whitespace: [ \t]+ -> skip;
 
+Newline: ('\r' '\n'? | '\n') -> skip;
 
+LineCommnet: '//' ~[\r\n]* -> skip;
 
+// @Deprecated
+BlockComment: '/*' .*? '*/' -> skip;
 
 
 
-
-
-
-
-
-
-
-
-
-Break : 'break' ;
-Continue : 'continue' ;
-Default : 'default' ;
-Else : 'else' ;
-For : 'for' ;
-If : 'if' ;
-Int : 'int' ;
-Long : 'long' ;
-Return : 'return' ;
-Class : 'class' ;
-Void : 'void' ;
-While : 'while' ;
-
-Bool : '_Bool' ;
-Noreturn : '_Noreturn' ;
-
-LeftParen : '(' ;
-RightParen : ')' ;
-LeftBracket : '[' ;
-RightBracket : ']' ;
-LeftBrace : '{' ;
-RightBrace : '}' ;
-
-Less : '<' ;
-LessEqual : '<=' ;
-Greater : '>' ;
-GreaterEqual : '>=' ;
-LeftShift : '<<' ;
-RightShift : '>>' ;
-
-Plus : '+' ;
-PlusPlus : '++' ;
-Minus : '-' ;
-MinusMinus : '--' ;
-Star : '*' ;
-Div : '/' ;
-Mod : '%' ;
-
-And : '&' ;
-Or : '|' ;
-AndAnd : '&&' ;
-OrOr : '||' ;
-Caret : '^' ;
-Not : '!' ;
-Tilde : '~' ;
-
-Question : '?' ;
-Colon : ':' ;
-Semi : ';' ;
-Comma : ',' ;
-
-Assign : '=' ;
-Equal : '==' ;
-NotEqual : '!=' ;
-
-Arrow : '->' ;
-Dot : '.' ;
-Ellipsis : '...' ;
+Break: 'break';
+Continue: 'continue';
+Default: 'default';
+Else: 'else';
+For: 'for';
+If: 'if';
+Int: 'int';
+Long: 'long';
+String: 'String';
+Return: 'return';
+Class: 'class';
+Void: 'void';
+While: 'while';
+Bool: '_Bool';
+Noreturn: '_Noreturn';
+LeftParen: '(';
+RightParen: ')';
+LeftBracket: '[';
+RightBracket: ']';
+LeftBrace: '{';
+RightBrace: '}';
+Less: '<';
+LessEqual: '<=';
+Greater: '>';
+GreaterEqual: '>=';
+LeftShift: '<<';
+RightShift: '>>';
+Plus: '+';
+PlusPlus: '++';
+Minus: '-';
+MinusMinus: '--';
+Star: '*';
+Div: '/';
+Mod: '%';
+And: '&';
+Or: '|';
+AndAnd: '&&';
+OrOr: '||';
+Caret: '^';
+Not: '!';
+Tilde: '~';
+Question: '?';
+Colon: ':';
+Semi: ';';
+Comma: ',';
+Assign: '=';
+Equal: '==';
+NotEqual: '!=';
+Arrow: '->';
+Dot: '.';
+Ellipsis: '...';
 
