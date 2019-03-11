@@ -20,11 +20,11 @@ variable_declaration // declaration
 	| type ';' //FIX ???
 	;
 
-type // also seen as declarationSpecifier
-	: type '[' ']'
+type			// also seen as declarationSpecifier
+	: type_name	// also typeSpecifier
+	| type '[' ']'
 	| type '[' IntegerLiteral ']'
 	// | type '(' param_typeref () ')'	//FIX: function-iter
-	| type_name // also typeSpecifier
 	;
 
 type_name // also typeSpecifier
@@ -32,7 +32,7 @@ type_name // also typeSpecifier
 	| Int
 	| String
 	| Bool
-	| type_new = Identifier // FIX: ALL right, how to check out?? Also typedefName
+	| Identifier // FIX: ALL right, how to check out?? Also typedefName
 	;
 // type_new
 // 	: 
@@ -45,6 +45,7 @@ init_declaration_list // variable name and declaration
 init_declarator								// each one
 	: direct_declarator ('=' expression)?	// initvalue
 	;
+
 direct_declarator
 	: Identifier				// variable name or so
 	| '(' direct_declarator ')'	// FIX: what the hell
@@ -59,6 +60,7 @@ function_declaration
 function_declarator
 	: direct_declarator '(' parameter_list? ')'
 	;
+
 parameter_list
 	: parameter_declaration (',' parameter_declaration)*
 	;
@@ -86,7 +88,7 @@ statement
 
 expression				// FIX: may have declaration if 'for' stmt has
 	: new_declarator	// TODO: herited from java
-	| expression10 // DigitString??
+	| expression10		// DigitString??
 	| term '=' expression
 	;
 
@@ -100,7 +102,9 @@ new_declarator
 	;
 
 expression10
-	: logical_or_expression ('?' expression ':' expression10)?
+	: logical_or_expression (
+		'?' expression ':' expression10
+	)?
 	;
 logical_or_expression
 	: logical_and_expression ('||' logical_or_expression)*
@@ -198,8 +202,8 @@ return_statement
 
 // TODO class
 class_declaration
-	: 'class' Identifier? '{' class_body* '}'
-	| 'class' Identifier
+	: 'class' Identifier? '{' class_body* '}'	// FIX: what is '?'
+	| 'class' Identifier						// FIX: what is this?
 	;
 
 class_body // 

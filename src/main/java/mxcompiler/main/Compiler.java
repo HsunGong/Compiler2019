@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import mxcompiler.parser.*;
 import mxcompiler.exception.*;
+import mxcompiler.ast.*;
 
 public final class Compiler {
     static final public String ProgName = "mxc";
@@ -15,35 +16,46 @@ public final class Compiler {
 
     public static void main (String[] args) {
         Compiler c = new Compiler(ProgName);
-        c.command(args);
+        c.execute(args);
     }
     
     private Compiler (String name) {
         this.errHandler = new ExceptionHandler(name);
     }
     
-    private void command(String[] args) {
-        Option opts = new Option(args);
-        List<String> srcs = opts.sourceFiles();
-        
+    private void execute(String[] args) {
         try {
-            System.out.println(srcs.get(0));
-            build(srcs, opts);
-        } catch (Exception e) {}
-    }
 
-    private void build(List<String> srcs, Option opts) throws Exception {
-        for (String src : srcs) {
-            compile(src);
+            // parse options
+            Option opts = new Option(args);
+            List<String> srcs = opts.sourceFiles();
+            
+            // build each file
+            for (String src : srcs) {
+                compile(src, opts);
+            }
+            
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
-
-    private void compile(String src) throws Exception {
+    
+    // file compiler
+    private void compile(String src, Option opts) throws Exception {
         MxLexer lexer = new MxLexer(CharStreams.fromFileName(src));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxParser parser = new MxParser(tokens);
-
-        ParseTree tree = parser.start();
-        System.out.println(tree.toStringTree(parser));
+        
+        ParseTree tree = parser.start(); // the begin root of my g4 file
+        
+        AST ast = new AST();
+        ast.visit(tree);
+        
+        // SemanticAnalyze sem = new SemanticAnalyze.visit(ast);
+        
+        // IR ir = new ir.visit(ast);
+        
+        // ASM asm = generateAssembly(ir, ast);
+        // writefile(opts.outputFile());
     }
 }
