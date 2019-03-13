@@ -46,10 +46,20 @@ public final class Compiler {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxParser parser = new MxParser(tokens);
         
-        ParseTree tree = parser.start(); // the begin root of my g4 file
+        ParseTree tree = parser.compilation_unit(); // the begin root of my g4 file
         
-        AST ast = new AST();
-        ast.visit(tree);
+        switch(opts.mode()) {
+            case Default:
+                AST ast = new AST();
+                ast.visit(tree);
+                break;
+            case Dump:
+                break;
+            case Check:
+                break;
+            default:
+                throw new Exception("No Compile Mode selected");
+        }
         
         // SemanticAnalyze sem = new SemanticAnalyze.visit(ast);
         

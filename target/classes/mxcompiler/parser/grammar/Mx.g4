@@ -4,212 +4,235 @@ grammar Mx
 import Lexis
 	;
 
-compilation_unit
-	: translate_unit* EOF
+compilationUnit
+	: translationUnit* EOF
 	;
 
-translate_unit
-	: function_declaration
-	| class_declaration
-	| variable_declaration
-	| ';' // FIX: how to find a 'main function
+translationUnit
+	: functionDeclaration
+	| classDeclaration
+	| variableDeclaration
+	| ';'
 	;
 
-variable_declaration // declaration
-	: type init_declaration_list ';'
-	| type ';' //FIX ???
-	;
-
-type			// also seen as declarationSpecifier
-	: type_name	// also typeSpecifier
-	| type '[' ']'
-	| type '[' IntegerLiteral ']'
-	// | type '(' param_typeref () ')'	//FIX: function-iter
-	;
-
-type_name // also typeSpecifier
-	: Void
-	| Int
-	| String
-	| Bool
-	| Identifier // FIX: ALL right, how to check out?? Also typedefName
-	;
-// type_new
-// 	: 
-// 	;
-
-init_declaration_list // variable name and declaration
-	: init_declarator (',' init_declarator)*
-	;
-
-init_declarator								// each one
-	: direct_declarator ('=' expression)?	// initvalue
-	;
-
-direct_declarator
-	: Identifier				// variable name or so
-	| '(' direct_declarator ')'	// FIX: what the hell
-	// | direct_declarator '(' parameter_list? ')'	// FIX: the function??
-	;
+// FIX: left recursive --> * replace with left recursive
+/* logicalOrExpression
+	: logicalAndExpression							# logicalOrExpressionUnary
+	| logicalOrExpression ('||' logicalAndExpression	# logicalOrExpressionBinary
+	; */
 
 
-function_declaration
-	: type? function_declarator block // ? for construct function
+logicalOrExpression // expression9
+	: logicalAndExpression ('||' logicalAndExpression)*
+	;
+logicalAndExpression
+	: binaryOrExpression ('&&' binaryOrExpression)*
+	;
+binaryOrExpression
+	: binaryNorExpression ('|' binaryNorExpression)*
+	;
+binaryNorExpression
+	: binaryAndExpression ('^' binaryAndExpression)*
+	;
+binaryAndExpression
+	: equalExpression ('&' equalExpression)*
+	;
+equalExpression // FIX: needed to tag == or != or unary??
+	: compareExpression ('==' compareExpression)*
+	| compareExpression ('!=' compareExpression)*
+	;
+compareExpression
+	: shiftExpression ('<' shiftExpression)*
+	| shiftExpression ('>' shiftExpression)*
+	| shiftExpression ('<=' shiftExpression)*
+	| shiftExpression ('>=' shiftExpression)*
+	;
+shiftExpression
+	: addExpression ('>>' addExpression)*
+	| addExpression ('<<' addExpression)*
+	;
+addExpression
+	: multiExpression ('+' multiExpression)*
+	| multiExpression ('-' multiExpression)*
+	;
+multiExpression
+	: term ('*' term)*
+	| term ('/' term)*
+	| term ('%' term)*
 	;
 
-function_declarator
-	: direct_declarator '(' parameter_list? ')'
-	;
-
-parameter_list
-	: parameter_declaration (',' parameter_declaration)*
-	;
-parameter_declaration
-	: type direct_declarator
+term
+	: unaryExpression
+	| DigitSequence // a number
+	// | '(' typeName ')' term // forced cast change
 	;
 
 
-block
-	: '{' (statement | variable_declaration)* '}'
+unaryExpression /* seems not like an expression
+	but here regard as an expression*/
+	: '++' unaryExpression	# unaryExpressionPrefixInc
+	| '--' unaryExpression	# unaryExpressionPrefixDec
+	| unaryOperator term	# unaryExpressionPrefix // FIX: double unaryOperator??
+	| postfixExpression	# unaryExpressionPostfix
 	;
 
-statement
-	:
-	| ';' // especially added so to be mentioned
-	| expression ';'
-	| block // FIX ??
-	| if_statement
-	| while_statement
-	| for_statement
-	| break_statement
-	| continue_statement
-	| return_statement
+unaryOperator
+	: '+'
+	| '-'
+	| '!'
+	| '~'
 	;
 
-expression				// FIX: may have declaration if 'for' stmt has
-	: new_declarator	// TODO: herited from java
-	| expression10		// DigitString??
-	| term '=' expression
+
+postfixExpression /* FIX: different between left:(x)* and left:left + x
+	FIX: needed to tag??
+	non-terminal symbol -> postfix
+	terminal symbol(may) -> primary */
+	: primaryExpression
+	| postfixExpression '++'
+	| postfixExpression '--'
+	| postfixExpression '[' expression ']'
+	| postfixExpression '.' Identifier
+	| postfixExpression '(' args ')'
 	;
 
-// FIX: needed to change '[' into leftbracket ???
-new_declarator
-	: New type_name ('[' expression ']')+ ('[' ']')* // array
-	| New type_name ('[' expression ']')+ ('[' ']')* (
-		'[' expression ']'
-	)+							//error array type
-	| New type_name ('(' ')')	// simple var
+
+args // FIX: does Single or Mutli matters??
+	: (expression (',' expression))?
 	;
 
-expression10
-	: logical_or_expression (
-		'?' expression ':' expression10
-	)?
-	;
-logical_or_expression
-	: logical_and_expression ('||' logical_or_expression)*
-	;
-logical_and_expression
-	: bit_or_expression ('&&' logical_and_expression)*
-	;
-bit_or_expression
-	: bit_nor_expression ('|' bit_or_expression)*
-	;
-bit_nor_expression
-	: bit_and_expression ('^' bit_nor_expression)*
-	;
-bit_and_expression
-	: relational_expression ('&' bit_and_expression)*
-	;
-relational_expression
-	: shift_expression ('>' relational_expression)*
-	| shift_expression ('>=' relational_expression)*
-	| shift_expression ('<' relational_expression)*
-	| shift_expression ('<=' relational_expression)*
-	| shift_expression ('==' relational_expression)*
-	| shift_expression ('!=' relational_expression)*
-	;
-shift_expression
-	: additive_expression ('>>' shift_expression)*
-	| additive_expression ('<<' shift_expression)*
-	;
-additive_expression
-	: multiplicative_expression ('+' additive_expression)*
-	| multiplicative_expression ('-' additive_expression)*
-	;
-multiplicative_expression
-	: term ('*' multiplicative_expression)*
-	| term ('/' multiplicative_expression)*
-	| term ('%' multiplicative_expression)*
-	;
-term // cast_expression
-	: '(' type ')' term
-	| IntegerLiteral // FIX ??? where should be put and why? seen as DigitSequence
-	| unary
-	;
-
-unary
-	: ('++' | '--') unary
-	| ('+' | '-' | '!' | '~') term
-	// | Sizeof '(' type ')'
-	// | Sizeof unary
-	| postfix
-	;
-
-postfix
-	: primary (
-		'++'
-		| '--'
-		| '.' type_name // Identifier
-		// | '->' type_name
-		| '[' expression ']'
-		| '(' arguments_list? ')'
-	) // FIX: mutiply postfix ???
-	;
-arguments_list
-	: expression (',' expression)*
-	;
-primary
+primaryExpression
 	: 'this'
-	| 'null'
 	| 'true'
 	| 'false'
+	| 'null'
 	| Identifier
-	| IntegerLiteral
 	| StringLiteral
+	| IntegerLiteral
 	| '(' expression ')'
 	;
 
 
-if_statement
-	: If '(' expression ')' statement (Else statement)?
-	;
-while_statement
-	: While '(' expression ')' statement
-	;
-for_statement
-	: For '(' expression? ';' expression? ';' expression? ';' ')' statement
-	;
-break_statement
-	: Break ';'
-	;
-continue_statement
-	: Continue ';'
-	;
-return_statement
-	: Return expression? ';'
+expression10
+	: logicalOrExpression (
+		'?' expression ':' expression10
+	)?
 	;
 
-// TODO class
-class_declaration
-	: 'class' Identifier? '{' class_body* '}'	// FIX: what is '?'
-	| 'class' Identifier						// FIX: what is this?
-	;
-
-class_body // 
-	: variable_declaration
-	| function_declaration
+expression
+	: newExpression
+	| expression10
+	| unaryExpression '=' expression //rhsExpr
+	// | unaryExpression opassignOp expression // += /= ...
+	// | DigitSequence  // FIX: what the hell is this?
 	;
 
 
+variableDeclaration /* define variables, may have no names;
+	may have mutiply names; may have init values */
+	: type variableDeclarator (',' variableDeclarator)* ';'	# declarationInit
+	| type ';'													# declarationNone // only type no name
+	;
 
+
+variableDeclarator						// declare some of variables names and some has init values
+	: directDeclarator					# variableDeclaratorNone
+	| directDeclarator '=' expression	# variableDeclaratorInit
+	;
+
+
+newExpression /* new operation
+	FIX : is LeftBracket LeftParen needed??? */
+	: 'new' typeName ('[' expression ']')+ ('[' ']')+ (
+		'[' expression ']'
+	)+ # newExpressionError
+	| 'new' typeName ('[' expression ']')+ (
+		LeftBracket ']'
+	)*									# newExpressionArray
+	| 'new' typeName (LeftParen ')')?	# newExpressionNonarray
+	;
+
+
+type /* like int or int[]
+	used for init */
+	: typeName		# typeType
+	| type '[' ']'	# typeArray
+	;
+
+
+typeName // FIX: include function type!!!
+	: 'void'
+	| 'int'
+	| 'string'
+	| 'bool'
+	| typedefName
+	;
+
+
+typedefName // only for self define type!!!!
+	: Identifier
+	;
+
+
+directDeclarator /* FIX: when to use recycle??
+	all of the declarator names 
+	and some are functions
+	and ?? */
+	: Identifier								# directDeclaratorIdentifier
+	| directDeclarator '(' parameterList? ')'	# directDeclaratorWithParameterList
+	// | '(' directDeclarator ')'					# directDeclaratorRecycle 
+	;
+
+
+
+statement													// FIX: whether 'if' or If; so as For While...
+	: expression? ';'										# exprStatement // contain ';'
+	| block													# blockStatement
+	| If '(' expression ')' statement ('else' statement)?	# switchStatement
+	| While '(' expression ')' statement					# iterationStatementWhile
+	| For '(' forCondition ')' statement					# iterationStatementFor
+	| 'continue' ';'										# jumpStatementContinue
+	| 'break' ';'											# jumpStatementBreak
+	| 'return' expression? ';'								# jumpStatementReturn
+	;
+
+block
+	: '{' (statement | variableDeclaration)* '}'
+	;
+
+
+forCondition											// FIX: update?? end??
+	: forDeclaration ';' expression? ';' expression?	# forConditionInit
+	| expression? ';' expression? ';' expression?		# forConditionNone
+	;
+
+forDeclaration												// FIX: only support 1-declaration
+	: type variableDeclarator (',' variableDeclarator)*	# declarationInit
+	| type													# declarationNone // only type no name
+	;
+
+functionDeclaration
+	: type? functionDeclarator block
+	;
+
+functionDeclarator
+	: typedefName '(' parameterList? ')'
+	;
+parameterList
+	: parameterDeclaration (',' parameterDeclaration)* # parameterListMulti
+	;
+
+parameterDeclaration
+	: type Identifier
+	;
+
+
+classDeclaration
+	: 'class' Identifier? '{' classBody* '}'	# classBodyDecl
+	| 'class' Identifier						# classBodyNone // FIX: what the hell??
+	;
+
+classBody
+	: variableDeclaration
+	| functionDeclaration
+	;

@@ -70,7 +70,7 @@ public class Option {
         }
 
         if (mode == null) {
-            mode = CompilerMode.Compile;
+            mode = CompilerMode.Default;
         }
     }
 

@@ -4,32 +4,15 @@ import java.util.Map;
 import java.util.HashMap;
 
 enum CompilerMode{
-    CheckSyntax 	("--check-syntax"),
-    DumpTokens 		("--dump-tokens"),
-    DumpAST 		("--dump-ast"),
-    DumpStmt 		("--dump-stmt"),
-    DumpExpr 		("--dump-expr"),
-    DumpSemantic 	("--dump-semantic"),
-    DumpReference 	("--dump-reference"),
-    DumpIR 			("--dump-ir"),
-    DumpAsm 		("--dump-asm"),
-    PrintAsm 		("--print-asm"),
-    Compile 		("-S"),
-    Assemble 		("-c"); 
+    Default ("-C"),
+    Check 	("--check"),
+    Dump    ("--dump");
     static private Map<String, CompilerMode> modes;
     static {
         modes = new HashMap<String, CompilerMode>();
-        modes.put("--check-syntax", CheckSyntax); // not realized
-        modes.put("--dump-tokens", DumpTokens);
-        modes.put("--dump-ast", DumpAST);
-        modes.put("--dump-stmt", DumpStmt);
-        modes.put("--dump-expr", DumpExpr);
-        modes.put("--dump-semantic", DumpSemantic);
-        modes.put("--dump-reference", DumpReference);
-        modes.put("--dump-ir", DumpIR);
-        modes.put("--dump-asm", DumpAsm);
-        modes.put("-S", Compile);
-        modes.put("-c", Assemble);// remain todo
+        modes.put("--check", Check); // not realized
+        modes.put("-C", Default);
+        modes.put("--dump", Dump);
     }
 
     private final String option;
@@ -50,8 +33,4 @@ enum CompilerMode{
     static public boolean isModeOption(String opt) {
         return modes.containsKey(opt);
     }
-
-    // boolean requires(CompilerMode m) {
-    //     return ordinal() >= m.ordinal();
-    // }
 }

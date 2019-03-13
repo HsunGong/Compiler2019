@@ -8,8 +8,12 @@ Identifier
 	)*
 	;
 
-fragment Letter: [a-zA-Z];
-fragment Digit: [0-9];
+fragment Letter //Nondigitnon
+	: [a-zA-Z]
+	;
+fragment Digit
+	: [0-9]
+	;
 
 
 
@@ -21,7 +25,9 @@ IntegerLiteral
 fragment DecimalConstant
 	: [1-9] Digit*
 	;
-
+DigitSequence
+	: Digit+
+	;
 // @Deprecated
 fragment IntegerSuffix
 	: [uU] [lL]?
@@ -31,9 +37,11 @@ fragment IntegerSuffix
 	;
 
 
-StringLiteral: '"' (Char+)? '"';
+StringLiteral
+	: '"' (SChar+)? '"'
+	;
 
-fragment Char
+fragment SChar
 	: ~["\r\n\\]
 	| '\\\n'
 	| '\\\r\n'
@@ -44,68 +52,172 @@ fragment EscapeSequence
 	: '\\' ['"?abfnrtv\\]
 	;
 
+Whitespace
+	: [ \t]+ -> skip
+	;
 
+Newline
+	: ('\r' '\n'? | '\n') -> skip
+	;
 
-Whitespace: [ \t]+ -> skip;
-
-Newline: ('\r' '\n'? | '\n') -> skip;
-
-LineCommnet: '//' ~[\r\n]* -> skip;
+LineCommnet
+	: '//' ~[\r\n]* -> skip
+	;
 
 // @Deprecated
-BlockComment: '/*' .*? '*/' -> skip;
+BlockComment
+	: '/*' .*? '*/' -> skip
+	;
 
 
 
-Break: 'break';
-Continue: 'continue';
-Default: 'default';
-Else: 'else';
-For: 'for';
-If: 'if';
-Int: 'int';
-Long: 'long';
-String: 'String';
-Return: 'return';
-Class: 'class';
-Void: 'void';
-While: 'while';
-Bool: '_Bool';
-Noreturn: '_Noreturn';
-LeftParen: '(';
-RightParen: ')';
-LeftBracket: '[';
-RightBracket: ']';
-LeftBrace: '{';
-RightBrace: '}';
-Less: '<';
-LessEqual: '<=';
-Greater: '>';
-GreaterEqual: '>=';
-LeftShift: '<<';
-RightShift: '>>';
-Plus: '+';
-PlusPlus: '++';
-Minus: '-';
-MinusMinus: '--';
-Star: '*';
-Div: '/';
-Mod: '%';
-And: '&';
-Or: '|';
-AndAnd: '&&';
-OrOr: '||';
-Caret: '^';
-Not: '!';
-Tilde: '~';
-Question: '?';
-Colon: ':';
-Semi: ';';
-Comma: ',';
-Assign: '=';
-Equal: '==';
-NotEqual: '!=';
-Arrow: '->';
-Dot: '.';
-Ellipsis: '...';
-New: 'new';
+Break
+	: 'break'
+	;
+Continue
+	: 'continue'
+	;
+Default
+	: 'default'
+	;
+Else
+	: 'else'
+	;
+For
+	: 'for'
+	;
+If
+	: 'if'
+	;
+Int
+	: 'int'
+	;
+String
+	: 'String'
+	;
+Return
+	: 'return'
+	;
+Class
+	: 'class'
+	;
+Void
+	: 'void'
+	;
+While
+	: 'while'
+	;
+Bool
+	: 'bool'
+	;
+
+
+LeftParen
+	: '('
+	;
+RightParen
+	: ')'
+	;
+LeftBracket
+	: '['
+	;
+RightBracket
+	: ']'
+	;
+LeftBrace
+	: '{'
+	;
+RightBrace
+	: '}'
+	;
+Less
+	: '<'
+	;
+LessEqual
+	: '<='
+	;
+Greater
+	: '>'
+	;
+GreaterEqual
+	: '>='
+	;
+LeftShift
+	: '<<'
+	;
+RightShift
+	: '>>'
+	;
+Plus
+	: '+'
+	;
+PlusPlus
+	: '++'
+	;
+Minus
+	: '-'
+	;
+MinusMinus
+	: '--'
+	;
+Star
+	: '*'
+	;
+Div
+	: '/'
+	;
+Mod
+	: '%'
+	;
+And
+	: '&'
+	;
+Or
+	: '|'
+	;
+AndAnd
+	: '&&'
+	;
+OrOr
+	: '||'
+	;
+Caret
+	: '^'
+	;
+Not
+	: '!'
+	;
+Tilde
+	: '~'
+	;
+Question
+	: '?'
+	;
+Colon
+	: ':'
+	;
+Semi
+	: ';'
+	;
+Comma
+	: ','
+	;
+Assign
+	: '='
+	;
+Equal
+	: '=='
+	;
+NotEqual
+	: '!='
+	;
+Arrow
+	: '->'
+	;
+Dot
+	: '.'
+	;
+
+New
+	: 'new'
+	;

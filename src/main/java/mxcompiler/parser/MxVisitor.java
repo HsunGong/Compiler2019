@@ -11,25 +11,23 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link MxParser#compilation_unit}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCompilation_unit(MxParser.Compilation_unitContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MxParser#translation_unit}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTranslation_unit(MxParser.Translation_unitContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MxParser#primaryExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitPrimaryExpression(MxParser.PrimaryExpressionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code declarationSpecifier_array}
-	 * labeled alternative in {@link MxParser#declarationSpecifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeclarationSpecifier_array(MxParser.DeclarationSpecifier_arrayContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code declarationSpecifier_type}
-	 * labeled alternative in {@link MxParser#declarationSpecifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDeclarationSpecifier_type(MxParser.DeclarationSpecifier_typeContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code postfixExpression_inc}
 	 * labeled alternative in {@link MxParser#postfixExpression}.
@@ -127,201 +125,71 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCastExpression(MxParser.CastExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code multiplicativeExpression_unary}
-	 * labeled alternative in {@link MxParser#multiplicativeExpression}.
+	 * Visit a parse tree produced by {@link MxParser#logical_or_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMultiplicativeExpression_unary(MxParser.MultiplicativeExpression_unaryContext ctx);
+	T visitLogical_or_expression(MxParser.Logical_or_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code multiplicativeExpression_mod}
-	 * labeled alternative in {@link MxParser#multiplicativeExpression}.
+	 * Visit a parse tree produced by {@link MxParser#logical_and_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMultiplicativeExpression_mod(MxParser.MultiplicativeExpression_modContext ctx);
+	T visitLogical_and_expression(MxParser.Logical_and_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code multiplicativeExpression_div}
-	 * labeled alternative in {@link MxParser#multiplicativeExpression}.
+	 * Visit a parse tree produced by {@link MxParser#binary_or_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMultiplicativeExpression_div(MxParser.MultiplicativeExpression_divContext ctx);
+	T visitBinary_or_expression(MxParser.Binary_or_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code multiplicativeExpression_mul}
-	 * labeled alternative in {@link MxParser#multiplicativeExpression}.
+	 * Visit a parse tree produced by {@link MxParser#binary_nor_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMultiplicativeExpression_mul(MxParser.MultiplicativeExpression_mulContext ctx);
+	T visitBinary_nor_expression(MxParser.Binary_nor_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code additiveExpression_sub}
-	 * labeled alternative in {@link MxParser#additiveExpression}.
+	 * Visit a parse tree produced by {@link MxParser#binary_and_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAdditiveExpression_sub(MxParser.AdditiveExpression_subContext ctx);
+	T visitBinary_and_expression(MxParser.Binary_and_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code additiveExpression_add}
-	 * labeled alternative in {@link MxParser#additiveExpression}.
+	 * Visit a parse tree produced by {@link MxParser#equal_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAdditiveExpression_add(MxParser.AdditiveExpression_addContext ctx);
+	T visitEqual_expression(MxParser.Equal_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code additiveExpression_unary}
-	 * labeled alternative in {@link MxParser#additiveExpression}.
+	 * Visit a parse tree produced by {@link MxParser#compare_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitAdditiveExpression_unary(MxParser.AdditiveExpression_unaryContext ctx);
+	T visitCompare_expression(MxParser.Compare_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code shiftExpression_shr}
-	 * labeled alternative in {@link MxParser#shiftExpression}.
+	 * Visit a parse tree produced by {@link MxParser#shift_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitShiftExpression_shr(MxParser.ShiftExpression_shrContext ctx);
+	T visitShift_expression(MxParser.Shift_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code shiftExpression_unary}
-	 * labeled alternative in {@link MxParser#shiftExpression}.
+	 * Visit a parse tree produced by {@link MxParser#add_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitShiftExpression_unary(MxParser.ShiftExpression_unaryContext ctx);
+	T visitAdd_expression(MxParser.Add_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code shiftExpression_shl}
-	 * labeled alternative in {@link MxParser#shiftExpression}.
+	 * Visit a parse tree produced by {@link MxParser#multi_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitShiftExpression_shl(MxParser.ShiftExpression_shlContext ctx);
+	T visitMulti_expression(MxParser.Multi_expressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code relationalExpression_ge}
-	 * labeled alternative in {@link MxParser#relationalExpression}.
+	 * Visit a parse tree produced by {@link MxParser#expression10}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitRelationalExpression_ge(MxParser.RelationalExpression_geContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code relationalExpression_unary}
-	 * labeled alternative in {@link MxParser#relationalExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelationalExpression_unary(MxParser.RelationalExpression_unaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code relationalExpression_geq}
-	 * labeled alternative in {@link MxParser#relationalExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelationalExpression_geq(MxParser.RelationalExpression_geqContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code relationalExpression_le}
-	 * labeled alternative in {@link MxParser#relationalExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelationalExpression_le(MxParser.RelationalExpression_leContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code relationalExpression_leq}
-	 * labeled alternative in {@link MxParser#relationalExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitRelationalExpression_leq(MxParser.RelationalExpression_leqContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code equalityExpression_unary}
-	 * labeled alternative in {@link MxParser#equalityExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqualityExpression_unary(MxParser.EqualityExpression_unaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code equalityExpression_equal}
-	 * labeled alternative in {@link MxParser#equalityExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqualityExpression_equal(MxParser.EqualityExpression_equalContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code equalityExpression_inequal}
-	 * labeled alternative in {@link MxParser#equalityExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEqualityExpression_inequal(MxParser.EqualityExpression_inequalContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code andExpression_unary}
-	 * labeled alternative in {@link MxParser#andExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndExpression_unary(MxParser.AndExpression_unaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code andExpression_binary}
-	 * labeled alternative in {@link MxParser#andExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAndExpression_binary(MxParser.AndExpression_binaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code exclusiveOrExpression_unary}
-	 * labeled alternative in {@link MxParser#exclusiveOrExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExclusiveOrExpression_unary(MxParser.ExclusiveOrExpression_unaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code exclusiveOrExpression_binary}
-	 * labeled alternative in {@link MxParser#exclusiveOrExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExclusiveOrExpression_binary(MxParser.ExclusiveOrExpression_binaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code inclusiveOrExpression_binary}
-	 * labeled alternative in {@link MxParser#inclusiveOrExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInclusiveOrExpression_binary(MxParser.InclusiveOrExpression_binaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code inclusiveOrExpression_unary}
-	 * labeled alternative in {@link MxParser#inclusiveOrExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitInclusiveOrExpression_unary(MxParser.InclusiveOrExpression_unaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code logicalAndExpression_unary}
-	 * labeled alternative in {@link MxParser#logicalAndExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLogicalAndExpression_unary(MxParser.LogicalAndExpression_unaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code logicalAndExpression_binary}
-	 * labeled alternative in {@link MxParser#logicalAndExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLogicalAndExpression_binary(MxParser.LogicalAndExpression_binaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code logicalOrExpression_binary}
-	 * labeled alternative in {@link MxParser#logicalOrExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLogicalOrExpression_binary(MxParser.LogicalOrExpression_binaryContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code logicalOrExpression_unary}
-	 * labeled alternative in {@link MxParser#logicalOrExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLogicalOrExpression_unary(MxParser.LogicalOrExpression_unaryContext ctx);
+	T visitExpression10(MxParser.Expression10Context ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#expression}.
 	 * @param ctx the parse tree
@@ -330,261 +198,212 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	T visitExpression(MxParser.ExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code declaration_init}
-	 * labeled alternative in {@link MxParser#declaration}.
+	 * labeled alternative in {@link MxParser#variable_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitDeclaration_init(MxParser.Declaration_initContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code declaration_none}
-	 * labeled alternative in {@link MxParser#declaration}.
+	 * labeled alternative in {@link MxParser#variable_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitDeclaration_none(MxParser.Declaration_noneContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code initDeclaratorList_single}
-	 * labeled alternative in {@link MxParser#initDeclaratorList}.
+	 * Visit a parse tree produced by the {@code variable_declarator_none}
+	 * labeled alternative in {@link MxParser#variable_declarator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInitDeclaratorList_single(MxParser.InitDeclaratorList_singleContext ctx);
+	T visitVariable_declarator_none(MxParser.Variable_declarator_noneContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code initDeclaratorList_multi}
-	 * labeled alternative in {@link MxParser#initDeclaratorList}.
+	 * Visit a parse tree produced by the {@code variable_declarator_init}
+	 * labeled alternative in {@link MxParser#variable_declarator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInitDeclaratorList_multi(MxParser.InitDeclaratorList_multiContext ctx);
+	T visitVariable_declarator_init(MxParser.Variable_declarator_initContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code initDeclarator_none}
-	 * labeled alternative in {@link MxParser#initDeclarator}.
+	 * Visit a parse tree produced by the {@code new_expression_error}
+	 * labeled alternative in {@link MxParser#new_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInitDeclarator_none(MxParser.InitDeclarator_noneContext ctx);
+	T visitNew_expression_error(MxParser.New_expression_errorContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code initDeclarator_init}
-	 * labeled alternative in {@link MxParser#initDeclarator}.
+	 * Visit a parse tree produced by the {@code new_expression_array}
+	 * labeled alternative in {@link MxParser#new_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitInitDeclarator_init(MxParser.InitDeclarator_initContext ctx);
+	T visitNew_expression_array(MxParser.New_expression_arrayContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#typeSpecifier}.
+	 * Visit a parse tree produced by the {@code new_expression_nonarray}
+	 * labeled alternative in {@link MxParser#new_expression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTypeSpecifier(MxParser.TypeSpecifierContext ctx);
+	T visitNew_expression_nonarray(MxParser.New_expression_nonarrayContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code newDeclarator_error}
-	 * labeled alternative in {@link MxParser#newDeclarator}.
+	 * Visit a parse tree produced by the {@code type_array}
+	 * labeled alternative in {@link MxParser#type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNewDeclarator_error(MxParser.NewDeclarator_errorContext ctx);
+	T visitType_array(MxParser.Type_arrayContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code newDeclarator_array}
-	 * labeled alternative in {@link MxParser#newDeclarator}.
+	 * Visit a parse tree produced by the {@code type_type}
+	 * labeled alternative in {@link MxParser#type}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNewDeclarator_array(MxParser.NewDeclarator_arrayContext ctx);
+	T visitType_type(MxParser.Type_typeContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code newDeclarator_nonarray}
-	 * labeled alternative in {@link MxParser#newDeclarator}.
+	 * Visit a parse tree produced by {@link MxParser#type_name}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitNewDeclarator_nonarray(MxParser.NewDeclarator_nonarrayContext ctx);
+	T visitType_name(MxParser.Type_nameContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code directDeclarator_Identifier}
-	 * labeled alternative in {@link MxParser#directDeclarator}.
+	 * Visit a parse tree produced by {@link MxParser#typedef_name}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDirectDeclarator_Identifier(MxParser.DirectDeclarator_IdentifierContext ctx);
+	T visitTypedef_name(MxParser.Typedef_nameContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code directDeclarator_with_parameterList}
-	 * labeled alternative in {@link MxParser#directDeclarator}.
+	 * Visit a parse tree produced by the {@code direct_declarator_Identifier}
+	 * labeled alternative in {@link MxParser#direct_declarator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDirectDeclarator_with_parameterList(MxParser.DirectDeclarator_with_parameterListContext ctx);
+	T visitDirect_declarator_Identifier(MxParser.Direct_declarator_IdentifierContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code directDeclarator_recycle}
-	 * labeled alternative in {@link MxParser#directDeclarator}.
+	 * Visit a parse tree produced by the {@code direct_declarator_with_parameterList}
+	 * labeled alternative in {@link MxParser#direct_declarator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitDirectDeclarator_recycle(MxParser.DirectDeclarator_recycleContext ctx);
+	T visitDirect_declarator_with_parameterList(MxParser.Direct_declarator_with_parameterListContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code parameterList_multi}
-	 * labeled alternative in {@link MxParser#parameterList}.
+	 * Visit a parse tree produced by the {@code expr_statement}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitParameterList_multi(MxParser.ParameterList_multiContext ctx);
+	T visitExpr_statement(MxParser.Expr_statementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code parameterList_single}
-	 * labeled alternative in {@link MxParser#parameterList}.
+	 * Visit a parse tree produced by the {@code block_statement}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitParameterList_single(MxParser.ParameterList_singleContext ctx);
+	T visitBlock_statement(MxParser.Block_statementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#parameterDeclaration}.
+	 * Visit a parse tree produced by the {@code switch_statement}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitParameterDeclaration(MxParser.ParameterDeclarationContext ctx);
+	T visitSwitch_statement(MxParser.Switch_statementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#typedefName}.
+	 * Visit a parse tree produced by the {@code iteration_statement_while}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTypedefName(MxParser.TypedefNameContext ctx);
+	T visitIteration_statement_while(MxParser.Iteration_statement_whileContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#statement}.
+	 * Visit a parse tree produced by the {@code iteration_statement_for}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStatement(MxParser.StatementContext ctx);
+	T visitIteration_statement_for(MxParser.Iteration_statement_forContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#compoundStatement}.
+	 * Visit a parse tree produced by the {@code jump_statement_continue}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCompoundStatement(MxParser.CompoundStatementContext ctx);
+	T visitJump_statement_continue(MxParser.Jump_statement_continueContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#blockItem}.
+	 * Visit a parse tree produced by the {@code jump_statement_break}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitBlockItem(MxParser.BlockItemContext ctx);
+	T visitJump_statement_break(MxParser.Jump_statement_breakContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#expressionStatement}.
+	 * Visit a parse tree produced by the {@code jump_statement_return}
+	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitExpressionStatement(MxParser.ExpressionStatementContext ctx);
+	T visitJump_statement_return(MxParser.Jump_statement_returnContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#selectionStatement}.
+	 * Visit a parse tree produced by {@link MxParser#block}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSelectionStatement(MxParser.SelectionStatementContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code iterationStatement_while}
-	 * labeled alternative in {@link MxParser#iterationStatement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIterationStatement_while(MxParser.IterationStatement_whileContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code iterationStatement_for}
-	 * labeled alternative in {@link MxParser#iterationStatement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIterationStatement_for(MxParser.IterationStatement_forContext ctx);
+	T visitBlock(MxParser.BlockContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code forCondition_init}
-	 * labeled alternative in {@link MxParser#forCondition}.
+	 * labeled alternative in {@link MxParser#for_condition}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitForCondition_init(MxParser.ForCondition_initContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code forCondition_none}
-	 * labeled alternative in {@link MxParser#forCondition}.
+	 * labeled alternative in {@link MxParser#for_condition}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitForCondition_none(MxParser.ForCondition_noneContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code forDeclaration_init}
-	 * labeled alternative in {@link MxParser#forDeclaration}.
+	 * Visit a parse tree produced by {@link MxParser#function_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForDeclaration_init(MxParser.ForDeclaration_initContext ctx);
+	T visitFunction_declaration(MxParser.Function_declarationContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code forDeclaration_none}
-	 * labeled alternative in {@link MxParser#forDeclaration}.
+	 * Visit a parse tree produced by {@link MxParser#function_declarator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForDeclaration_none(MxParser.ForDeclaration_noneContext ctx);
+	T visitFunction_declarator(MxParser.Function_declaratorContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#forExprEnd}.
+	 * Visit a parse tree produced by the {@code parameterList_multi}
+	 * labeled alternative in {@link MxParser#parameter_list}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForExprEnd(MxParser.ForExprEndContext ctx);
+	T visitParameterList_multi(MxParser.ParameterList_multiContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#forExprUpdate}.
+	 * Visit a parse tree produced by {@link MxParser#parameter_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForExprUpdate(MxParser.ForExprUpdateContext ctx);
+	T visitParameter_declaration(MxParser.Parameter_declarationContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code jumpStatement_continue}
-	 * labeled alternative in {@link MxParser#jumpStatement}.
+	 * Visit a parse tree produced by the {@code class_body_decl}
+	 * labeled alternative in {@link MxParser#class_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitJumpStatement_continue(MxParser.JumpStatement_continueContext ctx);
+	T visitClass_body_decl(MxParser.Class_body_declContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code jumpStatement_break}
-	 * labeled alternative in {@link MxParser#jumpStatement}.
+	 * Visit a parse tree produced by the {@code class_body_none}
+	 * labeled alternative in {@link MxParser#class_declaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitJumpStatement_break(MxParser.JumpStatement_breakContext ctx);
+	T visitClass_body_none(MxParser.Class_body_noneContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code jumpStatement_return}
-	 * labeled alternative in {@link MxParser#jumpStatement}.
+	 * Visit a parse tree produced by {@link MxParser#class_body}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitJumpStatement_return(MxParser.JumpStatement_returnContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#program}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitProgram(MxParser.ProgramContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#programDeclaration}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitProgramDeclaration(MxParser.ProgramDeclarationContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#functionDefinition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitFunctionDefinition(MxParser.FunctionDefinitionContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code classDeclaration_decl}
-	 * labeled alternative in {@link MxParser#classDefinition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitClassDeclaration_decl(MxParser.ClassDeclaration_declContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code classDeclaration_none}
-	 * labeled alternative in {@link MxParser#classDefinition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitClassDeclaration_none(MxParser.ClassDeclaration_noneContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MxParser#classDeclaration}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitClassDeclaration(MxParser.ClassDeclarationContext ctx);
+	T visitClass_body(MxParser.Class_bodyContext ctx);
 }
