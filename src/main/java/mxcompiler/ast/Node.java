@@ -7,10 +7,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 /**
  * A {@code Node} is the abstract Abstract Syntax Tree abstract Node
- * <p> means new para
- * The {@link mxcompiler.ast.ASTNode} 
+ * <p>  * Rewrite from down to top
  * <p> 
- * The {@linkplain mxcompiler.ast.AST} 
+ * The {@linkplain mxcompiler.ast.ASTNode} is root Node
  *
  * @author     Xun
  * @since      1.0
@@ -20,8 +19,10 @@ abstract public class Node {
     public Node() {}
 
     public ParserRuleContext ctx; // reserve the location of each grammer
-    abstract public void setCtx(ParserRuleContext ctx); 
+    /** FIX: Does it have use?? */
+    public void setCtx(ParserRuleContext ctx) { this.ctx = ctx; } 
     
+    // abstract void visit(ASTVisitor visitor);
     
     /**
      * dump output

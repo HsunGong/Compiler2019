@@ -1,16 +1,14 @@
 package mxcompiler.main;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.ListIterator;
 
 import mxcompiler.exception.OptionException;
 
 public class Option {
 
-
-    private List<String> srcs;
+    /** only support 1 source file */
+    private String src  = ""; 
     private String output = "a.out";
     private CompilerMode mode;
     private int level = 0;
@@ -21,8 +19,6 @@ public class Option {
     }
     
     void parseArgs(String[] Args) throws OptionException{
-        srcs = new ArrayList<String>();
-        // srcs.add(args[0]);
         ListIterator<String> args = Arrays.asList(Args).listIterator();
         while (args.hasNext()) {
             String arg = args.next();
@@ -64,9 +60,8 @@ public class Option {
                     throw new OptionException("unknown option: " + arg);
                 }
             }
-            else {
-                srcs.add(arg);
-            }
+            else if(src == "") { src = arg; }
+            else { throw new OptionException("too many srcs"); }
         }
 
         if (mode == null) {
@@ -75,9 +70,9 @@ public class Option {
     }
 
 
-    public List<String> sourceFiles() {
-        System.out.println(srcs.get(0) instanceof String);
-        return srcs;
+    public String sourceFile() {
+        System.out.println(src instanceof String);
+        return src;
     }
 
     public String outputFile() {

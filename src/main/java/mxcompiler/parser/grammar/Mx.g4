@@ -114,9 +114,8 @@ primaryExpression
 
 
 expression10
-	: logicalOrExpression (
-		'?' expression ':' expression10
-	)?
+	: logicalOrExpression 
+    // ( '?' expression ':' expression10 )?
 	;
 
 expression
@@ -130,8 +129,8 @@ expression
 
 variableDeclaration /* define variables, may have no names;
 	may have mutiply names; may have init values */
-	: type variableDeclarator (',' variableDeclarator)* ';'	# declarationInit
-	| type ';'													# declarationNone // only type no name
+	: type variableDeclarator (',' variableDeclarator)* ';'	# varDeclarationInit
+	| type ';'													# varDeclarationNone // only type no name
 	;
 
 
@@ -207,8 +206,8 @@ forCondition											// FIX: update?? end??
 	;
 
 forDeclaration												// FIX: only support 1-declaration
-	: type variableDeclarator (',' variableDeclarator)*	# declarationInit
-	| type													# declarationNone // only type no name
+	: type variableDeclarator (',' variableDeclarator)*	# forDeclarationInit
+	| type													# forDeclarationNone // only type no name
 	;
 
 functionDeclaration

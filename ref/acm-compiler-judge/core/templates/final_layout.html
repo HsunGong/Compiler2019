@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<!--
+Source Code:
+https://github.com/abcdabcd987/acm-compiler-judge
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %} - {{website_name}}</title>
+    <link href="{{ROOT}}/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ROOT}}/static/layout.css?v=20170228" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-static-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{{ROOT}}/">{{website_name}}</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="{{ROOT}}/"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a></li>
+            <li><a href="{{ROOT}}/compilers"><span class="glyphicon glyphicon-hdd" aria-hidden="true"></span> Compilers</a></li>
+            <li><a href="{{ROOT}}/builds"><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Builds</a></li>
+            <li><a href="{{ROOT}}/runs"><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Runs</a></li>
+            <li><a href="{{ROOT}}/testcases"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Testcases</a></li>
+            <li><a href="{{FINAL_ROOT}}/result.html"><span class="glyphicon glyphicon-sort-by-attributes-alt" aria-hidden="true"></span> Final</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <div class="container" role="main">
+    {% block content %}{% endblock %}
+    </div>
+
+    <script src="{{ROOT}}/static/jquery-3.1.1.min.js"></script>
+    <script src="{{ROOT}}/static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip({html: true})
+    })
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

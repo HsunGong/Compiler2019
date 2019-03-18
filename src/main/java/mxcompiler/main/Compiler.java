@@ -1,6 +1,5 @@
 package mxcompiler.main;
 
-import java.util.List;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -14,7 +13,7 @@ public final class Compiler {
 
     private final ExceptionHandler errHandler;
 
-    public static void main (String[] args) {
+    public static void main (String[] args) throws Exception {
         Compiler c = new Compiler(ProgName);
         c.execute(args);
     }
@@ -23,21 +22,25 @@ public final class Compiler {
         this.errHandler = new ExceptionHandler(name);
     }
     
-    private void execute(String[] args) {
-        try {
-
-            // parse options
-            Option opts = new Option(args);
-            List<String> srcs = opts.sourceFiles();
-            
-            // build each file
-            for (String src : srcs) {
+    private void execute(String[] args) throws Exception {
+        // parse options
+        Option opts = new Option(args);
+        String src = opts.sourceFile();
+        
+        switch(opts.mode()) {
+            case Default: // So
                 compile(src, opts);
-            }
-            
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+                System.out.println(opts.mode().toString());
+                break;
+            case Dump:
+                break;
+            case Check: // throw all Exception without errorHandler
+                compileCheck(src, opts);
+                break;
+            default:
+                throw new Exception("No Compile Mode selected");
         }
+        
     }
     
     // file compiler
@@ -46,20 +49,10 @@ public final class Compiler {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxParser parser = new MxParser(tokens);
         
-        ParseTree tree = parser.compilation_unit(); // the begin root of my g4 file
+        ParseTree tree = parser.compilationUnit(); // the begin root of my g4 file
         
-        switch(opts.mode()) {
-            case Default:
-                AST ast = new AST();
-                ast.visit(tree);
-                break;
-            case Dump:
-                break;
-            case Check:
-                break;
-            default:
-                throw new Exception("No Compile Mode selected");
-        }
+        ASTNode ast = new ASTNode(null);
+        ast.visit(tree);
         
         // SemanticAnalyze sem = new SemanticAnalyze.visit(ast);
         
@@ -68,4 +61,24 @@ public final class Compiler {
         // ASM asm = generateAssembly(ir, ast);
         // writefile(opts.outputFile());
     }
+
+    private void compileCheck(String src, Option opts) throws Exception {
+        MxLexer lexer = new MxLexer(CharStreams.fromFileName(src));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        MxParser parser = new MxParser(tokens);
+        
+        ParseTree tree = parser.compilationUnit(); // the begin root of my g4 file
+        
+        ASTNode ast = new ASTNode(null);
+        ast.visit(tree);
+        
+        // SemanticAnalyze sem = new SemanticAnalyze.visit(ast);
+        
+        // IR ir = new ir.visit(ast);
+        
+        // ASM asm = generateAssembly(ir, ast);
+        // writefile(opts.outputFile());
+    }
+
+
 }
