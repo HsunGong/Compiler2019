@@ -1,5 +1,6 @@
 package mxcompiler.main;
 
+import java.io.*;
 import java.util.Arrays;
 import java.util.ListIterator;
 
@@ -8,7 +9,7 @@ import mxcompiler.exception.OptionException;
 public class Option {
 
     /** only support 1 source file */
-    private String src  = ""; 
+    private InputStream src;
     private String output = "a.out";
     private CompilerMode mode;
     private int level = 0;
@@ -47,12 +48,12 @@ public class Option {
                     }
                     level = (type.equals("0") ? 0 : 1);
                 }
-                else if (arg.equals("--version")) {
+                else if (arg.equals("--version") || arg.equals("-v")) {
                     System.out.printf("%s version %s\n",
                         Compiler.ProgName, Compiler.Version);
                     System.exit(0);
                 }
-                else if (arg.equals("--help")) {
+                else if (arg.equals("--help") || arg.equals("-h")) {
                     printUsage();
                     System.exit(0);
                 }
@@ -60,9 +61,17 @@ public class Option {
                     throw new OptionException("unknown option: " + arg);
                 }
             }
-            else if(src == "") { src = arg; }
+            else if(src == null) { 
+                try {
+                    src = new FileInputStream(arg); 
+                } catch (FileNotFoundException e) {
+                    throw new OptionException(e.getMessage());
+                }
+            }
             else { throw new OptionException("too many srcs"); }
         }
+
+        if (src == null) src = System.in;
 
         if (mode == null) {
             mode = CompilerMode.Default;
@@ -70,11 +79,11 @@ public class Option {
     }
 
 
-    public String sourceFile() {
-        System.out.println(src instanceof String);
+    public InputStream sourceFile() {
         return src;
     }
 
+    // TODO: may support output to system.out 
     public String outputFile() {
         return output;
     }
@@ -90,8 +99,6 @@ public class Option {
     public boolean isDebug() {
         return debug;
     }
-
-    
 
     public void printUsage() {
         System.out.println("EMPTY");

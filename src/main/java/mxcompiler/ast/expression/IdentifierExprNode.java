@@ -2,7 +2,7 @@ package mxcompiler.ast.expression;
 
 import mxcompiler.ast.Dump;
 
-/** For variable identifier */
+/** For variable identifier in primary expr */
 public class IdentifierExprNode extends ExprNode {
     @Override
     public void _dump(Dump d) { d.print("identifier expr"); }

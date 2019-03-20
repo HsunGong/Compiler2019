@@ -1,150 +1,240 @@
+grammar Mx
+	;
 
-Break : 'break';
-Continue : 'continue';
-Else : 'else';
-For : 'for';
-If : 'if';
-Int : 'int';
-String : 'string';
-Return : 'return';
-Void : 'void';
-While : 'while';
-Class : 'class';
-New : 'new';
-True : 'true';
-False : 'false';
-Null : 'null';
-Bool : 'bool';
+import Lexis
+	;
 
-LeftParen : '(';
-RightParen : ')';
-LeftBracket : '[';
-RightBracket : ']';
-LeftBrace : '{';
-RightBrace : '}';
+compilationUnit
+	: translationUnit* EOF
+	;
 
-Less : '<';
-LessEqual : '<=';
-Greater : '>';
-GreaterEqual : '>=';
-LeftShift : '<<';
-RightShift : '>>';
+translationUnit
+	: functionDeclaration
+	| classDeclaration
+	| variableDeclaration
+	| ';'
+	;
 
-Plus : '+';
-PlusPlus : '++';
-Minus : '-';
-MinusMinus : '--';
-Star : '*';
-Div : '/';
-Mod : '%';
+// FIX: left recursive --> * replace with left recursive
+/* logicalOrExpression
+	: logicalAndExpression							# logicalOrExpressionUnary
+	| logicalOrExpression ('||' logicalAndExpression	# logicalOrExpressionBinary
+	; */
 
-And : '&';
-Or : '|';
-AndAnd : '&&';
-OrOr : '||';
-Caret : '^';
-Not : '!';
-Tilde : '~';
 
-Colon : ':';
-Semi : ';';
-Comma : ',';
+logicalOrExpression // expression9
+	: logicalAndExpression ('||' logicalAndExpression)*
+	;
+logicalAndExpression
+	: binaryOrExpression ('&&' binaryOrExpression)*
+	;
+binaryOrExpression
+	: binaryNorExpression ('|' binaryNorExpression)*
+	;
+binaryNorExpression
+	: binaryAndExpression ('^' binaryAndExpression)*
+	;
+binaryAndExpression
+	: equalExpression ('&' equalExpression)*
+	;
+equalExpression // FIX: needed to tag == or != or unary??
+	: compareExpression ('==' compareExpression)*
+	| compareExpression ('!=' compareExpression)*
+	;
+compareExpression
+	: shiftExpression ('<' shiftExpression)*
+	| shiftExpression ('>' shiftExpression)*
+	| shiftExpression ('<=' shiftExpression)*
+	| shiftExpression ('>=' shiftExpression)*
+	;
+shiftExpression
+	: addExpression ('>>' addExpression)*
+	| addExpression ('<<' addExpression)*
+	;
+addExpression
+	: multiExpression ('+' multiExpression)*
+	| multiExpression ('-' multiExpression)*
+	;
 
-Assign : '=';
+multiExpression
+	: term ('*' term)*
+	| term ('/' term)*
+	| term ('%' term)*
+	;
 
-Equal : '==';
-NotEqual : '!=';
+term
+	: unaryExpression
+	| DigitSequence // a number
+	// | '(' typeName ')' term // forced cast change
+	;
 
-Dot : '.';
 
-Identifier // 622
-    :   Nondigitnon
-        (   Nondigit
-        |   Digit
-        )*
-    ;
+unaryExpression /* seems not like an expression
+	but here regard as an expression*/
+	: '++' unaryExpression	# unaryExpressionPrefixInc
+	| '--' unaryExpression	# unaryExpressionPrefixDec
+	| unaryOperator term	# unaryExpressionPrefix // FIX: double unaryOperator??
+	| postfixExpression		# unaryExpressionPostfix
+	;
 
-fragment
-Nondigitnon
-    :   [a-zA-Z]
-    ;
+unaryOperator
+	: '+'
+	| '-'
+	| '!'
+	| '~'
+	;
 
-fragment
-Nondigit // 637
-    :   [a-zA-Z_]
-    ;
 
-fragment
-Digit // 642
-    :   [0-9]
-    ;
+postfixExpression /* FIX: different between left:(x)* and left:left + x
+	FIX: needed to tag??
+	non-terminal symbol -> postfix
+	terminal symbol(may) -> primary */
+	: primaryExpression
+	| postfixExpression '++'
+	| postfixExpression '--'
+	| postfixExpression '[' expression ']'
+	| postfixExpression '.' Identifier
+	| postfixExpression '(' args ')'
+	;
 
-Constant // 657
-    :   IntegerConstant
-    ;
 
-fragment
-IntegerConstant // 665
-    :   NonzeroDigit Digit*
-    ;
+args // FIX: does Single or Mutli matters??
+	: (expression (',' expression))?
+	;
 
-fragment
-NonzeroDigit // 698
-    :   [1-9]
-    ;
+primaryExpression
+	: This
+	| True
+	| False
+	| Null
+	| Identifier
+	| StringLiteral
+	| IntegerLiteral
+	| '(' expression ')'
+	;
 
-DigitSequence // 770
-    :   Digit+
-    ;
 
-fragment
-CChar
-    :   ~['\\\r\n]
-    |   EscapeSequence
-    ;
+expression
+	: newExpression
+	| logicalOrExpression
+	| unaryExpression '=' expression //rhsExpr
+	// | unaryExpression opassignOp expression // += /= ...
+	// | DigitSequence  // FIX: what the hell is this?
+	;
 
-fragment
-EscapeSequence // 816
-    :   '\\' ['"?abfnrtv\\]
-    ;
+// optim with expression
 
-StringLiteral // 836
-    :   '"' SCharSequence? '"'
-    ;
+newExpression /* new operation
+	FIX : is LeftBracket LeftParen needed??? */
+	: 'new' typeName ('[' expression ']')+ ('[' ']')+ (
+		'[' expression ']'
+	)+ # newExpressionError
+	| 'new' typeName ('[' expression ']')+ (
+		LeftBracket ']'
+	)*							# newExpressionArray
+	| 'new' typeName ('(' ')')?	# newExpressionNonarray
+	;
 
-fragment
-SCharSequence // 847
-    :   SChar+
-    ;
 
-fragment
-SChar // 851
-    :   ~["\\\r\n]
-    |   EscapeSequence
-    |   '\\\n'  
-    |   '\\\r\n' 
-    ;
+/** ------------------- statements ---------- */
+// FIX: whether 'if' or If; so as For While...
+statement
+	: block				# blockStatement
+	| expression ';'	# exprStatement // contain ';'
+	| If '(' expression ')' thenStmt = statement (
+		Else elseStmt = statement
+	)?										# ifStatement
+	| While '(' expression ')' statement	# whileStatement
+	| For '(' forCondition ')' statement	# forStatement
+	| Return expression? ';'				# returnStatement
+	| Continue ';'							# continueStatement
+	| Break ';'								# breakStatement
+	| ';'									# blankStmt
+	;
 
-Whitespace
-    :   [ \t]+
-        -> skip
-    ;
+block
+	: '{' blockContent* '}' // FIX: stmt and vardecl
+	;
 
-Newline
-    :   (   '\r' '\n'?
-        |   '\n'
-        )
-        -> skip
-    ;
+blockContent
+	: statement
+	| variableDeclaration
+	;
 
-BlockComment
-    :   '/*' .*? '*/'
-        -> skip
-    ;
+// FIX: x=expression
+forCondition
+	: init? ';' cond = expression? ';' step = expression?
+	;
 
-LineComment
-    :   '//' ~[\r\n]*
-        -> skip
-    ;
+init														// FIX: only support 1-declaration
+	: type (variableDeclarator (',' variableDeclarator)*)?	# forInitDecl
+	| expression											# forInitExpr
+	;
+
+
+/** -------------- Declarations --------------- */
+
+/** variable declaration */
+variableDeclaration /* define variables, may have no names;
+	may have mutiply names; may have init values */
+	: type variableDeclarator (',' variableDeclarator)* ';'	# varDeclarationInit
+	| type ';'												# varDeclarationNone // only type no name
+	;														// FIX: needed??
+
+variableDeclarator // declare some of variables names and some has init values
+	: directDeclarator ('=' expression)?
+	;
+
+type /* like int or int[]
+	used for init */
+	: typeName		# typeNonarray
+	| type '[' ']'	# typeArray
+	;
+
+typeName
+	: Int
+	| String
+	| Bool
+	| Identifier // self define name
+	;
+
+typeFuncName
+	: 'void'
+	| typeName
+	;
+
+directDeclarator /* FIX: when to use recycle??
+	all of the declarator names 
+	and some are functions
+	and ?? */
+	: Identifier // # directDeclaratorIdentifier
+	// | directDeclarator '(' parameterList? ')'	# directDeclaratorWithParameterList
+	// | '(' directDeclarator ')'					# directDeclaratorRecycle 
+	;
+
+/** function declaration */
+functionDeclaration
+	: typeFuncName? Identifier '(' parameterList? ')' block
+	;
+
+parameterList
+	: parameterDeclaration (',' parameterDeclaration)*
+	;
+
+// no init-expr
+parameterDeclaration
+	: type Identifier
+	;
+
+/** class declaration */
+classDeclaration
+	: 'class' Identifier '{' classBody* '}'
+	// | 'class' Identifier						# classBodyNone // FIX: what the hell??
+	;
+
+classBody
+	: variableDeclaration
+	| functionDeclaration
+	;
 
 

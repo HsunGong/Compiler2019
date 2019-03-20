@@ -5,7 +5,7 @@ import java.util.List;
 import mxcompiler.ast.Dump;
 import mxcompiler.ast.TypeNode;
 
-/** FIX: how to write new Node */
+/** for creator */
 public class NewExprNode extends ExprNode {
     @Override
     public void _dump(Dump d) { d.print("new expr"); }

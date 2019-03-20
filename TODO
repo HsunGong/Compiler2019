@@ -7,54 +7,78 @@ Projects:
 	☐ code optimize
 
 Main:
-    ✔ Generate Simple antlr @started(19-03-04 17:14) @done(19-03-13 21:00) @lasted(1w2d3h46m41s)
-    ☐ Generate AST nodes and Type nodes for at most 1 day @started(19-03-16 14:28)
+    ✔ Generate Simple antlr @started(19-03-04 17) @done(19-03-13 21) @lasted(1w2d3h46m41s)
+    ☐ Generate AST nodes and Type nodes for at most 1 day @started(19-03-16 14)
 
 Parser: 
-	✔ change antlr extension to use @started(19-03-05 18:04) @done(19-03-05 18:58) @lasted(54m24s)
+	✔ change antlr extension to use @started(19-03-05 18) @done(19-03-05 18) @lasted(54m24s)
 
 ASTNode: @today 
-    ✔ Scope init @done(19-03-16 16:35)
-    ✔ Node @done(19-03-16 14:58)
-        ✔ AST (programNode) @done(19-03-16 17:53)
-        ✔ Decl(define) @done(19-03-16 16:19)
-            ✔ Func @done(19-03-16 17:19)
-            ✔ Class @done(19-03-16 17:19)
-            ✔ Var @done(19-03-16 17:19)
-            ✘ VarList @cancelled(19-03-16 17:22)
-        ✔ Stmt @done(19-03-17 15:24)
-            ✔ Block @done(19-03-17 15:24)
-            ✔ Expr @done(19-03-17 15:44)
-            ✔ If (cond) @done(19-03-17 15:24)
-            ✔ While @done(19-03-17 15:35)
-            ✔ For @done(19-03-17 15:35)
-            ✔ Continue @done(19-03-17 15:35)
-            ✔ Break @done(19-03-17 15:35)
-            ✔ Return @done(19-03-17 15:35)
-            ✘ Blank @cancelled(19-03-17 15:44)
-            ✘ VarDecl @cancelled(19-03-17 15:44)
-        ✔ Expr @done(19-03-17 15:57)
-            ✔ FuncCall @done(19-03-17 16:15) class method ?? done with 
-            ✔ suffix @done(19-03-17 16:33)
-            ✔ prefix @done(19-03-17 16:33)
-            ✔ memberaccess @done(19-03-17 21:29)
-            ✔ binary or and @done(19-03-17 16:55)
-            ✔ new @done(19-03-17 16:39)
-            ✔ identifier ? id ? var decl node @critical  @done(19-03-17 21:19)
-            ✔ array index(aref, subscript) @done(19-03-17 21:36)
-            ✔ assign @done(19-03-17 17:03)
-            ✔ this @done(19-03-17 16:35)
-            ✔ const(literal) @done(19-03-17 16:46)
-                ✔ int @done(19-03-17 16:46)
-                ✔ string @done(19-03-17 16:46)
-                ✔ bool @done(19-03-17 16:46)
-            ✔ null @done(19-03-17 16:43)
-        ✔ type @done(19-03-17 22:41)
-            ✔ array @done(19-03-17 22:40)
-            ✔ func, class @done(19-03-17 22:41)
-            ✔ int, bool, string @done(19-03-17 22:41)
-            ✔ null void @done(19-03-17 22:41)
-        ☐ entity
+    ✔ Node       @done(03-16 14)
+        ✔ AST (programNode) @done(03-16 17)
+        ✔ Decl(define) @done(03-16 16)
+            ✔ Func  @done(03-16 17)
+            ✔ Class @done(03-16 17)
+            ✔ Var   @done(03-16 17)
+            ✘ VarList  @cancelled(03-16 17)
+        ✔ Stmt @done(03-17 15)
+            ✔ Block @done(03-17 15)
+            ✔ Expr  @done(03-17 15)
+            ✔ If (cond) @done(03-17 15)
+            ✔ While @done(03-17 15)
+            ✔ For 	@done(03-17 15)
+            ✔ Continue @done(03-17 15)
+            ✔ Break @done(03-17 15)
+            ✔ Return @done(03-17 15)
+            ✘ Blank @cancelled(03-17 15)
+            ✘ VarDecl @cancelled(03-17 15)
+        ✔ Expr @done(03-17 15)
+            ✔ FuncCall @done(03-17 16) class method ?? done with 
+            ✔ unary @done(03-17 16)
+                ✔ suffix @done(03-17 16)
+                ✔ prefix @done(03-17 16)
+            ✔ lhs 	@done(03-20 21)
+                ✔ memberaccess 	@done(03-17 21)
+                ✔ array index(aref, subscript) 	@done(03-17 21)
+            ✔ binary or and @done(03-17 16)
+            ✔ new 		@done(03-17 16)
+            ✔ identifier? var-decl-node @done(03-17 21)
+            ✔ assign @done(03-17 17)
+            ✔ this 	@done(03-17 16)
+            ✔ const(literal) @done(03-17 16)
+                ✔ int 	@done(03-17 16)
+                ✔ string @done(03-17 16)
+                ✔ bool 	@done(03-17 16)
+            ✔ null 	@done(03-17 16)
+        ✔ typeNode @done(03-20 18)
+		☐ compare my g4 with fanzhou @high @started(03-20 18)
+			typeOrVoid -> typeFuncName
+			parameterDeclarationList -> paramDeclarationList
+			memberDeclaration -> classBody
+			typeType -> type
+			nonArrayTypeType -> typeName
+			conditionStatement
+			loopStatement
+			jumpStatement
+
+
+
+
+
+	☐ check ASTBuilder out @today @started(19-03-18 21:27)
+
+
+TypeResolve:
+
+	✔ type 	@done(03-17 22)
+		✔ array @done(03-17 22)
+		✔ func, class @done(03-17 22)
+		✔ int, bool, string @done(03-17 22)
+		✔ null void @done(03-17 22)
+
+	✔ Scope init @done(03-16 16)
+
+    ☐ entity
         ☐  what is diff between type and entity
 
     ☐ remain may be used for asm in Scope
@@ -65,6 +89,8 @@ ASTNode: @today
         static public final String ARRAY_CLASS_NAME = "__array";
         static public final String STRING_CLASS_NAME = "__string";
         static public final String THIS_PARA_NAME = "__this_para";
+	
+		configuration for reg size
 
 type from Book: @critical @high @today 
     ☐ change arrayList into LinkedHashSet or not? @started(19-03-16 17:30)

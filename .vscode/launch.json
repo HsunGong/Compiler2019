@@ -9,6 +9,7 @@
             "name": "CodeLens (Launch) - Compiler",
             "request": "launch",
             "mainClass": "mxcompiler.main.Compiler",
+            "args": "-C /home/xun/Documents/mxc/src/test/cases/test.in",
             "projectName": "mxc"
         },
         {
@@ -18,19 +19,12 @@
             "mainClass": "${file}"
         },
         {
-            "type": "java",
-            "name": "Debug (Launch)-App<mxc>",
-            "request": "launch",
-            "mainClass": "mxcompiler.App",
-            "projectName": "mxc"
-        },
-        {
             "name": "Debug ANTLR4 grammar",
             "type": "antlr-debug",
             "request": "launch",
             "input": "src/test/cases/test.in",
             "grammar": "src/main/java/mxcompiler/parser/grammar/Mx.g4",
-            "startRule": "start",
+            "startRule": "compilationUnit",
             "printParseTree": true,
             "visualParseTree": true
         }
