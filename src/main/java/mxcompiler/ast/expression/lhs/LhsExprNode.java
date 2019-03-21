@@ -1,12 +1,20 @@
 package mxcompiler.ast.expression.lhs;
 
 import mxcompiler.ast.expression.ExprNode;
+import mxcompiler.ast.Location;
 
-/** Lhs can be assign with value
- * Without auto type transfer, no originType is needed
-*/
+/**
+ * Lhs can be assign with value Without auto type transfer, no originType is
+ * needed
+ */
 abstract public class LhsExprNode extends ExprNode {
-    @Override
-    public boolean isLeftValue() { return true; }
-    // isLoadable, isAssignable, allocSize() ...
+	@Override
+	public boolean isLeftValue() {
+		return true;
+	}
+	// isLoadable, isAssignable, allocSize() ...
+
+	public LhsExprNode(Location location) {
+		super(location);
+	}
 }

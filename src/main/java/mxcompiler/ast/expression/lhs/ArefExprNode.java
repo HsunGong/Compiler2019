@@ -1,17 +1,16 @@
 package mxcompiler.ast.expression.lhs;
 
-import mxcompiler.ast.Dump;
+
 import mxcompiler.ast.expression.ExprNode;
 
-
+import mxcompiler.ast.Location;
 /** This is the array index node */
 public class ArefExprNode extends LhsExprNode {
-    @Override
-    public void _dump(Dump d) { d.print("Array index"); }
     private ExprNode expr;
     private ExprNode index;
 
-    public ArefExprNode(ExprNode expr, ExprNode index) {
+    public ArefExprNode(ExprNode expr, ExprNode index, Location location) {
+		super(location);
         this.expr = expr;
         this.index = index;
     }

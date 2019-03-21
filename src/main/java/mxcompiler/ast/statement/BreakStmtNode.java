@@ -1,11 +1,10 @@
 package mxcompiler.ast.statement;
 
-import mxcompiler.ast.Dump;
 
+import mxcompiler.ast.Location;
 public class BreakStmtNode extends StmtNode {
-    @Override
-    public void _dump(Dump d) { d.print("Break stmt"); }
 
-    public BreakStmtNode() {}
+	public BreakStmtNode(Location location) {
+		super(location);}
     
 }

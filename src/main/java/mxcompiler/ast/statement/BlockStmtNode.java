@@ -3,20 +3,18 @@ package mxcompiler.ast.statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import mxcompiler.ast.Dump;
+
 import mxcompiler.ast.declaration.VarDeclListNode;
 import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.entity.scope.LocalScope;
-
+import mxcompiler.ast.Location;
 public class BlockStmtNode extends StmtNode {
-    @Override
-    public void _dump(Dump d) { d.print("block stmt"); }
-    
 	private List<StmtNode> stmts;
 	private List<VarDeclNode> varList;
     private LocalScope scope;
 
-    public BlockStmtNode (List<StmtNode> stmts, List<VarDeclNode> varList) {
+    public BlockStmtNode (List<StmtNode> stmts, List<VarDeclNode> varList, Location location) {
+		super(location);
         if(stmts == null) this.stmts = new ArrayList<StmtNode>();
 		else this.stmts = stmts;
 
@@ -24,8 +22,8 @@ public class BlockStmtNode extends StmtNode {
         else this.varList = varList;
     }
 
-	public BlockStmtNode (List<StmtNode> stmts, VarDeclListNode varList) {
-		this(stmts, varList.getList());
+	public BlockStmtNode (List<StmtNode> stmts, VarDeclListNode varList, Location location) {
+		this(stmts, varList.getList(), location);
 	}
 
     public void setScope(LocalScope scope) { this.scope = scope; }

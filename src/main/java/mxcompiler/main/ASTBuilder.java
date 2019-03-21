@@ -7,7 +7,9 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import mxcompiler.parser.MxBaseVisitor;
 import mxcompiler.parser.MxParser;
+
 import mxcompiler.type.*;
+
 import mxcompiler.ast.*;
 import mxcompiler.ast.statement.*;
 import mxcompiler.ast.declaration.*;
@@ -46,7 +48,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 				else
 					throw new Error("not found decl from compilation unit");
 			}
-		return new ASTNode(decls);
+		return new ASTNode(decls, new Location(ctx));
 	}
 
 	/**
@@ -98,7 +100,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			for (ParserRuleContext varDecl : ctx.variableDeclarator())
 				varDecls.add((VarDeclNode) visit(varDecl));
 
-		return new VarDeclListNode(varDecls);
+		return new VarDeclListNode(varDecls, new Location(ctx));
 	}
 
 	/**
@@ -113,7 +115,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	public Node visitVariableDeclarator(MxParser.VariableDeclaratorContext ctx) {
 		ExprNode init;
 		init = (ctx.expression() == null) ? null : (ExprNode) visit(ctx.expression());
-		return new VarDeclNode(ctx.Identifier().getText(), init, typeTransfer);
+		return new VarDeclNode(ctx.Identifier().getText(), init, typeTransfer, new Location(ctx));
 	}
 
 	/**
@@ -129,7 +131,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		TypeNode type = (TypeNode) visit(ctx.type());
 		// TODO: can get dims ?? - get support from type.arraytype and conflict with
 		// array-creator
-		return new TypeNode(new ArrayType(type.getType()));
+		return new TypeNode(new ArrayType(type.getType()), new Location(ctx));
 	}
 
 	/**
@@ -155,7 +157,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitTypeName(MxParser.TypeNameContext ctx) {
-		return new TypeNode(getType(ctx));
+		return new TypeNode(getType(ctx), new Location(ctx));
 	}
 
 	/** Nonarray, non-function */
@@ -190,7 +192,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		VarDeclListNode varList = (VarDeclListNode) visit(ctx.paramDeclarationList());
 		BlockStmtNode body = (BlockStmtNode) visit(ctx.block());
 
-		return new FuncDeclNode(name, returnType, varList, body);
+		return new FuncDeclNode(name, returnType, varList, body, new Location(ctx));
 	}
 
 	/**
@@ -203,7 +205,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitTypeReturn(MxParser.TypeReturnContext ctx) {
-		return (ctx.Void() != null) ? new TypeNode(new VoidType()) : visit(ctx.type());
+		return (ctx.Void() != null) ? new TypeNode(new VoidType(), new Location(ctx)) : visit(ctx.type());
 	}
 
 	/**
@@ -221,7 +223,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			for (ParserRuleContext param : ctx.paramDeclaration()) {
 				paramList.add((VarDeclNode) visit(param));
 			} // BUG: can be null
-		return new VarDeclListNode(paramList);
+		return new VarDeclListNode(paramList, new Location(ctx));
 	}
 
 	/**
@@ -231,7 +233,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitParamDeclaration(MxParser.ParamDeclarationContext ctx) {
-		return new VarDeclNode(ctx.Identifier().getText(), null, (TypeNode) visit(ctx.type()));
+		return new VarDeclNode(ctx.Identifier().getText(), null, (TypeNode) visit(ctx.type()), new Location(ctx));
 	}
 
 	/**
@@ -260,7 +262,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 				// Never happen else throw new Error("not found such class body");
 			}
 
-		return new ClassDeclNode(name, varList, funcList);
+		return new ClassDeclNode(name, varList, funcList, new Location(ctx));
 	}
 
 	/**
@@ -320,7 +322,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 					stmts.add((StmtNode) stmt);
 			}
 
-		return new BlockStmtNode(stmts, varList);
+		return new BlockStmtNode(stmts, varList, new Location(ctx));
 	}
 
 	/**
@@ -351,7 +353,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitExprStmt(MxParser.ExprStmtContext ctx) {
-		return new ExprStmtNode((ExprNode) visit(ctx.expression()));
+		return new ExprStmtNode((ExprNode) visit(ctx.expression()), new Location(ctx));
 	}
 
 	/**
@@ -368,7 +370,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		StmtNode thenBody = (StmtNode) visit(ctx.statement(0));
 		StmtNode elseBody = (ctx.statement(1) == null) ? null : (StmtNode) visit(ctx.statement(1));
 
-		return new IfStmtNode(cond, thenBody, elseBody);
+		return new IfStmtNode(cond, thenBody, elseBody, new Location(ctx));
 	}
 
 	/**
@@ -384,7 +386,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		ExprNode cond = (ExprNode) visit(ctx.expression());
 		StmtNode body = (StmtNode) visit(ctx.statement());
 
-		return new WhileStmtNode(cond, body);
+		return new WhileStmtNode(cond, body, new Location(ctx));
 	}
 
 	/**
@@ -407,7 +409,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		varList = (VarDeclListNode) visit(ctx.init);
 		body = (StmtNode) visit(ctx.statement());
 
-		return new ForStmtNode(init, cond, incr, body, varList);
+		return new ForStmtNode(init, cond, incr, body, varList, new Location(ctx));
 	}
 
 	/**
@@ -429,7 +431,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		incr = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
 		body = (StmtNode) visit(ctx.statement());
 
-		return new ForStmtNode(init, cond, incr, body, varList);
+		return new ForStmtNode(init, cond, incr, body, varList, new Location(ctx));
 	}
 
 	/**
@@ -442,7 +444,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitContinueStmt(MxParser.ContinueStmtContext ctx) {
-		return new ContinueStmtNode();
+		return new ContinueStmtNode(new Location(ctx));
 	}
 
 	/**
@@ -455,7 +457,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitBreakStmt(MxParser.BreakStmtContext ctx) {
-		return new BreakStmtNode();
+		return new BreakStmtNode(new Location(ctx));
 	}
 
 	/**
@@ -471,7 +473,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		ExprNode returnExpr;
 		returnExpr = (ctx.expression() == null) ? null : (ExprNode) visit(ctx.expression());
 
-		return new ReturnStmtNode(returnExpr);
+		return new ReturnStmtNode(returnExpr, new Location(ctx));
 	}
 
 	/**
@@ -506,7 +508,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 				params.add((ExprNode) visit(param));
 			}
 
-		return new FuncallExprNode(func, params);
+		return new FuncallExprNode(func, params, new Location(ctx));
 	}
 
 	/**
@@ -574,7 +576,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		// ArrayType(newType.getType()));
 		newType.setType(new ArrayType(newType.getType()));
 
-		return new NewExprNode(newType, dims, num);
+		return new NewExprNode(newType, dims, num, new Location(ctx));
 	}
 
 	/**
@@ -588,7 +590,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitNonArrayCreator(MxParser.NonArrayCreatorContext ctx) {
 		TypeNode newType = (TypeNode) visit(ctx.typeName());
-		return new NewExprNode(newType, null, 0);
+		return new NewExprNode(newType, null, 0, new Location(ctx));
 	}
 
 	/**
@@ -603,7 +605,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	public Node visitPrefixExpr(MxParser.PrefixExprContext ctx) {
 		ExprNode prefixExpr = (ExprNode) visit(ctx.expression());
 
-		return new PrefixExprNode(ctx.op.getText(), prefixExpr);
+		return new PrefixExprNode(ctx.op.getText(), prefixExpr, new Location(ctx));
 	}
 
 	/**
@@ -618,7 +620,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	public Node visitSuffixExpr(MxParser.SuffixExprContext ctx) {
 		ExprNode suffixExpr = (ExprNode) visit(ctx.expression());
 
-		return new SuffixExprNode(ctx.op.getText(), suffixExpr);
+		return new SuffixExprNode(ctx.op.getText(), suffixExpr, new Location(ctx));
 	}
 
 	/**
@@ -633,7 +635,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	public Node visitMemberExpr(MxParser.MemberExprContext ctx) {
 		ExprNode expr = (ExprNode) visit(ctx.expression());
 
-		return new MemberExprNode(expr, ctx.Identifier().getText());
+		return new MemberExprNode(expr, ctx.Identifier().getText(), new Location(ctx));
 	}
 
 	/**
@@ -649,7 +651,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		ExprNode arr = (ExprNode) visit(ctx.arr);
 		ExprNode index = (ExprNode) visit(ctx.index);
 
-		return new ArefExprNode(arr, index);
+		return new ArefExprNode(arr, index, new Location(ctx));
 	}
 
 	/**
@@ -665,7 +667,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		ExprNode lhs = (ExprNode) visit(ctx.expression(0));
 		ExprNode rhs = (ExprNode) visit(ctx.expression(1));
 
-		return new BinaryOpExprNode(lhs, ctx.op.getText(), rhs);
+		return new BinaryOpExprNode(lhs, ctx.op.getText(), rhs, new Location(ctx));
 	}
 
 	/**
@@ -681,7 +683,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		ExprNode lhs = (ExprNode) visit(ctx.expression(0));
 		ExprNode rhs = (ExprNode) visit(ctx.expression(1));
 
-		return new AssignExprNode(lhs, rhs);
+		return new AssignExprNode(lhs, rhs, new Location(ctx));
 	}
 
 	/**
@@ -700,9 +702,9 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitPrimaryExpression(MxParser.PrimaryExpressionContext ctx) {
 		if (ctx.Identifier() != null)
-			return new IdentifierExprNode(ctx.getText());
+			return new IdentifierExprNode(ctx.getText(), new Location(ctx));
 		if (ctx.This() != null)
-			return new ThisExprNode();
+			return new ThisExprNode(new Location(ctx));
 		if (ctx.literal() != null)
 			return visit(ctx.literal());
 		if (ctx.expression() != null)
@@ -728,17 +730,17 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			} catch (Exception e) {
 				throw new Error("not found int literal" + e);
 			}
-			return new IntLiteralExprNode(v);
+			return new IntLiteralExprNode(v, new Location(ctx));
 		}
 		if (ctx.StringLiteral() != null) {
 			String v = ctx.getText(); // BUG: escape-sequence??
-			return new StringLiteralExprNode(v);
+			return new StringLiteralExprNode(v, new Location(ctx));
 		}
 		if (ctx.Null() != null) {
-			return new NullExprNode();
+			return new NullExprNode(new Location(ctx));
 		}
 		if (ctx.True() != null | ctx.False() != null) {
-			return new BoolLiteralExprNode(ctx.True() != null);
+			return new BoolLiteralExprNode(ctx.True() != null, new Location(ctx));
 		}
 
 		throw new Error("not found literal type");

@@ -1,18 +1,16 @@
 package mxcompiler.ast.statement;
 
-import mxcompiler.ast.Dump;
+
 import mxcompiler.ast.expression.ExprNode;
-
+import mxcompiler.ast.Location;
 public class IfStmtNode extends StmtNode {
-    @Override
-    public void _dump(Dump d) { d.print("If stmt"); }
-
     private ExprNode cond;
     private StmtNode thenBody;
     /** may be null */
     private StmtNode elseBody; 
 
-    public IfStmtNode(ExprNode cond, StmtNode thenBody, StmtNode elseBody) {
+    public IfStmtNode(ExprNode cond, StmtNode thenBody, StmtNode elseBody, Location location) {
+		super(location);
         this.cond = cond;
         this.thenBody = thenBody;
         this.elseBody = elseBody; // may be null

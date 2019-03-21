@@ -1,17 +1,15 @@
 package mxcompiler.ast.statement;
 
-import mxcompiler.ast.Dump;
-import mxcompiler.ast.expression.ExprNode;
 
+import mxcompiler.ast.expression.ExprNode;
+import mxcompiler.ast.Location;
 
 /** This is Expr from stmt */
 public class ExprStmtNode extends StmtNode {
-    @Override
-    public void _dump(Dump d) { d.print("expr stmt"); }
-
     private ExprNode expr;
 
-    public ExprStmtNode(ExprNode e) {
+    public ExprStmtNode(ExprNode e, Location location) {
+		super(location);
         this.expr = e;
     }
 

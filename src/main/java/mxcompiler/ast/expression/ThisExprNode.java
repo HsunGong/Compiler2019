@@ -1,10 +1,10 @@
 package mxcompiler.ast.expression;
 
-import mxcompiler.ast.Dump;
 
+import mxcompiler.ast.Location;
 /** for class and Primary Expr */
 public class ThisExprNode extends ExprNode {
-    @Override
-    public void _dump(Dump d) { d.print("this expr"); }
-
+	public ThisExprNode(Location location) {
+		super(location);
+	}
 }

@@ -2,19 +2,18 @@ package mxcompiler.ast.expression;
 
 import java.util.List;
 
-import mxcompiler.ast.Dump;
-import mxcompiler.ast.TypeNode;
 
+import mxcompiler.ast.TypeNode;
+import mxcompiler.ast.Location;
 /** for creator */
 public class NewExprNode extends ExprNode {
-    @Override
-    public void _dump(Dump d) { d.print("new expr"); }
-    
+
     private TypeNode newType;
     private List<ExprNode> dims;
     private int num; // for dimension-number
 
-    public NewExprNode(TypeNode newType, List<ExprNode> dims, int num) {
+    public NewExprNode(TypeNode newType, List<ExprNode> dims, int num, Location location) {
+		super(location);
         this.newType = newType;
 		this.dims = dims;
 		this.num = num;

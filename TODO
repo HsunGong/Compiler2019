@@ -171,6 +171,4 @@ type from Book: @critical @high @today
 		☐ 2, escape sequence
 		✔ 3, for each rule have to check set-null @done(03-21 17)
 		✔ Opt with ? : operator @done(03-21 17)
-	concluion from ASTBuilder
-		☐ 1, ctx.label | ctx.parserRule()
-		☐ 2, visit(ctx.xx) Deprecated visitChildren
+

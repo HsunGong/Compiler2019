@@ -6,13 +6,9 @@ import java.util.List;
 
 import mxcompiler.ast.*;
 import mxcompiler.ast.statement.BlockStmtNode;
-import mxcompiler.type.Type;
-
+import mxcompiler.ast.Location;
 public class FuncDeclNode extends DeclNode{
-    @Override
-    public void _dump(Dump d) { d.print("Var Decl"); }
-
-    private boolean isConstruct;
+	private boolean isConstruct;
     private TypeNode returnType;
     private List<VarDeclNode> varList;
     private BlockStmtNode body; // or stmts???
@@ -21,16 +17,16 @@ public class FuncDeclNode extends DeclNode{
     // private BasciBlock start, over;
     
     public FuncDeclNode(String name, TypeNode returnType, 
-            VarDeclListNode varList, BlockStmtNode body) {
-        this(name, returnType, varList.getList(), body);
+            VarDeclListNode varList, BlockStmtNode body, Location location) {
+        this(name, returnType, varList.getList(), body, location);
 	}
 	
     /**
      * List can not add later
      */
     public FuncDeclNode(String name, TypeNode returnType, 
-            List<VarDeclNode> varList, BlockStmtNode body) {
-        super(name);
+            List<VarDeclNode> varList, BlockStmtNode body, Location location) {
+		super(name, location);
 
         this.returnType = returnType;
         if(returnType == null) this.isConstruct = true;

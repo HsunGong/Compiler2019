@@ -3,15 +3,12 @@ package mxcompiler.ast.statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import mxcompiler.ast.Dump;
+
 import mxcompiler.ast.declaration.VarDeclListNode;
 import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.ast.expression.ExprNode;
-
+import mxcompiler.ast.Location;
 public class ForStmtNode extends StmtNode {
-    @Override
-    public void _dump(Dump d) { d.print("For stmt"); }
-
 	private List<VarDeclNode> varList;
     private ExprNode init;
     private ExprNode cond;
@@ -20,7 +17,8 @@ public class ForStmtNode extends StmtNode {
 	private StmtNode body;
 	
     public ForStmtNode(ExprNode init, ExprNode cond, ExprNode incr, 
-                    StmtNode body, List<VarDeclNode> varList) {
+                    StmtNode body, List<VarDeclNode> varList, Location location) {
+		super(location);
         this.init = init;
         this.incr = incr;
         this.cond = cond;
@@ -30,8 +28,8 @@ public class ForStmtNode extends StmtNode {
 	}
 	
 	public ForStmtNode(ExprNode init, ExprNode cond, ExprNode incr, 
-                    StmtNode body, VarDeclListNode varList) {
-		this(init, cond, incr, body, varList.getList());
+                    StmtNode body, VarDeclListNode varList, Location location) {
+		this(init, cond, incr, body, varList.getList(), location);
 	}
 
 	public List<VarDeclNode> getList() { return varList; }

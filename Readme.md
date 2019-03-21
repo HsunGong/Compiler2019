@@ -60,6 +60,10 @@ locals, throws, catch, finally, mode, options, tokens
 
 要将操作限制为生成的解析器或词法分析器，请使用@parser::name或@lexer::name。
 
+	concluion from ASTBuilder
+		1, ctx.label | ctx.parserRule()
+		2, visit(ctx.xx) Deprecated visitChildren
+
 
 [C.g4]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/C.g4
 [1]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/java.g4

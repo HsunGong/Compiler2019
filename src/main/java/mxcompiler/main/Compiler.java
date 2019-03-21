@@ -114,8 +114,8 @@ public final class Compiler {
         ASTBuilder astBuilder = new ASTBuilder();
         root = (ASTNode) astBuilder.visit(tree);
 		
-		if (mode = CompilerMode.Dump) {
-			// root.
+		if (mode == CompilerMode.Dump) {
+			new ASTDump(System.out).visit(root);
 		}
     }
 

@@ -15,8 +15,6 @@ import mxcompiler.entity.scope.ToplevelScope;
  * Here we simplify
  */
 public class ASTNode extends Node {
-    @Override
-    public void _dump(Dump d) { d.print(""); }
 
     private List<DeclNode> declarations;
     private ToplevelScope scope;
@@ -24,8 +22,8 @@ public class ASTNode extends Node {
     // private Location location_source;
 
     /** can add with empty list */
-    public ASTNode(List<DeclNode> decl) {
-        // super();
+    public ASTNode(List<DeclNode> decl, Location location) {
+        super(location);
         if (decl == null) decl = new ArrayList<DeclNode>();
         else this.declarations = decl;
     }

@@ -2,13 +2,9 @@ package mxcompiler.ast.declaration;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import mxcompiler.ast.*;
+import mxcompiler.ast.Location;
 
 public class ClassDeclNode extends DeclNode{
-    @Override
-    public void _dump(Dump d) { d.print("Class Decl"); }
-
     private List<VarDeclNode> varList;
     private List<FuncDeclNode> funcList;
     //  private IntValue intValue;
@@ -20,8 +16,8 @@ public class ClassDeclNode extends DeclNode{
      *  and list can be null, can add later
      */
     public ClassDeclNode(String name, 
-        List<VarDeclNode> varList, List<FuncDeclNode> funcList) {
-        super(name);
+        List<VarDeclNode> varList, List<FuncDeclNode> funcList, Location location) {
+		super(name, location);
         
         if(varList != null ) this.varList = varList;
         else varList = new ArrayList<VarDeclNode>();
@@ -30,8 +26,8 @@ public class ClassDeclNode extends DeclNode{
     }
 
 	public ClassDeclNode(String name, 
-		VarDeclListNode varList, List<FuncDeclNode> funcList) {
-		this(name, varList.getList(), funcList);
+		VarDeclListNode varList, List<FuncDeclNode> funcList, Location location) {
+		this(name, varList.getList(), funcList, location);
 	}
 
     // TODO : add varNode here????/???? or add at init place ??

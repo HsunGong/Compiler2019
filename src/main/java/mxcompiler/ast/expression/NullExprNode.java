@@ -1,9 +1,11 @@
 package mxcompiler.ast.expression;
 
-import mxcompiler.ast.Dump;
+
+import mxcompiler.ast.Location;
 
 /** Maybe for Nullliteral?? */
 public class NullExprNode extends ExprNode {
-    @Override
-    public void _dump(Dump d) { d.print("Null expr");}
+	public NullExprNode(Location location) {
+		super(location);
+	}
 }

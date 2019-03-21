@@ -1,14 +1,11 @@
 package mxcompiler.ast.expression.unary;
 
-import mxcompiler.ast.Dump;
-import mxcompiler.ast.expression.ExprNode;
 
+import mxcompiler.ast.expression.ExprNode;
+import mxcompiler.ast.Location;
 /** No longer support UnaryArithmeticOpNode 
 */
 public class SuffixExprNode extends ExprNode {
-    @Override
-    public void _dump(Dump d) { d.print("Suffix Expr"); }
-
     public static enum Op {
         SUF_INC("++"), SUF_DEC("--");
 		private String label;
@@ -21,7 +18,8 @@ public class SuffixExprNode extends ExprNode {
     private Op suffixOp;
     private ExprNode suffixExpr;
 
-    public SuffixExprNode(String suffixOp, ExprNode suffixExpr) {
+    public SuffixExprNode(String suffixOp, ExprNode suffixExpr, Location location) {
+		super(location);
         this.suffixOp = Op.valueOf(suffixOp);
         this.suffixExpr = suffixExpr;
     }

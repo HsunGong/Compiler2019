@@ -1,14 +1,9 @@
 package mxcompiler.ast.expression;
 
-import mxcompiler.ast.Dump;
+
 import mxcompiler.type.Type;
-
+import mxcompiler.ast.Location;
 public class BinaryOpExprNode extends ExprNode {
-	@Override
-	public void _dump(Dump d) {
-		d.print("BinaryOpExprNode expr");
-	}
-
 	private static enum Oper {
 		MUL("*"), DIV("/"), MOD("%"), 
 		ADD("+"), SUB("-"), 
@@ -30,7 +25,8 @@ public class BinaryOpExprNode extends ExprNode {
 	private Oper op;
 
 	/** type can be null and add later */
-	public BinaryOpExprNode(ExprNode lhs, String op, ExprNode rhs) {
+	public BinaryOpExprNode(ExprNode lhs, String op, ExprNode rhs, Location location) {
+		super(location);
 		// this.type = type;
 		// UGLY: will throw IllegalArgumentException 
 		this.op = Oper.valueOf(op);
