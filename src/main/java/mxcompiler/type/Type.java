@@ -19,10 +19,15 @@ abstract public class Type {
         private InnerType(String label) { this.label = label; }
 
         public String toString() { return this.label; }
-    }
-
+	}
+	
+	
     public InnerType innerType;
     public InnerType getInnerType() { return innerType; }
+
+	public Type(InnerType inner) {
+		this.innerType = inner;
+	}
 
     protected int varSize;
     public int getSize() { return varSize; }

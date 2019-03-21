@@ -79,11 +79,11 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParamDeclaration(MxParser.ParamDeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MxParser#typeFuncName}.
+	 * Visit a parse tree produced by {@link MxParser#typeReturn}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitTypeFuncName(MxParser.TypeFuncNameContext ctx);
+	T visitTypeReturn(MxParser.TypeReturnContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#classDeclaration}.
 	 * @param ctx the parse tree
@@ -159,6 +159,26 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBlankStmt(MxParser.BlankStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code forCondInit}
+	 * labeled alternative in {@link MxParser#forCondition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForCondInit(MxParser.ForCondInitContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code forCondNone}
+	 * labeled alternative in {@link MxParser#forCondition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForCondNone(MxParser.ForCondNoneContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MxParser#forDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForDeclaration(MxParser.ForDeclarationContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#block}.
 	 * @param ctx the parse tree

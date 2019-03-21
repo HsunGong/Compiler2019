@@ -82,16 +82,91 @@ TypeResolve:
         ☐  what is diff between type and entity
 
     ☐ remain may be used for asm in Scope
-        static private final String KEY_PREFIX = "$";
-        static private final String VAR_PREFIX = "$VAR$";
-        static private final String CLASS_PREFIX = "$CLASS$";
-        static private final String FUNC_PREFIX = "$FUNC$";
-        static public final String ARRAY_CLASS_NAME = "__array";
-        static public final String STRING_CLASS_NAME = "__string";
-        static public final String THIS_PARA_NAME = "__this_para";
+        static private final String KEY_PREFIX = "$"
+        static private final String VAR_PREFIX = "$VAR$"
+        static private final String CLASS_PREFIX = "$CLASS$"
+        static private final String FUNC_PREFIX = "$FUNC$"
+        static public final String ARRAY_CLASS_NAME = "__array"
+        static public final String STRING_CLASS_NAME = "__string"
+        static public final String THIS_PARA_NAME = "__this_para"
 	
 		configuration for reg size
 
 type from Book: @critical @high @today 
     ☐ change arrayList into LinkedHashSet or not? @started(19-03-16 17:30)
-    ☐ add Location type
+	☐ add Location type
+	
+
+☐ G4 file outline with ASTBuilder:
+	✔ compilationUnit @done(03-21 08)
+		✔ translationUnit* EOF @done(03-21 08)
+	✔ translationUnit @done(03-21 08)
+		✔ variableDeclaration @done(03-21 08)
+			✔ type variableDeclaratorList '' @done(03-21 09)
+				✔ variableDeclarator (',' variableDeclarator)* @done(03-21 09)
+					✔ Identifier ('=' expression)? @done(03-21 09)
+		✘ type @cancelled(03-21 09)
+			✔ type '[' ']'	# arrayType @done(03-21 09)
+			✔ typeName		# nonarrayType @done(03-21 09)
+				✔ Int Bool String Identifier		✔ functionDeclaration @done(03-21 10)
+		✔ typeFuncName? Identifier '(' paramDeclarationList? ')' block @done(03-21 10)
+			✔ typeFuncName type void @done(03-21 10)
+			✔ paramDeclaration (',' paramDeclaration)* @done(03-21 10)
+				✔ type Identifier @done(03-21 10)
+		✔ classDeclaration @done(03-21 08)
+			✔ Class Identifier '{' classBody* '}' @done(03-21 11)
+				✔ functionDeclaration variableDeclaration @done(03-21 11)
+	☐ statement
+		☐ block
+			☐ '{' blockBody* '}'									# blockStmt
+				☐ statement variableDeclaration
+		☐ expression ''									# exprStmt
+		☐ If '(' expression ')' statement (Else statement)?	# condStmt
+		☐ While '(' expression ')' statement				# whileStmt
+		☐ For '(' forCondition ')' statement				# forStmt
+				☐ forCondition // 474
+					☐ forDeclaration (type variableDeclaratorList) ';' expression? ';' expression?    #forCondInit
+					☐ expression? ';' expression? ';' expression?       #forCondNon
+		☐ Continue ''				# continueStmt
+		☐ Break ''					# breakStmt
+		☐ Return expression? ''	# returnStmt
+		☐ ''						# blankStmt
+	☐ expression
+		☐ // FIX: position of primary expression
+		☐ primaryExpression							# primaryExpr
+			☐ Identifier			# identifierExpr
+			☐ This					# thisExpr
+			☐ literal				# constExpr
+				☐ IntLiteral StringLiteral Null (True | False)
+		☐ '(' expression ')'	# subExpr
+		☐ expression op = ('++' | '--')				# suffixExpr
+		☐ expression '.' Identifier					# memberExpr // under lhs
+		☐ arr = expression '[' sub = expression ']'	# arefExpr // under lhs
+		☐ expression '(' paramList? ')'				# funcallExpr
+			☐ expression (',' expression)*
+		☐ // prefix unary
+		☐ <assoc = right> op = ('++' | '--') expression	# prefixExpr
+		☐ <assoc = right> op = ('+' | '-') expression	# prefixExpr
+		☐ <assoc = right> op = ('!' | '~') expression	# prefixExpr
+		☐ <assoc = right> New creator					# newExpr
+			☐ typeName ('[' expression ']')+ ('[' ']')+ ('[' expression ']')+	# errorCreator
+			☐ typeName ('[' expression ']')+ ('[' ']')*	# arrayCreator
+			☐ typeName ('(' ')')?						# nonArrayCreator
+		☐ // suffix
+		☐ expression op = ('*' | '/' | '%') expression	# binaryExpr
+		☐ expression op = ('+' | '-') expression		# binaryExpr
+		☐ // shift
+		☐ expression op = ('<<' | '>>') expression # binaryExpr
+		☐ // compare
+		☐ expression op = ('<' | '>') expression	# binaryExpr
+		☐ expression op = ('<=' | '>=') expression	# binaryExpr
+		☐ expression op = ('==' | '!=') expression	# binaryExpr
+		☐ // bitwise
+		☐ expression op = '&' expression	# binaryExpr
+		☐ expression op = '^' expression	# binaryExpr
+		☐ expression op = '|' expression	# binaryExpr
+		☐ // logical
+		☐ <assoc = right> expression op = '&&' expression	# binaryExpr
+		☐ <assoc = right> expression op = '||' expression	# binaryExpr
+		☐ // assign
+		☐ <assoc = right> expression op = '=' expression # assignExpr

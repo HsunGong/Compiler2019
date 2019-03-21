@@ -3,13 +3,13 @@ package mxcompiler.ast.declaration;
 
 import mxcompiler.ast.*;
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.type.Type;
 
-public class VarDefineNode extends DeclarationNode{
+public class VarDeclNode extends DeclNode{
     @Override
     public void _dump(Dump d) { d.print("Var define"); }
 
-    private Type type;
+	/** to support type transfer, maybe change into typeNode */
+    private TypeNode type;
     private ExprNode init;
     // public int offset; // FIX: what is this?
     // public IntValue intvalue; // TODO: for IR
@@ -17,13 +17,13 @@ public class VarDefineNode extends DeclarationNode{
 
 
     // or maybe init Location, intvalue, offset
-    public VarDefineNode(String name, ExprNode init, 
-                            Type vartype) {
+    public VarDeclNode(String name, ExprNode init, 
+                            TypeNode vartypeNode) {
         super(name);
-        this.type = vartype;
+        this.type = vartypeNode;
         this.init = init;
     }
 
-    public Type getType() { return type; }
+    public TypeNode getType() { return type; }
     public ExprNode getInit() { return init; }
 }

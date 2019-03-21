@@ -44,7 +44,7 @@ typeName
 
 // function
 functionDeclaration
-	: typeFuncName? Identifier '(' paramDeclarationList? ')' block
+	: typeReturn? Identifier '(' paramDeclarationList? ')' block
 	;
 
 paramDeclarationList
@@ -55,7 +55,7 @@ paramDeclaration
 	: type Identifier
 	;
 
-typeFuncName
+typeReturn
 	: type
 	| Void
 	;
@@ -78,13 +78,22 @@ statement
 	| expression ';'									# exprStmt
 	| If '(' expression ')' statement (Else statement)?	# condStmt
 	| While '(' expression ')' statement				# whileStmt
-	| For '(' init = expression? ';' cond = expression? ';' step = expression? ')'
-		statement				# forStmt
-	| Continue ';'				# continueStmt
-	| Break ';'					# breakStmt
-	| Return expression? ';'	# returnStmt
-	| ';'						# blankStmt
+	| For '(' forCondition ')' statement				# forStmt
+	| Continue ';'										# continueStmt
+	| Break ';'											# breakStmt
+	| Return expression? ';'							# returnStmt
+	| ';'												# blankStmt
 	;
+
+forCondition // 474
+	:   forDeclaration ';' expression? ';' expression?    #forCondInit
+	|   expression? ';' expression? ';' expression?       #forCondNone
+	;
+
+// only support 1-type decl with decl-init
+forDeclaration // 479
+    :   type variableDeclaratorList
+    ;
 
 block
 	: '{' blockBody* '}'
@@ -97,7 +106,7 @@ blockBody
 
 /* ------------------------------ expression -------------------------------- */
 expression
-	// FIX: position of primary expression
+// FIX: position of primary expression
 	: primaryExpression							# primaryExpr
 	| expression op = ('++' | '--')				# suffixExpr
 	| expression '.' Identifier					# memberExpr // under lhs

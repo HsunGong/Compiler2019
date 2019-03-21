@@ -4,6 +4,6 @@ public class BoolType extends Type {
     // name, size
     // private int size; // from configuration
     public BoolType() {
-        innerType = InnerType.BOOL;
+		super(Type.InnerType.BOOL);
     }
 }

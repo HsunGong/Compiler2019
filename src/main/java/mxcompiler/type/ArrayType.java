@@ -2,7 +2,13 @@ package mxcompiler.type;
 
 public class ArrayType extends Type {
     // private int length, pointersize, undefined; // from configuration
-    public ArrayType() {
-        innerType = InnerType.ARRAY;
-    }
+	private Type baseType;
+	
+	public ArrayType(Type baseType) {
+		super(Type.InnerType.ARRAY);
+		this.baseType = baseType;
+	}
+	
+	public Type getBaseType() { return baseType; }
+	// public int getDim() { return dim; } maybe from entity
 }

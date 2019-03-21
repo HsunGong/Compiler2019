@@ -5,7 +5,7 @@ public class ClassType extends Type {
     private String name;
     
     public ClassType(String name) {
-        innerType = InnerType.CLASS;
+		super(InnerType.CLASS);
         this.name = name;
     }
 

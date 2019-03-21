@@ -148,13 +148,13 @@ public class MxBaseListener implements MxListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTypeFuncName(MxParser.TypeFuncNameContext ctx) { }
+	@Override public void enterTypeReturn(MxParser.TypeReturnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTypeFuncName(MxParser.TypeFuncNameContext ctx) { }
+	@Override public void exitTypeReturn(MxParser.TypeReturnContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -287,6 +287,42 @@ public class MxBaseListener implements MxListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBlankStmt(MxParser.BlankStmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterForCondInit(MxParser.ForCondInitContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForCondInit(MxParser.ForCondInitContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterForCondNone(MxParser.ForCondNoneContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForCondNone(MxParser.ForCondNoneContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterForDeclaration(MxParser.ForDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitForDeclaration(MxParser.ForDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
