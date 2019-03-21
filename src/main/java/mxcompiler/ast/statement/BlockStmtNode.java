@@ -31,7 +31,7 @@ public class BlockStmtNode extends StmtNode {
 
     public void addStmt(StmtNode stmt) { stmts.add(stmt); }
 	public List<StmtNode> getStmts() { return stmts; }
-	public List<VarDeclNode> getVarList() { return varList; }
+	public List<VarDeclNode> getVar() { return varList; }
 
     // public List<Node> getVars() { return vars; }
 }

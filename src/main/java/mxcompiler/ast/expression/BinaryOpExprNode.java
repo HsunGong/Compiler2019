@@ -4,7 +4,7 @@ package mxcompiler.ast.expression;
 import mxcompiler.type.Type;
 import mxcompiler.ast.Location;
 public class BinaryOpExprNode extends ExprNode {
-	private static enum Oper {
+	public static enum Oper {
 		MUL("*"), DIV("/"), MOD("%"), 
 		ADD("+"), SUB("-"), 
 		SH_L("<<"), SH_R(">>"), 
@@ -34,19 +34,19 @@ public class BinaryOpExprNode extends ExprNode {
 		this.rhs = rhs;
 	}
 
-	public ExprNode getlhs() {
+	public ExprNode getLhs() {
 		return lhs;
 	}
 
-	public ExprNode getrhs() {
+	public ExprNode getRhs() {
 		return rhs;
 	}
 
-	public void setlhs(ExprNode lhs) {
+	public void setLhs(ExprNode lhs) {
 		this.lhs = lhs;
 	}
 
-	public void setrhs(ExprNode rhs) {
+	public void setRhs(ExprNode rhs) {
 		this.rhs = rhs;
 	}
 

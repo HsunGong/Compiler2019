@@ -30,7 +30,7 @@ public class ASTNode extends Node {
 
     public void visit(ParseTree tree){}
 
-    public List<DeclNode> getDeclarations() { return declarations; }
+    public List<DeclNode> getDecl() { return declarations; }
     public void addDeclaration(DeclNode n) { declarations.add(n); }
 
     public void setScope(ToplevelScope scope) { this.scope = scope; }

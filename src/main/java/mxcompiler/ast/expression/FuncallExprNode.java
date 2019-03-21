@@ -20,5 +20,5 @@ public class FuncallExprNode extends ExprNode {
     }
 
     public ExprNode getExpr() { return expr; }
-    public List<ExprNode> getparams() { return params; }
+    public List<ExprNode> getParam() { return params; }
 }

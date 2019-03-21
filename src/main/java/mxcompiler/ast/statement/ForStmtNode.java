@@ -32,7 +32,7 @@ public class ForStmtNode extends StmtNode {
 		this(init, cond, incr, body, varList.getList(), location);
 	}
 
-	public List<VarDeclNode> getList() { return varList; }
+	public List<VarDeclNode> getVar() { return varList; }
     public ExprNode getInit() { return init; }
     public ExprNode getCond() { return cond; }
     public ExprNode getIncr() { return incr; }
