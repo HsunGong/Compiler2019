@@ -109,7 +109,7 @@ expression
 	: primaryExpression							# primaryExpr
 	| expression op = ('++' | '--')				# suffixExpr
 	| expression '.' Identifier					# memberExpr // under lhs
-	| arr = expression '[' sub = expression ']'	# arefExpr // under lhs
+	| arr = expression '[' index = expression ']'	# arefExpr // under lhs
 	| expression '(' paramList? ')'				# funcallExpr
 	// prefix unary
 	| <assoc = right> op = ('++' | '--') expression	# prefixExpr
@@ -141,10 +141,10 @@ paramList
 	;
 
 primaryExpression
-	: Identifier
-	| This
+	: This
 	| literal
-	| '(' expression ')'
+	| Identifier
+	| '(' expression ')' // used for () operator
 	;
 
 literal

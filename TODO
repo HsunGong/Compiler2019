@@ -51,7 +51,7 @@ ASTNode: @today
                 ✔ bool 	@done(03-17 16)
             ✔ null 	@done(03-17 16)
         ✔ typeNode @done(03-20 18)
-		☐ compare my g4 with fanzhou @high @started(03-20 18)
+		✔ compare my g4 with fanzhou @high @started(03-20 18) @done(03-21 14) @lasted(20h14m37s)
 			typeOrVoid -> typeFuncName
 			parameterDeclarationList -> paramDeclarationList
 			memberDeclaration -> classBody
@@ -97,7 +97,7 @@ type from Book: @critical @high @today
 	☐ add Location type
 	
 
-☐ G4 file outline with ASTBuilder:
+✔ G4 file outline with ASTBuilder: @done(03-21 16)
 	✔ compilationUnit @done(03-21 08)
 		✔ translationUnit* EOF @done(03-21 08)
 	✔ translationUnit @done(03-21 08)
@@ -130,42 +130,42 @@ type from Book: @critical @high @today
 		✔ Break ''					# breakStmt @done(03-21 12)
 		✔ Return expression? ''	# returnStmt @done(03-21 12)
 		✔ ''						# blankStmt @done(03-21 12)
-	☐ expression @started(03-21 12)
+	✔ expression @started(03-21 12) @done(03-21 16) @lasted(4h14m55s)
 		// FIX: position of primary expression
 		✔ primaryExpression							# primaryExpr @done(03-21 12)
 			✔ Identifier			# identifierExpr @done(03-21 12)
 			✔ This					# thisExpr @done(03-21 12)
 			✔ literal				# constExpr @done(03-21 12)
-				✔ IntLiteral StringLiteral Null (True | False) @done(03-21 12)
-		☐ '(' expression ')'	# subExpr
-		☐ expression op = ('++' | '--')				# suffixExpr
-		☐ expression '.' Identifier					# memberExpr // under lhs
-		☐ arr = expression '[' sub = expression ']'	# arefExpr // under lhs
-		☐ expression '(' paramList? ')'				# funcallExpr
-			☐ expression (',' expression)*
-		☐ // prefix unary
-		☐ <assoc = right> op = ('++' | '--') expression	# prefixExpr
-		☐ <assoc = right> op = ('+' | '-') expression	# prefixExpr
-		☐ <assoc = right> op = ('!' | '~') expression	# prefixExpr
-		☐ <assoc = right> New creator					# newExpr
-			☐ typeName ('[' expression ']')+ ('[' ']')+ ('[' expression ']')+	# errorCreator
-			☐ typeName ('[' expression ']')+ ('[' ']')*	# arrayCreator
-			☐ typeName ('(' ')')?						# nonArrayCreator
-		☐ // suffix
-		☐ expression op = ('*' | '/' | '%') expression	# binaryExpr
-		☐ expression op = ('+' | '-') expression		# binaryExpr
-		☐ // shift
-		☐ expression op = ('<<' | '>>') expression # binaryExpr
-		☐ // compare
-		☐ expression op = ('<' | '>') expression	# binaryExpr
-		☐ expression op = ('<=' | '>=') expression	# binaryExpr
-		☐ expression op = ('==' | '!=') expression	# binaryExpr
-		☐ // bitwise
-		☐ expression op = '&' expression	# binaryExpr
-		☐ expression op = '^' expression	# binaryExpr
-		☐ expression op = '|' expression	# binaryExpr
-		☐ // logical
-		☐ <assoc = right> expression op = '&&' expression	# binaryExpr
-		☐ <assoc = right> expression op = '||' expression	# binaryExpr
-		☐ // assign
-		☐ <assoc = right> expression op = '=' expression # assignExpr
+			✔ IntLiteral StringLiteral Null (True | False) @done(03-21 12)
+			✔ '(' expression ')'	# subExpr  @done(03-21 14) () operator
+		✔ expression op = ('++' | '--')				# suffixExpr @done(03-21 16)
+		✔ expression '.' Identifier					# memberExpr // under lhs @done(03-21 14)
+		✔ arr = expression '[' index = expression ']'	# arefExpr // under lhs @done(03-21 14)
+		✔ expression '(' paramList? ')'				# funcallExpr @done(03-21 14)
+			✔ expression (',' expression)* @done(03-21 14)
+		✔ prefix unary @done(03-21 16)
+			<assoc = right> op = ('++' | '--') expression	# prefixExpr
+			<assoc = right> op = ('+' | '-') expression	# prefixExpr
+			<assoc = right> op = ('!' | '~') expression	# prefixExpr
+		✔ <assoc = right> New creator					# newExpr @done(03-21 14)
+			✔ typeName ('[' expression ']')+ ('[' ']')+ ('[' expression ']')+	# errorCreator @done(03-21 14)
+			✔ typeName ('[' expression ']')+ ('[' ']')*	# arrayCreator @done(03-21 16)
+			✔ typeName ('(' ')')?						# nonArrayCreator @done(03-21 14)
+		// suffix
+		✔ expression op = ('*' | '/' | '%') expression	# binaryExpr @done(03-21 15)
+		✔ expression op = ('+' | '-') expression		# binaryExpr @done(03-21 15)
+		// shift
+		✔ expression op = ('<<' | '>>') expression # binaryExpr @done(03-21 15)
+		// compare
+		✔ expression op = ('<' | '>') expression	# binaryExpr @done(03-21 15)
+		✔ expression op = ('<=' | '>=') expression	# binaryExpr @done(03-21 15)
+		✔ expression op = ('==' | '!=') expression	# binaryExpr @done(03-21 15)
+		// bitwise
+		✔ expression op = '&' expression	# binaryExpr @done(03-21 15)
+		✔ expression op = '^' expression	# binaryExpr @done(03-21 15)
+		✔ expression op = '|' expression	# binaryExpr @done(03-21 15)
+		// logical
+		✔ <assoc = right> expression op = '&&' expression	# binaryExpr @done(03-21 15)
+		✔ <assoc = right> expression op = '||' expression	# binaryExpr @done(03-21 15)
+		// assign
+		✔ <assoc = right> expression op = '=' expression # assignExpr @done(03-21 15)

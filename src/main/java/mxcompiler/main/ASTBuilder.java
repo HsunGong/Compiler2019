@@ -498,8 +498,44 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
+	public Node visitFuncallExpr(MxParser.FuncallExprContext ctx) {
+		ExprNode func = (ExprNode) visit(ctx.expression());
+		// FIX: try to change vardecllist into listnode but failed
+		List<ExprNode> params = new ArrayList<ExprNode>();
+
+		for (ParserRuleContext param : ctx.paramList().expression()) {
+			params.add((ExprNode) visit(param));
+		}
+
+		return new FuncallExprNode(func, params);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 * </p>
+	 */
+	@Deprecated // cause cannot transfer vardecl into expr
+	@Override
+	public Node visitParamList(MxParser.ParamListContext ctx) {
+		return visitChildren(ctx);
+	}
+
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 * </p>
+	 */
+	@Override
 	public Node visitNewExpr(MxParser.NewExprContext ctx) {
-		return visitChildren(ctx);
+		return visit(ctx.creator());
 	}
 
 	/**
@@ -511,8 +547,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitPrefixExpr(MxParser.PrefixExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitErrorCreator(MxParser.ErrorCreatorContext ctx) {
+		throw new Error("can not create this");
 	}
 
 	/**
@@ -524,8 +560,19 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitFuncallExpr(MxParser.FuncallExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitArrayCreator(MxParser.ArrayCreatorContext ctx) {
+		TypeNode newType = (TypeNode) visit(ctx.typeName());
+		List<ExprNode> dims = new ArrayList<ExprNode>();
+		for (ParserRuleContext dim : ctx.expression()) {
+			dims.add((ExprNode) visit(dim));
+		}
+		int num = ctx.LeftBracket().size();
+		
+		// FIX: current is no array plain type how to figure how many dims is needed??
+		//  for (int i = 0; i < numDim; ++i) newType.setType(new ArrayType(newType.getType()));
+		newType.setType(new ArrayType(newType.getType()));
+		
+		return new NewExprNode(newType, dims, num);
 	}
 
 	/**
@@ -537,8 +584,9 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitSuffixExpr(MxParser.SuffixExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitNonArrayCreator(MxParser.NonArrayCreatorContext ctx) {
+		TypeNode newType = (TypeNode) visit(ctx.typeName());
+		return new NewExprNode(newType, null, 0);
 	}
 
 	/**
@@ -550,8 +598,10 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitMemberExpr(MxParser.MemberExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitPrefixExpr(MxParser.PrefixExprContext ctx) {
+		ExprNode prefixExpr = (ExprNode) visit(ctx.expression());
+
+		return new PrefixExprNode(ctx.op.getText(), prefixExpr);
 	}
 
 	/**
@@ -563,8 +613,10 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitArefExpr(MxParser.ArefExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitSuffixExpr(MxParser.SuffixExprContext ctx) {
+		ExprNode suffixExpr = (ExprNode) visit(ctx.expression());
+
+		return new SuffixExprNode(ctx.op.getText(), suffixExpr);
 	}
 
 	/**
@@ -576,8 +628,10 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitBinaryExpr(MxParser.BinaryExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitMemberExpr(MxParser.MemberExprContext ctx) {
+		ExprNode expr = (ExprNode) visit(ctx.expression());
+
+		return new MemberExprNode(expr, ctx.Identifier().getText());
 	}
 
 	/**
@@ -589,8 +643,11 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitAssignExpr(MxParser.AssignExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitArefExpr(MxParser.ArefExprContext ctx) {
+		ExprNode arr = (ExprNode) visit(ctx.arr);
+		ExprNode index = (ExprNode) visit(ctx.index);
+
+		return new ArefExprNode(arr, index);
 	}
 
 	/**
@@ -602,8 +659,27 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitParamList(MxParser.ParamListContext ctx) {
-		return visitChildren(ctx);
+	public Node visitBinaryExpr(MxParser.BinaryExprContext ctx) {
+		ExprNode lhs = (ExprNode) visit(ctx.expression(0));
+		ExprNode rhs = (ExprNode) visit(ctx.expression(1));
+
+		return new BinaryOpExprNode(lhs, ctx.op.getText(), rhs);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 * </p>
+	 */
+	@Override
+	public Node visitAssignExpr(MxParser.AssignExprContext ctx) {
+		ExprNode lhs = (ExprNode) visit(ctx.expression(0));
+		ExprNode rhs = (ExprNode) visit(ctx.expression(1));
+
+		return new AssignExprNode(lhs, rhs);
 	}
 
 	/**
@@ -621,9 +697,14 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 
 	@Override
 	public Node visitPrimaryExpression(MxParser.PrimaryExpressionContext ctx) {
-		if(ctx.Identifier() != null) return new IdentifierExprNode(ctx.getText());
-		if(ctx.This() != null) return new ThisExprNode();
-		if(ctx.literal() != null) return visit(ctx.literal());
+		if (ctx.Identifier() != null)
+			return new IdentifierExprNode(ctx.getText());
+		if (ctx.This() != null)
+			return new ThisExprNode();
+		if (ctx.literal() != null)
+			return visit(ctx.literal());
+		if (ctx.expression() != null)
+			return visit(ctx.expression());
 
 		throw new Error("not found primary expr");
 	}
@@ -661,55 +742,4 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		throw new Error("not found literal type");
 	}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
-	 */
-	@Override
-	public T visitSubExpr(MxParser.SubExprContext ctx) {
-		return visitChildren(ctx);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
-	 */
-	@Override
-	public T visitErrorCreator(MxParser.ErrorCreatorContext ctx) {
-		return visitChildren(ctx);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
-	 */
-	@Override
-	public T visitArrayCreator(MxParser.ArrayCreatorContext ctx) {
-		return visitChildren(ctx);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
-	 */
-	@Override
-	public T visitNonArrayCreator(MxParser.NonArrayCreatorContext ctx) {
-		return visitChildren(ctx);
-	}
 }

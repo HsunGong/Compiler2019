@@ -10,14 +10,19 @@ public class SuffixExprNode extends ExprNode {
     public void _dump(Dump d) { d.print("Suffix Expr"); }
 
     public static enum Op {
-        SUF_INC, SUF_DEC
+        SUF_INC("++"), SUF_DEC("--");
+		private String label;
+
+		private Op(String label) {
+			this.label = label;
+		}
     }
 
     private Op suffixOp;
     private ExprNode suffixExpr;
 
-    public SuffixExprNode(Op suffixOp, ExprNode suffixExpr) {
-        this.suffixOp = suffixOp;
+    public SuffixExprNode(String suffixOp, ExprNode suffixExpr) {
+        this.suffixOp = Op.valueOf(suffixOp);
         this.suffixExpr = suffixExpr;
     }
 

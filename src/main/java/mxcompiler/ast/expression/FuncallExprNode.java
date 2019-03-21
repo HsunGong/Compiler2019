@@ -12,15 +12,15 @@ public class FuncallExprNode extends ExprNode {
     public void _dump(Dump d) { d.print("fun call expr"); }
 
     private ExprNode expr;
-    private List<ExprNode> args;
+    private List<ExprNode> params;
     // FIX: funcEntity ?
 
-    public FuncallExprNode(ExprNode e, List<ExprNode> args) {
+    public FuncallExprNode(ExprNode e, List<ExprNode> params) {
         this.expr = e;
-        if(args == null) this.args = new ArrayList<ExprNode>();
-        else this.args = args;
+        if(params == null) this.params = new ArrayList<ExprNode>();
+        else this.params = params;
     }
 
     public ExprNode getExpr() { return expr; }
-    public List<ExprNode> getArgs() { return args; }
+    public List<ExprNode> getparams() { return params; }
 }

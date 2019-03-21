@@ -5,13 +5,13 @@ import mxcompiler.ast.expression.ExprNode;
 
 
 /** This is the array index node */
-public class ArefNode extends LhsExprNode {
+public class ArefExprNode extends LhsExprNode {
     @Override
     public void _dump(Dump d) { d.print("Array index"); }
     private ExprNode expr;
     private ExprNode index;
 
-    public ArefNode(ExprNode expr, ExprNode index) {
+    public ArefExprNode(ExprNode expr, ExprNode index) {
         this.expr = expr;
         this.index = index;
     }

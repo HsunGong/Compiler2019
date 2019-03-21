@@ -4,34 +4,58 @@ import mxcompiler.ast.Dump;
 import mxcompiler.type.Type;
 
 public class BinaryOpExprNode extends ExprNode {
-    @Override
-    public void _dump(Dump d) { d.print("BinaryOpExprNode expr");}
+	@Override
+	public void _dump(Dump d) {
+		d.print("BinaryOpExprNode expr");
+	}
 
-    private static enum Op {
-        MUL, DIV, MOD,
-        ADD, SUB, SHL, SHR,
-        GREATER, LESS, 
-        GREATER_EQUAL, LESS_EQUAL, 
-        EQUAL, INEQUAL,
-        BIT_AND, BIT_OR, BIT_XOR, 
-        LOGIC_AND, LOGIC_OR
-    }
+	private static enum Oper {
+		// FIX: needed check
+		MUL("*"), DIV("/"), MOD("%"), 
+		ADD("+"), SUB("-"), 
+		SH_L("<<"), SH_R(">>"), 
+		GREATER(">"), LESS("<"), 
+		GREATER_EQUAL(">="), LESS_EQUAL("<="), 
+		EQUAL("=="), INEQUAL("!="), 
+		BIT_AND("&"), BIT_OR("|"), BIT_XOR("^"), 
+		LOGIC_AND("&&"), LOGIC_OR("||");
 
-    private ExprNode left, right;
-    private Op op;
+		private String label;
 
-    /** type can be null and add later */
-    public BinaryOpExprNode(ExprNode left, Op op, ExprNode right, Type type) {
-        this.type = type;
-        this.op = op;
-        this.left = left;
-        this.right = right;
-    }
+		private Oper(String label) {
+			this.label = label;
+		}
+	}
 
-    public ExprNode getLeft() { return left; }
-    public ExprNode getRight() { return right; }
-    public void setLeft(ExprNode left) { this.left = left; }
-    public void setRight(ExprNode right) { this.right = right; }
+	private ExprNode lhs, rhs;
+	private Oper op;
 
-    public Op getOp() { return op; }
+	/** type can be null and add later */
+	public BinaryOpExprNode(ExprNode lhs, String op, ExprNode rhs) {
+		// this.type = type;
+		// fix: will throw IllegalArgumentException 
+		this.op = Oper.valueOf(op);
+		this.lhs = lhs;
+		this.rhs = rhs;
+	}
+
+	public ExprNode getlhs() {
+		return lhs;
+	}
+
+	public ExprNode getrhs() {
+		return rhs;
+	}
+
+	public void setlhs(ExprNode lhs) {
+		this.lhs = lhs;
+	}
+
+	public void setrhs(ExprNode rhs) {
+		this.rhs = rhs;
+	}
+
+	public Oper getOp() {
+		return op;
+	}
 }

@@ -1781,7 +1781,7 @@ public class MxParser extends Parser {
 	}
 	public static class ArefExprContext extends ExpressionContext {
 		public ExpressionContext arr;
-		public ExpressionContext sub;
+		public ExpressionContext index;
 		public TerminalNode LeftBracket() { return getToken(MxParser.LeftBracket, 0); }
 		public TerminalNode RightBracket() { return getToken(MxParser.RightBracket, 0); }
 		public List<ExpressionContext> expression() {
@@ -2235,7 +2235,7 @@ public class MxParser extends Parser {
 						setState(258);
 						match(LeftBracket);
 						setState(259);
-						((ArefExprContext)_localctx).sub = expression(0);
+						((ArefExprContext)_localctx).index = expression(0);
 						setState(260);
 						match(RightBracket);
 						}
@@ -2351,11 +2351,11 @@ public class MxParser extends Parser {
 	}
 
 	public static class PrimaryExpressionContext extends ParserRuleContext {
-		public TerminalNode Identifier() { return getToken(MxParser.Identifier, 0); }
 		public TerminalNode This() { return getToken(MxParser.This, 0); }
 		public LiteralContext literal() {
 			return getRuleContext(LiteralContext.class,0);
 		}
+		public TerminalNode Identifier() { return getToken(MxParser.Identifier, 0); }
 		public TerminalNode LeftParen() { return getToken(MxParser.LeftParen, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
@@ -2387,17 +2387,10 @@ public class MxParser extends Parser {
 			setState(288);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
-			case Identifier:
+			case This:
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(281);
-				match(Identifier);
-				}
-				break;
-			case This:
-				enterOuterAlt(_localctx, 2);
-				{
-				setState(282);
 				match(This);
 				}
 				break;
@@ -2406,10 +2399,17 @@ public class MxParser extends Parser {
 			case Null:
 			case IntLiteral:
 			case StringLiteral:
+				enterOuterAlt(_localctx, 2);
+				{
+				setState(282);
+				literal();
+				}
+				break;
+			case Identifier:
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(283);
-				literal();
+				match(Identifier);
 				}
 				break;
 			case LeftParen:
@@ -2950,7 +2950,7 @@ public class MxParser extends Parser {
 		"%\3\2\2\2\u0112\u0110\3\2\2\2\u0113\u0118\5$\23\2\u0114\u0115\7-\2\2\u0115"+
 		"\u0117\5$\23\2\u0116\u0114\3\2\2\2\u0117\u011a\3\2\2\2\u0118\u0116\3\2"+
 		"\2\2\u0118\u0119\3\2\2\2\u0119\'\3\2\2\2\u011a\u0118\3\2\2\2\u011b\u0123"+
-		"\7:\2\2\u011c\u0123\7\64\2\2\u011d\u0123\5*\26\2\u011e\u011f\7\20\2\2"+
+		"\7\64\2\2\u011c\u0123\5*\26\2\u011d\u0123\7:\2\2\u011e\u011f\7\20\2\2"+
 		"\u011f\u0120\5$\23\2\u0120\u0121\7\21\2\2\u0121\u0123\3\2\2\2\u0122\u011b"+
 		"\3\2\2\2\u0122\u011c\3\2\2\2\u0122\u011d\3\2\2\2\u0122\u011e\3\2\2\2\u0123"+
 		")\3\2\2\2\u0124\u0129\78\2\2\u0125\u0129\79\2\2\u0126\u0129\7\67\2\2\u0127"+

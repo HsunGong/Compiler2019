@@ -12,11 +12,12 @@ public class NewExprNode extends ExprNode {
     
     private TypeNode newType;
     private List<ExprNode> dims;
-    // private int numDim; // for dimension
+    private int num; // for dimension-number
 
-    public NewExprNode(TypeNode newType, List<ExprNode> dims) {
+    public NewExprNode(TypeNode newType, List<ExprNode> dims, int num) {
         this.newType = newType;
-        this.dims = dims;
+		this.dims = dims;
+		this.num = num;
     }
 
     public TypeNode getNewType() {
@@ -25,6 +26,8 @@ public class NewExprNode extends ExprNode {
 
     public List<ExprNode> getDims() {
         return dims;
-    }
+	}
+	
+	public int getNum() { return num; }
 
 } 

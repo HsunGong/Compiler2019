@@ -18,10 +18,7 @@ public class TypeNode extends Node {
     }
 
     public Type getType() { return type; }
-    public void setType(Type t) throws Exception{
-        if (type != null) {
-            throw new Exception();
-        }
+    public void setType(Type t) {
         type = t;
     }
     public boolean isEqual(TypeNode rhs) { return rhs.type == this.type; }

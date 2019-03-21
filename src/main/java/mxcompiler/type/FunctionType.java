@@ -5,7 +5,7 @@ public class FunctionType extends Type {
     private String name;
     
     public FunctionType(String name) {
-        innerType = InnerType.FUNCTION;
+        super(InnerType.FUNCTION);
         this.name = name;
     }
 
