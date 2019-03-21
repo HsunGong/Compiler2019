@@ -116,28 +116,27 @@ type from Book: @critical @high @today
 		✔ classDeclaration @done(03-21 08)
 			✔ Class Identifier '{' classBody* '}' @done(03-21 11)
 				✔ functionDeclaration variableDeclaration @done(03-21 11)
-	☐ statement
-		☐ block
-			☐ '{' blockBody* '}'									# blockStmt
-				☐ statement variableDeclaration
-		☐ expression ''									# exprStmt
-		☐ If '(' expression ')' statement (Else statement)?	# condStmt
-		☐ While '(' expression ')' statement				# whileStmt
-		☐ For '(' forCondition ')' statement				# forStmt
-				☐ forCondition // 474
-					☐ forDeclaration (type variableDeclaratorList) ';' expression? ';' expression?    #forCondInit
-					☐ expression? ';' expression? ';' expression?       #forCondNon
-		☐ Continue ''				# continueStmt
-		☐ Break ''					# breakStmt
-		☐ Return expression? ''	# returnStmt
-		☐ ''						# blankStmt
-	☐ expression
-		☐ // FIX: position of primary expression
-		☐ primaryExpression							# primaryExpr
-			☐ Identifier			# identifierExpr
-			☐ This					# thisExpr
-			☐ literal				# constExpr
-				☐ IntLiteral StringLiteral Null (True | False)
+	✔ statement @done(03-21 11)
+		✔ block @done(03-21 11)
+			✔ '{' blockBody* '}'									# blockStmt @done(03-21 11)
+				✔ statement variableDeclaration @done(03-21 11)
+		✔ expression ''									# exprStmt @done(03-21 11)
+		✔ If '(' expression ')' statement (Else statement)?	# condStmt @done(03-21 11)
+		✔ While '(' expression ')' statement				# whileStmt @done(03-21 11)
+		✔ For + statement @done(03-21 12)
+			✔ forDeclaration (type variableDeclaratorList) ';' expression? ';' expression?    #forCondInit @done(03-21 12)
+			✔ expression? ';' expression? ';' expression?       #forCondNon @done(03-21 12)
+		✔ Continue ''				# continueStmt @done(03-21 12)
+		✔ Break ''					# breakStmt @done(03-21 12)
+		✔ Return expression? ''	# returnStmt @done(03-21 12)
+		✔ ''						# blankStmt @done(03-21 12)
+	☐ expression @started(03-21 12)
+		// FIX: position of primary expression
+		✔ primaryExpression							# primaryExpr @done(03-21 12)
+			✔ Identifier			# identifierExpr @done(03-21 12)
+			✔ This					# thisExpr @done(03-21 12)
+			✔ literal				# constExpr @done(03-21 12)
+				✔ IntLiteral StringLiteral Null (True | False) @done(03-21 12)
 		☐ '(' expression ')'	# subExpr
 		☐ expression op = ('++' | '--')				# suffixExpr
 		☐ expression '.' Identifier					# memberExpr // under lhs

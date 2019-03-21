@@ -110,10 +110,11 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitVariableDeclarator(MxParser.VariableDeclaratorContext ctx) {
 		ExprNode init;
-		if (ctx.expression() == null) init = null;
-		else init = (ExprNode) visit(ctx.expression());
-		return new VarDeclNode(ctx.Identifier().getText(), 
-					init, typeTransfer);
+		if (ctx.expression() == null)
+			init = null;
+		else
+			init = (ExprNode) visit(ctx.expression());
+		return new VarDeclNode(ctx.Identifier().getText(), init, typeTransfer);
 	}
 
 	/**
@@ -159,14 +160,18 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 
 	/** Nonarray, non-function */
 	private Type getType(MxParser.TypeNameContext ctx) {
-		if (ctx.Identifier() != null) 
-		return new ClassType(ctx.Identifier().getText());
-		if(ctx.Int() != null) return new IntType();
-		if(ctx.Bool() != null) return new BoolType();
-		if(ctx.String() != null) return new StringType();
-		
+		if (ctx.Identifier() != null)
+			return new ClassType(ctx.Identifier().getText());
+		if (ctx.Int() != null)
+			return new IntType();
+		if (ctx.Bool() != null)
+			return new BoolType();
+		if (ctx.String() != null)
+			return new StringType();
+
 		throw new Error("Invalid Type");
 	}
+
 	/**
 	 * {@inheritDoc}
 	 *
@@ -178,13 +183,15 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitFunctionDeclaration(MxParser.FunctionDeclarationContext ctx) {
 		TypeNode returnType;
-		if (ctx.typeReturn() == null) returnType = null; // new NullType();
-		else returnType = (TypeNode) visit(ctx.typeReturn());
+		if (ctx.typeReturn() == null)
+			returnType = null; // new NullType();
+		else
+			returnType = (TypeNode) visit(ctx.typeReturn());
 
 		String name = ctx.Identifier().getText();
 		VarDeclListNode varList = (VarDeclListNode) visit(ctx.paramDeclarationList());
 		BlockStmtNode body = (BlockStmtNode) visit(ctx.block());
-		
+
 		return new FuncDeclNode(name, returnType, varList, body);
 	}
 
@@ -198,8 +205,10 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitTypeReturn(MxParser.TypeReturnContext ctx) {
-		if(ctx.Void() != null) return new TypeNode(new VoidType());
-		else return visit(ctx.type());
+		if (ctx.Void() != null)
+			return new TypeNode(new VoidType());
+		else
+			return visit(ctx.type());
 	}
 
 	/**
@@ -213,9 +222,9 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitParamDeclarationList(MxParser.ParamDeclarationListContext ctx) {
 		List<VarDeclNode> paramList = new ArrayList<>();
-            for (ParserRuleContext param : ctx.paramDeclaration()) {
-                paramList.add((VarDeclNode) visit(param));
-            } // FIX: can be null
+		for (ParserRuleContext param : ctx.paramDeclaration()) {
+			paramList.add((VarDeclNode) visit(param));
+		} // FIX: can be null
 		return new VarDeclListNode(paramList);
 	}
 
@@ -226,8 +235,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitParamDeclaration(MxParser.ParamDeclarationContext ctx) {
-		return new VarDeclNode(ctx.Identifier().getText(), 
-					null, (TypeNode) visit(ctx.type()));
+		return new VarDeclNode(ctx.Identifier().getText(), null, (TypeNode) visit(ctx.type()));
 	}
 
 	/**
@@ -246,11 +254,11 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 
 		for (ParserRuleContext body : ctx.classBody()) {
 			Node decl = visit(body);
-			if (decl instanceof VarDeclListNode) 
-				varList.addAll( ((VarDeclListNode) decl).getList() );
-			else if (decl instanceof VarDeclNode) 
+			if (decl instanceof VarDeclListNode)
+				varList.addAll(((VarDeclListNode) decl).getList());
+			else if (decl instanceof VarDeclNode)
 				varList.add((VarDeclNode) decl);
-			else if (decl instanceof FuncDeclNode) 
+			else if (decl instanceof FuncDeclNode)
 				funcList.add((FuncDeclNode) decl);
 			// Never happen else throw new Error("not found such class body");
 		}
@@ -272,7 +280,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			return visit(ctx.functionDeclaration());
 		if (ctx.variableDeclaration() != null)
 			return visit(ctx.variableDeclaration());
-		
+
 		throw new Error("not found such class body");
 	}
 
@@ -284,8 +292,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * {@link #visitChildren} on {@code ctx}.
 	 * </p>
 	 * 
-	 * to divide block from stmt
-	 * symbol function
+	 * to divide block from stmt symbol function
 	 */
 	@Override
 	public Node visitBlockStmt(MxParser.BlockStmtContext ctx) {
@@ -307,11 +314,11 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 
 		for (ParserRuleContext body : ctx.blockBody()) {
 			Node s = visit(body);
-			if (s instanceof VarDeclListNode) 
-				varList.addAll( ((VarDeclListNode) s).getList() );
-			else if (s instanceof VarDeclNode) 
+			if (s instanceof VarDeclListNode)
+				varList.addAll(((VarDeclListNode) s).getList());
+			else if (s instanceof VarDeclNode)
 				varList.add((VarDeclNode) s);
-			else if (s instanceof StmtNode) 
+			else if (s instanceof StmtNode)
 				stmts.add((StmtNode) s);
 		}
 
@@ -328,8 +335,10 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitBlockBody(MxParser.BlockBodyContext ctx) {
-		if (ctx.statement() != null) return visit(ctx.statement());
-		if (ctx.variableDeclaration() != null) return visit(ctx.variableDeclaration());
+		if (ctx.statement() != null)
+			return visit(ctx.statement());
+		if (ctx.variableDeclaration() != null)
+			return visit(ctx.variableDeclaration());
 
 		throw new Error("no such block-body-stmt");
 	}
@@ -344,7 +353,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitExprStmt(MxParser.ExprStmtContext ctx) {
-		return visitChildren(ctx);
+		return new ExprStmtNode((ExprNode) visit(ctx.expression()));
 	}
 
 	/**
@@ -356,8 +365,12 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitCondStmt(MxParser.CondStmtContext ctx) {
-		return visitChildren(ctx);
+	public Node visitIfStmt(MxParser.IfStmtContext ctx) {
+		ExprNode cond = (ExprNode) visit(ctx.expression());
+		StmtNode thenBody = (StmtNode) visit(ctx.statement(0));
+		StmtNode elseBody = (ctx.statement(1) == null) ? null : (StmtNode) visit(ctx.statement(1));
+
+		return new IfStmtNode(cond, thenBody, elseBody);
 	}
 
 	/**
@@ -369,8 +382,11 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitWhileStmt(MxParser.WhileStmtContext ctx) {
-		return visitChildren(ctx);
+	public Node visitWhileStmt(MxParser.WhileStmtContext ctx) {
+		ExprNode cond = (ExprNode) visit(ctx.expression());
+		StmtNode body = (StmtNode) visit(ctx.statement());
+
+		return new WhileStmtNode(cond, body);
 	}
 
 	/**
@@ -382,8 +398,18 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitForStmt(MxParser.ForStmtContext ctx) {
-		return visitChildren(ctx);
+	public Node visitForInitStmt(MxParser.ForInitStmtContext ctx) {
+		ExprNode init, cond, incr;
+		VarDeclListNode varList = null;
+		StmtNode body;
+
+		init = null;
+		cond = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
+		incr = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
+		varList = (VarDeclListNode) visit(ctx.init);
+		body = (StmtNode) visit(ctx.statement());
+
+		return new ForStmtNode(init, cond, incr, body, varList);
 	}
 
 	/**
@@ -395,8 +421,17 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitContinueStmt(MxParser.ContinueStmtContext ctx) {
-		return visitChildren(ctx);
+	public Node visitForNoneStmt(MxParser.ForNoneStmtContext ctx) {
+		ExprNode init, cond, incr;
+		StmtNode body;
+		VarDeclListNode varList = null;
+
+		init = (ctx.init == null) ? null : (ExprNode) visit(ctx.init);
+		cond = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
+		incr = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
+		body = (StmtNode) visit(ctx.statement());
+
+		return new ForStmtNode(init, cond, incr, body, varList);
 	}
 
 	/**
@@ -408,8 +443,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitBreakStmt(MxParser.BreakStmtContext ctx) {
-		return visitChildren(ctx);
+	public Node visitContinueStmt(MxParser.ContinueStmtContext ctx) {
+		return new ContinueStmtNode();
 	}
 
 	/**
@@ -421,8 +456,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitReturnStmt(MxParser.ReturnStmtContext ctx) {
-		return visitChildren(ctx);
+	public Node visitBreakStmt(MxParser.BreakStmtContext ctx) {
+		return new BreakStmtNode();
 	}
 
 	/**
@@ -434,10 +469,12 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitBlankStmt(MxParser.BlankStmtContext ctx) {
-		return visitChildren(ctx);
-	}
+	public Node visitReturnStmt(MxParser.ReturnStmtContext ctx) {
+		ExprNode returnExpr;
+		returnExpr = (ctx.expression() == null) ? null : (ExprNode) visit(ctx.expression());
 
+		return new ReturnStmtNode(returnExpr);
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -448,7 +485,20 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitNewExpr(MxParser.NewExprContext ctx) {
+	public Node visitBlankStmt(MxParser.BlankStmtContext ctx) {
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.
+	 * </p>
+	 */
+	@Override
+	public Node visitNewExpr(MxParser.NewExprContext ctx) {
 		return visitChildren(ctx);
 	}
 
@@ -462,19 +512,6 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public T visitPrefixExpr(MxParser.PrefixExprContext ctx) {
-		return visitChildren(ctx);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
-	 */
-	@Override
-	public T visitPrimaryExpr(MxParser.PrimaryExprContext ctx) {
 		return visitChildren(ctx);
 	}
 
@@ -578,8 +615,17 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitIdentifierExpr(MxParser.IdentifierExprContext ctx) {
-		return visitChildren(ctx);
+	public Node visitPrimaryExpr(MxParser.PrimaryExprContext ctx) {
+		return visit(ctx.primaryExpression());
+	}
+
+	@Override
+	public Node visitPrimaryExpression(MxParser.PrimaryExpressionContext ctx) {
+		if(ctx.Identifier() != null) return new IdentifierExprNode(ctx.getText());
+		if(ctx.This() != null) return new ThisExprNode();
+		if(ctx.literal() != null) return visit(ctx.literal());
+
+		throw new Error("not found primary expr");
 	}
 
 	/**
@@ -591,21 +637,28 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * </p>
 	 */
 	@Override
-	public T visitThisExpr(MxParser.ThisExprContext ctx) {
-		return visitChildren(ctx);
-	}
+	public Node visitLiteral(MxParser.LiteralContext ctx) {
+		if (ctx.IntLiteral() != null) {
+			int v;
+			try {
+				v = Integer.parseInt(ctx.getText());
+			} catch (Exception e) {
+				throw new Error("not found int literal" + e);
+			}
+			return new IntLiteralExprNode(v);
+		}
+		if (ctx.StringLiteral() != null) {
+			String v = ctx.getText(); // FIX: escape-sequence??
+			return new StringLiteralExprNode(v);
+		}
+		if (ctx.Null() != null) {
+			return new NullExprNode();
+		}
+		if (ctx.True() != null | ctx.False() != null) {
+			return new BoolLiteralExprNode(ctx.True() != null);
+		}
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
-	 */
-	@Override
-	public T visitConstExpr(MxParser.ConstExprContext ctx) {
-		return visitChildren(ctx);
+		throw new Error("not found literal type");
 	}
 
 	/**
@@ -618,19 +671,6 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public T visitSubExpr(MxParser.SubExprContext ctx) {
-		return visitChildren(ctx);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>
-	 * The default implementation returns the result of calling
-	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
-	 */
-	@Override
-	public T visitLiteral(MxParser.LiteralContext ctx) {
 		return visitChildren(ctx);
 	}
 

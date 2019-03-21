@@ -76,24 +76,23 @@ classBody
 statement
 	: block												# blockStmt
 	| expression ';'									# exprStmt
-	| If '(' expression ')' statement (Else statement)?	# condStmt
+	| If '(' expression ')' statement (Else statement)?	# ifStmt
 	| While '(' expression ')' statement				# whileStmt
-	| For '(' forCondition ')' statement				# forStmt
-	| Continue ';'										# continueStmt
-	| Break ';'											# breakStmt
-	| Return expression? ';'							# returnStmt
-	| ';'												# blankStmt
+	| For '(' init = forDeclaration ';' cond = expression? ';' incr = expression? ')'
+		statement # forInitStmt
+	| For '(' init = expression? ';' cond = expression? ';' incr = expression? ')'
+		statement				# forNoneStmt
+	| Continue ';'				# continueStmt
+	| Break ';'					# breakStmt
+	| Return expression? ';'	# returnStmt
+	| ';'						# blankStmt
 	;
 
-forCondition // 474
-	:   forDeclaration ';' expression? ';' expression?    #forCondInit
-	|   expression? ';' expression? ';' expression?       #forCondNone
-	;
 
 // only support 1-type decl with decl-init
 forDeclaration // 479
-    :   type variableDeclaratorList
-    ;
+	: type variableDeclaratorList
+	;
 
 block
 	: '{' blockBody* '}'
@@ -142,10 +141,10 @@ paramList
 	;
 
 primaryExpression
-	: Identifier			# identifierExpr
-	| This					# thisExpr
-	| literal				# constExpr
-	| '(' expression ')'	# subExpr
+	: Identifier
+	| This
+	| literal
+	| '(' expression ')'
 	;
 
 literal

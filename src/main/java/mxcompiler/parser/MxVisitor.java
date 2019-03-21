@@ -111,12 +111,12 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExprStmt(MxParser.ExprStmtContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code condStmt}
+	 * Visit a parse tree produced by the {@code ifStmt}
 	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitCondStmt(MxParser.CondStmtContext ctx);
+	T visitIfStmt(MxParser.IfStmtContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code whileStmt}
 	 * labeled alternative in {@link MxParser#statement}.
@@ -125,12 +125,19 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitWhileStmt(MxParser.WhileStmtContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code forStmt}
+	 * Visit a parse tree produced by the {@code forInitStmt}
 	 * labeled alternative in {@link MxParser#statement}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitForStmt(MxParser.ForStmtContext ctx);
+	T visitForInitStmt(MxParser.ForInitStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code forNoneStmt}
+	 * labeled alternative in {@link MxParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitForNoneStmt(MxParser.ForNoneStmtContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code continueStmt}
 	 * labeled alternative in {@link MxParser#statement}.
@@ -159,20 +166,6 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBlankStmt(MxParser.BlankStmtContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code forCondInit}
-	 * labeled alternative in {@link MxParser#forCondition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitForCondInit(MxParser.ForCondInitContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code forCondNone}
-	 * labeled alternative in {@link MxParser#forCondition}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitForCondNone(MxParser.ForCondNoneContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#forDeclaration}.
 	 * @param ctx the parse tree
@@ -261,33 +254,11 @@ public interface MxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParamList(MxParser.ParamListContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code identifierExpr}
-	 * labeled alternative in {@link MxParser#primaryExpression}.
+	 * Visit a parse tree produced by {@link MxParser#primaryExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitIdentifierExpr(MxParser.IdentifierExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code thisExpr}
-	 * labeled alternative in {@link MxParser#primaryExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitThisExpr(MxParser.ThisExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code constExpr}
-	 * labeled alternative in {@link MxParser#primaryExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitConstExpr(MxParser.ConstExprContext ctx);
-	/**
-	 * Visit a parse tree produced by the {@code subExpr}
-	 * labeled alternative in {@link MxParser#primaryExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSubExpr(MxParser.SubExprContext ctx);
+	T visitPrimaryExpression(MxParser.PrimaryExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MxParser#literal}.
 	 * @param ctx the parse tree
