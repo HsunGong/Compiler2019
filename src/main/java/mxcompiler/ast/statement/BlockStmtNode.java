@@ -15,9 +15,7 @@ public class BlockStmtNode extends StmtNode {
 	private List<StmtNode> stmts;
 	private List<VarDeclNode> varList;
     private LocalScope scope;
-    // private List<Node> vars;
 
-    // FIX: whether put vars here or not
     public BlockStmtNode (List<StmtNode> stmts, List<VarDeclNode> varList) {
         if(stmts == null) this.stmts = new ArrayList<StmtNode>();
 		else this.stmts = stmts;

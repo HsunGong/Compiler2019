@@ -29,7 +29,6 @@ variableDeclarator
 	: Identifier ('=' expression)?
 	;
 
-// FIX: needed ??
 type
 	: type '[' ']'	# arrayType
 	| typeName		# nonarrayType
@@ -105,7 +104,6 @@ blockBody
 
 /* ------------------------------ expression -------------------------------- */
 expression
-// FIX: position of primary expression
 	: primaryExpression							# primaryExpr
 	| expression op = ('++' | '--')				# suffixExpr
 	| expression '.' Identifier					# memberExpr // under lhs

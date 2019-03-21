@@ -19,7 +19,7 @@ abstract public class Node {
     public Node() {}
 
     public ParserRuleContext ctx; // reserve the location of each grammer
-    /** FIX: Does it have use?? */
+    /** NOTE: Does it have use?? */
     public void setCtx(ParserRuleContext ctx) { this.ctx = ctx; } 
     
     // abstract void visit(ASTVisitor visitor);

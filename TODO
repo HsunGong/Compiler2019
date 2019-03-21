@@ -1,14 +1,11 @@
 Projects:
-	☐ lexer analysis @started(19-03-05 18:58)
-	☐ syntax analysis
-	☐ AST tree generate
-	☐ Semantic analysis
+	☐ Semantic analysis @started(19-03-05 18:58)
+		✔ Generate Simple antlr @started(19-03-04 17) @done(19-03-13 21) @lasted(1w2d3h46m41s)
+		☐ Generate AST nodes and Type nodes for at most 1 day @started(19-03-16 14)
 	☐ IR generate
+	☐ ASM Code
 	☐ code optimize
-
-Main:
-    ✔ Generate Simple antlr @started(19-03-04 17) @done(19-03-13 21) @lasted(1w2d3h46m41s)
-    ☐ Generate AST nodes and Type nodes for at most 1 day @started(19-03-16 14)
+TODO|FIXME|FIX|BUG|UGLY|HACK|NOTE|IDEA|REVIEW|DEBUG|OPTIMIZE
 
 Parser: 
 	✔ change antlr extension to use @started(19-03-05 18) @done(19-03-05 18) @lasted(54m24s)
@@ -131,7 +128,7 @@ type from Book: @critical @high @today
 		✔ Return expression? ''	# returnStmt @done(03-21 12)
 		✔ ''						# blankStmt @done(03-21 12)
 	✔ expression @started(03-21 12) @done(03-21 16) @lasted(4h14m55s)
-		// FIX: position of primary expression
+		// NOTE: position of primary expression
 		✔ primaryExpression							# primaryExpr @done(03-21 12)
 			✔ Identifier			# identifierExpr @done(03-21 12)
 			✔ This					# thisExpr @done(03-21 12)
@@ -169,3 +166,11 @@ type from Book: @critical @high @today
 		✔ <assoc = right> expression op = '||' expression	# binaryExpr @done(03-21 15)
 		// assign
 		✔ <assoc = right> expression op = '=' expression # assignExpr @done(03-21 15)
+	☐ FIX 2 bug @started(03-21 16)
+		✔ 1, list add null -> have to check for it @done(03-21 17)
+		☐ 2, escape sequence
+		✔ 3, for each rule have to check set-null @done(03-21 17)
+		✔ Opt with ? : operator @done(03-21 17)
+	concluion from ASTBuilder
+		☐ 1, ctx.label | ctx.parserRule()
+		☐ 2, visit(ctx.xx) Deprecated visitChildren

@@ -55,7 +55,7 @@ public final class Compiler {
 
     // file compiler with errorHandler
     private void compile(Option opts) throws Exception {
-        buildAST();
+        buildAST(opts.mode());
         /* 
             // SemanticAnalyze sem = new SemanticAnalyze.visit(ast);
             
@@ -89,17 +89,17 @@ public final class Compiler {
 
     // file compiler with errorHandler
     private void compileDump(Option opts) throws Exception {
-        buildAST();
+        buildAST(opts.mode());
         // dumpAST();
     }
 
     // no errorHandler
     private void compileCheck(Option opts) throws Exception {
-        buildAST();
+        buildAST(opts.mode());
     }
 
 
-    private void buildAST() throws Exception {
+    private void buildAST(CompilerMode mode) throws Exception {
         // System.out.println(src.toString());
         MxLexer lexer = new MxLexer(CharStreams.fromStream(src));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -113,7 +113,10 @@ public final class Compiler {
         
         ASTBuilder astBuilder = new ASTBuilder();
         root = (ASTNode) astBuilder.visit(tree);
-        
+		
+		if (mode = CompilerMode.Dump) {
+			// root.
+		}
     }
 
     private void TypeChecker() {}

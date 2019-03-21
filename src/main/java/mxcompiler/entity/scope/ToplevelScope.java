@@ -7,7 +7,8 @@ import mxcompiler.entity.Entity;
 import mxcompiler.exception.SemanticException;
 
 public class ToplevelScope extends Scope {
-    public Map<String, Entity> entities; // FIX: DeclNode is alse Entity
+	// FIX: DeclNode is alse Entity
+	public Map<String, Entity> entities; 
     // public List<DeclNode> staticVariables;
 
     public ToplevelScope() {

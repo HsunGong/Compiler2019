@@ -13,7 +13,7 @@ public class FuncallExprNode extends ExprNode {
 
     private ExprNode expr;
     private List<ExprNode> params;
-    // FIX: funcEntity ?
+    // UGLY: funcEntity ?
 
     public FuncallExprNode(ExprNode e, List<ExprNode> params) {
         this.expr = e;

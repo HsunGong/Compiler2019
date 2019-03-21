@@ -11,7 +11,7 @@ public class TypeNode extends Node {
     public void _dump(Dump d) { d.print("type"); }
     
     protected Type type;
-    // protected dim; // FIX:
+    // protected dim; // UGLY:
 
     public TypeNode(Type type) {
         this.type = type;

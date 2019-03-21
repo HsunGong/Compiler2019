@@ -10,7 +10,6 @@ public class BinaryOpExprNode extends ExprNode {
 	}
 
 	private static enum Oper {
-		// FIX: needed check
 		MUL("*"), DIV("/"), MOD("%"), 
 		ADD("+"), SUB("-"), 
 		SH_L("<<"), SH_R(">>"), 
@@ -33,7 +32,7 @@ public class BinaryOpExprNode extends ExprNode {
 	/** type can be null and add later */
 	public BinaryOpExprNode(ExprNode lhs, String op, ExprNode rhs) {
 		// this.type = type;
-		// fix: will throw IllegalArgumentException 
+		// UGLY: will throw IllegalArgumentException 
 		this.op = Oper.valueOf(op);
 		this.lhs = lhs;
 		this.rhs = rhs;

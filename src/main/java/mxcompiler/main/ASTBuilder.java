@@ -10,7 +10,6 @@ import mxcompiler.parser.MxParser;
 import mxcompiler.type.*;
 import mxcompiler.ast.*;
 import mxcompiler.ast.statement.*;
-import mxcompiler.exception.CompileException;
 import mxcompiler.ast.declaration.*;
 import mxcompiler.ast.expression.*;
 import mxcompiler.ast.expression.literal.*;
@@ -36,15 +35,17 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitCompilationUnit(MxParser.CompilationUnitContext ctx) {
-		List<DeclNode> decls = new ArrayList<>();
-		for (ParserRuleContext unit : ctx.translationUnit()) {
-			Node decl = visit(unit);
-			// FIX: attention to DeclListNode
-			if (decl instanceof VarDeclListNode)
-				decls.addAll(((VarDeclListNode) decl).getList());
-			else
-				decls.add((DeclNode) decl);
-		}
+		List<DeclNode> decls = new ArrayList<>(); // Include class, function, variable
+		if (ctx.translationUnit() != null)
+			for (ParserRuleContext unit : ctx.translationUnit()) {
+				Node decl = visit(unit);
+				if (decl instanceof VarDeclListNode)
+					decls.addAll(((VarDeclListNode) decl).getList());
+				else if (decl instanceof DeclNode)
+					decls.add((DeclNode) decl);
+				else
+					throw new Error("not found decl from compilation unit");
+			}
 		return new ASTNode(decls);
 	}
 
@@ -65,7 +66,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		if (ctx.variableDeclaration() != null)
 			return visit(ctx.variableDeclaration());
 
-		// FIX: redo my own error type
+		// UGLY: redo my own error type
 		throw new Error("No translation part found");
 	}
 
@@ -93,8 +94,9 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitVariableDeclaratorList(MxParser.VariableDeclaratorListContext ctx) {
 		List<VarDeclNode> varDecls = new ArrayList<>();
-		for (ParserRuleContext varDecl : ctx.variableDeclarator())
-			varDecls.add((VarDeclNode) visit(varDecl));
+		if (ctx.variableDeclarator() != null)
+			for (ParserRuleContext varDecl : ctx.variableDeclarator())
+				varDecls.add((VarDeclNode) visit(varDecl));
 
 		return new VarDeclListNode(varDecls);
 	}
@@ -110,10 +112,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitVariableDeclarator(MxParser.VariableDeclaratorContext ctx) {
 		ExprNode init;
-		if (ctx.expression() == null)
-			init = null;
-		else
-			init = (ExprNode) visit(ctx.expression());
+		init = (ctx.expression() == null) ? null : (ExprNode) visit(ctx.expression());
 		return new VarDeclNode(ctx.Identifier().getText(), init, typeTransfer);
 	}
 
@@ -128,7 +127,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitArrayType(MxParser.ArrayTypeContext ctx) {
 		TypeNode type = (TypeNode) visit(ctx.type());
-		// TODO: can get dims ?? - get support from type.arraytype
+		// TODO: can get dims ?? - get support from type.arraytype and conflict with
+		// array-creator
 		return new TypeNode(new ArrayType(type.getType()));
 	}
 
@@ -183,10 +183,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitFunctionDeclaration(MxParser.FunctionDeclarationContext ctx) {
 		TypeNode returnType;
-		if (ctx.typeReturn() == null)
-			returnType = null; // new NullType();
-		else
-			returnType = (TypeNode) visit(ctx.typeReturn());
+		// UGLY: new NullType() for null
+		returnType = (ctx.typeReturn() == null) ? null : (TypeNode) visit(ctx.typeReturn());
 
 		String name = ctx.Identifier().getText();
 		VarDeclListNode varList = (VarDeclListNode) visit(ctx.paramDeclarationList());
@@ -205,10 +203,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitTypeReturn(MxParser.TypeReturnContext ctx) {
-		if (ctx.Void() != null)
-			return new TypeNode(new VoidType());
-		else
-			return visit(ctx.type());
+		return (ctx.Void() != null) ? new TypeNode(new VoidType()) : visit(ctx.type());
 	}
 
 	/**
@@ -222,9 +217,10 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitParamDeclarationList(MxParser.ParamDeclarationListContext ctx) {
 		List<VarDeclNode> paramList = new ArrayList<>();
-		for (ParserRuleContext param : ctx.paramDeclaration()) {
-			paramList.add((VarDeclNode) visit(param));
-		} // FIX: can be null
+		if (ctx.paramDeclaration() != null)
+			for (ParserRuleContext param : ctx.paramDeclaration()) {
+				paramList.add((VarDeclNode) visit(param));
+			} // BUG: can be null
 		return new VarDeclListNode(paramList);
 	}
 
@@ -252,16 +248,17 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		List<VarDeclNode> varList = new ArrayList<>();
 		List<FuncDeclNode> funcList = new ArrayList<>();
 
-		for (ParserRuleContext body : ctx.classBody()) {
-			Node decl = visit(body);
-			if (decl instanceof VarDeclListNode)
-				varList.addAll(((VarDeclListNode) decl).getList());
-			else if (decl instanceof VarDeclNode)
-				varList.add((VarDeclNode) decl);
-			else if (decl instanceof FuncDeclNode)
-				funcList.add((FuncDeclNode) decl);
-			// Never happen else throw new Error("not found such class body");
-		}
+		if (ctx.classBody() != null)
+			for (ParserRuleContext body : ctx.classBody()) {
+				Node decl = visit(body);
+				if (decl instanceof VarDeclListNode)
+					varList.addAll(((VarDeclListNode) decl).getList());
+				else if (decl instanceof VarDeclNode)
+					varList.add((VarDeclNode) decl);
+				else if (decl instanceof FuncDeclNode)
+					funcList.add((FuncDeclNode) decl);
+				// Never happen else throw new Error("not found such class body");
+			}
 
 		return new ClassDeclNode(name, varList, funcList);
 	}
@@ -312,15 +309,16 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		List<StmtNode> stmts = new ArrayList<>();
 		List<VarDeclNode> varList = new ArrayList<>();
 
-		for (ParserRuleContext body : ctx.blockBody()) {
-			Node s = visit(body);
-			if (s instanceof VarDeclListNode)
-				varList.addAll(((VarDeclListNode) s).getList());
-			else if (s instanceof VarDeclNode)
-				varList.add((VarDeclNode) s);
-			else if (s instanceof StmtNode)
-				stmts.add((StmtNode) s);
-		}
+		if (ctx.blockBody() != null)
+			for (ParserRuleContext body : ctx.blockBody()) {
+				Node stmt = visit(body);
+				if (stmt instanceof VarDeclListNode)
+					varList.addAll(((VarDeclListNode) stmt).getList());
+				else if (stmt instanceof VarDeclNode)
+					varList.add((VarDeclNode) stmt);
+				else if (stmt instanceof StmtNode)
+					stmts.add((StmtNode) stmt);
+			}
 
 		return new BlockStmtNode(stmts, varList);
 	}
@@ -500,12 +498,13 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitFuncallExpr(MxParser.FuncallExprContext ctx) {
 		ExprNode func = (ExprNode) visit(ctx.expression());
-		// FIX: try to change vardecllist into listnode but failed
+		// UGLY: try to change vardecllist into listnode but failed
 		List<ExprNode> params = new ArrayList<ExprNode>();
 
-		for (ParserRuleContext param : ctx.paramList().expression()) {
-			params.add((ExprNode) visit(param));
-		}
+		if (ctx.paramList().expression() != null)
+			for (ParserRuleContext param : ctx.paramList().expression()) {
+				params.add((ExprNode) visit(param));
+			}
 
 		return new FuncallExprNode(func, params);
 	}
@@ -523,7 +522,6 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	public Node visitParamList(MxParser.ParamListContext ctx) {
 		return visitChildren(ctx);
 	}
-
 
 	/**
 	 * {@inheritDoc}
@@ -563,15 +561,19 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	public Node visitArrayCreator(MxParser.ArrayCreatorContext ctx) {
 		TypeNode newType = (TypeNode) visit(ctx.typeName());
 		List<ExprNode> dims = new ArrayList<ExprNode>();
-		for (ParserRuleContext dim : ctx.expression()) {
-			dims.add((ExprNode) visit(dim));
-		}
+
+		if (ctx.expression() != null)
+			for (ParserRuleContext dim : ctx.expression()) {
+				dims.add((ExprNode) visit(dim));
+			}
 		int num = ctx.LeftBracket().size();
-		
-		// FIX: current is no array plain type how to figure how many dims is needed??
-		//  for (int i = 0; i < numDim; ++i) newType.setType(new ArrayType(newType.getType()));
+
+		// UGLY: NOTE: current is no array plain type how to figure how many dims is
+		// needed??
+		// for (int i = 0; i < numDim; ++i) newType.setType(new
+		// ArrayType(newType.getType()));
 		newType.setType(new ArrayType(newType.getType()));
-		
+
 		return new NewExprNode(newType, dims, num);
 	}
 
@@ -729,7 +731,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			return new IntLiteralExprNode(v);
 		}
 		if (ctx.StringLiteral() != null) {
-			String v = ctx.getText(); // FIX: escape-sequence??
+			String v = ctx.getText(); // BUG: escape-sequence??
 			return new StringLiteralExprNode(v);
 		}
 		if (ctx.Null() != null) {

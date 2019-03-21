@@ -3,13 +3,13 @@ package mxcompiler.ast;
 import java.io.PrintStream;
 
 public class Dump {
-    private PrintStream stream;
+    private PrintStream os;
 
     public Dump(PrintStream x) {
-        stream = x;
+        os = x;
     }
 
     public void print(String x) {
-        stream.println(x);
+        os.println(x);
     }
 }

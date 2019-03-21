@@ -33,7 +33,7 @@ public class PrefixExprNode extends ExprNode {
 		this.prefixExpr = prefixExpr;
 	}
 
-	// FIX: maybe get string ???
+	// NOTE: maybe get string ???
 	public Op getOp() {
 		return prefixOp;
 	}
