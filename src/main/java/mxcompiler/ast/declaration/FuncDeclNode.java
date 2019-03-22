@@ -3,11 +3,9 @@ package mxcompiler.ast.declaration;
 import java.util.ArrayList;
 import java.util.List;
 
-import mxcompiler.ast.*;
 import mxcompiler.ast.statement.BlockStmtNode;
 import mxcompiler.type.NullType;
-import mxcompiler.ast.Location;
-import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;;
 
 public class FuncDeclNode extends DeclNode {
 	@Override
@@ -27,6 +25,8 @@ public class FuncDeclNode extends DeclNode {
 
 	public FuncDeclNode(String name, TypeNode returnType, VarDeclListNode varList, BlockStmtNode body,
 			Location location) {
+		// REVIEW: varList is null, fixed outside
+		// this(name, returnType,(varList != null) ? varList.getList(): null, body, location);
 		this(name, returnType, varList.getList(), body, location);
 	}
 
@@ -68,6 +68,8 @@ public class FuncDeclNode extends DeclNode {
 		return body;
 	}
 
-	// public void addVar(VarDeclNode v) { varList.add(v); }
-
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

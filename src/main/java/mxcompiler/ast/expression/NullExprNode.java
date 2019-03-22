@@ -1,8 +1,7 @@
 package mxcompiler.ast.expression;
 
 
-import mxcompiler.ast.Location;
-import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 /** Maybe for Nullliteral?? */
 public class NullExprNode extends ExprNode {
 			@Override
@@ -12,5 +11,9 @@ public class NullExprNode extends ExprNode {
 	}
 	public NullExprNode(Location location) {
 		super(location);
+	}
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

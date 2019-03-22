@@ -1,9 +1,8 @@
 package mxcompiler.ast.statement;
 
 
-import mxcompiler.ast.Location;
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 public class WhileStmtNode extends StmtNode {
 			@Override
 	public void _dump(ASTDump d) {		d.printf("<WhileStmtNode> %s\n", location.toString());
@@ -23,5 +22,9 @@ public class WhileStmtNode extends StmtNode {
 
 	public StmtNode getBody() {
 		return body;
+	}
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

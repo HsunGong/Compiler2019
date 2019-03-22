@@ -3,8 +3,7 @@ package mxcompiler.ast.expression;
 import java.util.List;
 
 
-import mxcompiler.ast.TypeNode;
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 /** for creator */
 public class NewExprNode extends ExprNode {
 			@Override
@@ -33,5 +32,8 @@ public class NewExprNode extends ExprNode {
 	}
 	
 	public int getNum() { return num; }
-
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 } 

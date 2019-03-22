@@ -1,7 +1,7 @@
 package mxcompiler.ast.expression.lhs;
 
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;
+import mxcompiler.ast.*;
 
 /**
  * Lhs can be assign with value Without auto type transfer, no originType is

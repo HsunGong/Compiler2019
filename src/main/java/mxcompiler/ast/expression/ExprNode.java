@@ -16,5 +16,6 @@ abstract public class ExprNode extends Node{
     // protected boolean isLeftValue;
     // public void setIsLeftValue(boolean s) { this.isLeftValue = s; }
     // public boolean isLeftValue() { return isLeftValue; } 
-    public boolean isLeftValue() { return false; }
+	public boolean isLeftValue() { return false; }
+	
 }

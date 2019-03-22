@@ -1,7 +1,7 @@
 package mxcompiler.ast.expression;
 
 
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 /** for class and Primary Expr */
 public class ThisExprNode extends ExprNode {
 			@Override
@@ -11,5 +11,9 @@ public class ThisExprNode extends ExprNode {
 	}
 	public ThisExprNode(Location location) {
 		super(location);
+	}
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

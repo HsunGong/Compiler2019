@@ -1,9 +1,6 @@
 package mxcompiler.ast.declaration;
 
-
-import mxcompiler.ast.*;
-import mxcompiler.ast.Location;
-import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;;
 /** Normally seen as declare node 
  * FIX: however, in opinion, it should be put in entity
  * with entity
@@ -15,5 +12,4 @@ abstract public class DeclNode extends Node {
 
     // get name FIX: set name??
     public String getName() { return name; }
-
 }

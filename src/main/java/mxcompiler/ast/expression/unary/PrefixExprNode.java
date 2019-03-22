@@ -2,7 +2,7 @@ package mxcompiler.ast.expression.unary;
 
 
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 /**
  * No longer support UnaryArithmeticOpNode It is included in {@code suffix} and
  * {@code prefix}
@@ -42,5 +42,8 @@ public class PrefixExprNode extends ExprNode {
 	public ExprNode getExpr() {
 		return prefixExpr;
 	}
-
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

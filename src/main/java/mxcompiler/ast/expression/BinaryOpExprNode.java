@@ -2,7 +2,7 @@ package mxcompiler.ast.expression;
 
 
 import mxcompiler.type.Type;
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 public class BinaryOpExprNode extends ExprNode {
 		@Override
 	public void _dump(ASTDump d) {
@@ -57,5 +57,9 @@ public class BinaryOpExprNode extends ExprNode {
 
 	public Oper getOp() {
 		return op;
+	}
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

@@ -1,7 +1,7 @@
 package mxcompiler.ast.expression;
 
 
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 /** no auto transfer type */
 public class AssignExprNode extends ExprNode {
 		@Override
@@ -19,5 +19,9 @@ public class AssignExprNode extends ExprNode {
 
     public ExprNode getLhs() { return lhs; }
     public ExprNode getRhs() { return rhs; }
-    public void setRhs(ExprNode e) { this.rhs = e; }
+	public void setRhs(ExprNode e) { this.rhs = e; }
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

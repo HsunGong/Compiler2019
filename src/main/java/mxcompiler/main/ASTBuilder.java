@@ -62,7 +62,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitTranslationUnit(MxParser.TranslationUnitContext ctx) {
 		if (ctx.functionDeclaration() != null)
-			return visit(ctx.functionDeclaration());
+			return visitFunctionDeclaration(ctx.functionDeclaration());
 		if (ctx.classDeclaration() != null)
 			return visit(ctx.classDeclaration());
 		if (ctx.variableDeclaration() != null)
@@ -190,7 +190,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 				: (TypeNode) visit(ctx.typeReturn());
 
 		String name = ctx.Identifier().getText();
-		VarDeclListNode varList = (VarDeclListNode) visit(ctx.paramDeclarationList());
+		VarDeclListNode varList = (ctx.paramDeclarationList() == null) ? new VarDeclListNode(null, new Location(ctx))
+				: (VarDeclListNode) visit(ctx.paramDeclarationList());
 		BlockStmtNode body = (BlockStmtNode) visit(ctx.block());
 
 		return new FuncDeclNode(name, returnType, varList, body, new Location(ctx));
@@ -504,7 +505,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		// UGLY: try to change vardecllist into listnode but failed
 		List<ExprNode> params = new ArrayList<ExprNode>();
 
-		if (ctx.paramList().expression() != null)
+		if (ctx.paramList() != null) // REVIEW: not parmList.expression
 			for (ParserRuleContext param : ctx.paramList().expression()) {
 				params.add((ExprNode) visit(param));
 			}

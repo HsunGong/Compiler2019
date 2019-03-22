@@ -171,4 +171,6 @@ type from Book: @critical @high @today
 		☐ 2, escape sequence
 		✔ 3, for each rule have to check set-null @done(03-21 17)
 		✔ Opt with ? : operator @done(03-21 17)
+		☐ 4, visit DeclNode but can not change into detail instance 
+			-> fix by: 1, add acceptfunction in each node 2, specify each node in visit(abstract Node)
 

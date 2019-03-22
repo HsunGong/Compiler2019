@@ -2,8 +2,7 @@ package mxcompiler.ast.expression.lhs;
 
 
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.ASTDump;
-import mxcompiler.ast.Location;
+import mxcompiler.ast.*;
 /** This is the array index node */
 public class ArefExprNode extends LhsExprNode {
 		@Override
@@ -23,5 +22,9 @@ public class ArefExprNode extends LhsExprNode {
     public ExprNode getExpr() { return expr; }
     public ExprNode getIndex() { return index; }
 
-    // public int getDim() { return dims; }
+	// public int getDim() { return dims; }
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

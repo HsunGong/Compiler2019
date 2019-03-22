@@ -63,12 +63,16 @@ public class ASTDump implements ASTVisitor {
 	public void visit(TypeNode node) {
 		addTab();
 		node._dump(this);
-
 		delTab();
 	}
 
-	@Deprecated
+	// UGLY: FIX: visit DeclNode but can not change into detail instance
+	// 1, instanceof to fix
+	// 2, accept function to fix
 	public void visit(DeclNode node) {
+		if(node instanceof ClassDeclNode) visit((ClassDeclNode) node);
+		if(node instanceof FuncDeclNode) visit((FuncDeclNode) node);
+		if(node instanceof VarDeclNode) visit((VarDeclNode) node);
 	}
 
 	public void visit(ClassDeclNode node) {
@@ -85,7 +89,7 @@ public class ASTDump implements ASTVisitor {
 		addTab();
 		node._dump(this);
 
-		print(" returnType:");
+		println(" returnType:");
 		// if (getReturnType() != null) {
 		// d.print("\n");
 		visit(node.getReturnType());
@@ -93,7 +97,7 @@ public class ASTDump implements ASTVisitor {
 		// d.println(" null");
 
 		printVarDeclList(" parameterList:", node.getVar());
-		print(" body:");
+		println(" body:");
 		visit(node.getBody());
 		delTab();
 	}
@@ -102,19 +106,19 @@ public class ASTDump implements ASTVisitor {
 		addTab();
 		node._dump(this);
 
-		print(" type:");
+		println(" type:");
 		visit(node.getType());
 		printExpr(" init:", node.getInit());
 
 		delTab();
 	}
 
-	@Deprecated
 	public void visit(VarDeclListNode node) {
+		node._dump(this);
 	}
 
-	@Deprecated
 	public void visit(LhsExprNode node) {
+		node.accept(this);
 	}
 
 	public void visit(ArefExprNode node) {
@@ -129,7 +133,6 @@ public class ASTDump implements ASTVisitor {
 	public void visit(MemberExprNode node) {
 		addTab();
 		node._dump(this);
-		printf(" member: %s\n", node.getMember());
 		printExpr(" expr:", node.getExpr());
 		delTab();
 	}
@@ -183,15 +186,15 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	@Deprecated
+	// UGLY: as DeclNode
 	public void visit(ExprNode node) {
+
 	}
 
 	public void visit(FuncallExprNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" expr:", node.getExpr()); // FIX: getFunc
-
 		printExprList(" args:", node.getParam());
 		delTab();
 	}

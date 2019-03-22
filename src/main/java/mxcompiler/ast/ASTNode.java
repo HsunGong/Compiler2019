@@ -35,5 +35,10 @@ public class ASTNode extends Node {
     public void addDeclaration(DeclNode n) { declarations.add(n); }
 
     public void setScope(ToplevelScope scope) { this.scope = scope; }
-    public ToplevelScope getScope() { return scope; }
+	public ToplevelScope getScope() { return scope; }
+	
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

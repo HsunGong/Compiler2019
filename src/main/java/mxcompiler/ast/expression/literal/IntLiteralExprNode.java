@@ -2,8 +2,7 @@ package mxcompiler.ast.expression.literal;
 
 
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;
-import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 
 public class IntLiteralExprNode extends ExprNode {
 		@Override
@@ -20,5 +19,10 @@ public class IntLiteralExprNode extends ExprNode {
 
 	public int getValue() {
 		return value;
+	}
+
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

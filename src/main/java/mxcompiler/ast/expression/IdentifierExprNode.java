@@ -1,7 +1,7 @@
 package mxcompiler.ast.expression;
 
 
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 /** For variable identifier in primary expr 
  * Or maybe called nameExprNode is better?
 */
@@ -40,5 +40,9 @@ public class IdentifierExprNode extends ExprNode {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
-    }
+	}
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

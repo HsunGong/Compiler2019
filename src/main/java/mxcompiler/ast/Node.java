@@ -26,4 +26,5 @@ abstract public class Node {
 	// abstract void visit(ASTVisitor visitor);
 
 	abstract public void _dump(ASTDump d);
+	abstract public void accept(ASTVisitor visitor);
 }

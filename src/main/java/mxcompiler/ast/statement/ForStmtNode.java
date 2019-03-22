@@ -2,12 +2,12 @@ package mxcompiler.ast.statement;
 
 import java.util.ArrayList;
 import java.util.List;
-import mxcompiler.ast.ASTDump;
 
+import mxcompiler.ast.*;
 import mxcompiler.ast.declaration.VarDeclListNode;
 import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;
+
 public class ForStmtNode extends StmtNode {
 			@Override
 	public void _dump(ASTDump d) {d.printf("<ForStmtNode> %s\n", location.toString());
@@ -39,5 +39,9 @@ public class ForStmtNode extends StmtNode {
     public ExprNode getInit() { return init; }
     public ExprNode getCond() { return cond; }
     public ExprNode getIncr() { return incr; }
-    public StmtNode getBody() { return body; }
+	public StmtNode getBody() { return body; }
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

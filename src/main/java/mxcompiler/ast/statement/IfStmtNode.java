@@ -2,7 +2,7 @@ package mxcompiler.ast.statement;
 
 
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 public class IfStmtNode extends StmtNode {
 			@Override
 	public void _dump(ASTDump d) {		d.printf("<IfStmtNode> %s\n", location.toString());
@@ -21,5 +21,9 @@ public class IfStmtNode extends StmtNode {
 
     public ExprNode getCond() { return cond; }
     public StmtNode getThen() { return thenBody; }
-    public StmtNode getElse() { return elseBody; }
+	public StmtNode getElse() { return elseBody; }
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

@@ -3,9 +3,7 @@ package mxcompiler.ast.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import mxcompiler.ast.Location;
-import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 /** Also for class method */
 public class FuncallExprNode extends ExprNode {
 		@Override
@@ -24,5 +22,9 @@ public class FuncallExprNode extends ExprNode {
     }
 
     public ExprNode getExpr() { return expr; }
-    public List<ExprNode> getParam() { return params; }
+	public List<ExprNode> getParam() { return params; }
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

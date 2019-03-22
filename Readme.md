@@ -64,6 +64,8 @@ locals, throws, catch, finally, mode, options, tokens
 		1, ctx.label | ctx.parserRule()
 		2, visit(ctx.xx) Deprecated visitChildren
 
+ctrl alt - -> back (after press f12)
+
 
 [C.g4]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/C.g4
 [1]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/java.g4

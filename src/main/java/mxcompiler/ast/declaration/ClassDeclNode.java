@@ -2,8 +2,7 @@ package mxcompiler.ast.declaration;
 
 import java.util.ArrayList;
 import java.util.List;
-import mxcompiler.ast.Location;
-import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 
 public class ClassDeclNode extends DeclNode {
 	@Override
@@ -55,5 +54,10 @@ public class ClassDeclNode extends DeclNode {
 
 	public List<FuncDeclNode> getFunc() {
 		return funcList;
+	}
+
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

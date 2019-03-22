@@ -32,5 +32,8 @@ public class TypeNode extends Node {
 	public boolean isEqual(TypeNode rhs) {
 		return rhs.type == this.type;
 	}
-
+	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }

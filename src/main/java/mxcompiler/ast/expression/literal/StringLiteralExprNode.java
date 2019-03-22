@@ -1,8 +1,8 @@
 package mxcompiler.ast.expression.literal;
 
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;
-import mxcompiler.ast.ASTDump;
+
+import mxcompiler.ast.*;
 public class StringLiteralExprNode extends ExprNode {
 	@Override
 	public void _dump(ASTDump d) {
@@ -19,5 +19,9 @@ public class StringLiteralExprNode extends ExprNode {
 
 	public String getValue() {
 		return value;
+	}
+		@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
 	}
 }

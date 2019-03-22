@@ -1,7 +1,7 @@
 package mxcompiler.ast.statement;
 
 
-import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+import mxcompiler.ast.*;
 public class BreakStmtNode extends StmtNode {
 			@Override
 	public void _dump(ASTDump d) {
@@ -11,5 +11,8 @@ public class BreakStmtNode extends StmtNode {
 
 	public BreakStmtNode(Location location) {
 		super(location);}
-    
+    	@Override
+	public void accept(ASTVisitor visitor) {
+		visitor.visit(this);
+	}
 }
