@@ -1,32 +1,39 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "java",
-            "name": "CodeLens (Launch) - Compiler",
-            "request": "launch",
-            "mainClass": "mxcompiler.main.Compiler",
-            "args": "-C /home/xun/Documents/mxc/src/test/cases/test.in",
-            "projectName": "mxc"
-        },
-        {
-            "type": "java",
-            "name": "Debug (Launch) - Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "name": "Debug ANTLR4 grammar",
-            "type": "antlr-debug",
-            "request": "launch",
-            "input": "src/test/cases/test.in",
-            "grammar": "src/main/java/mxcompiler/parser/grammar/Mx.g4",
-            "startRule": "compilationUnit",
-            "printParseTree": true,
-            "visualParseTree": true
-        }
-    ]
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "java",
+			"name": "CodeLens (Launch) - Compiler",
+			"request": "launch",
+			"mainClass": "mxcompiler.main.Compiler",
+			"args": "-C /home/xun/Documents/mxc/src/test/cases/test.in",
+			"projectName": "mxc"
+		},
+		{
+			"type": "java",
+			"name": "Debug (Launch) - Current File",
+			"request": "launch",
+			"mainClass": "${file}"
+		},
+		{
+			"name": "Debug ANTLR4 grammar",
+			"type": "antlr-debug",
+			"request": "launch",
+			"input": "src/test/cases/test.in",
+			"grammar": "src/main/java/mxcompiler/parser/grammar/Mx.g4",
+			"startRule": "compilationUnit",
+			"printParseTree": true,
+			"visualParseTree": true
+		},
+		{
+			"type": "java",
+			"name": "Debug (Attach)",
+			"request": "attach",
+			"hostName": "localhost",
+			"port": 8000
+		}
+	]
 }

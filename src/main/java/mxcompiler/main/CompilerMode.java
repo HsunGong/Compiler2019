@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 enum CompilerMode{
     Default ("-C"),
-    Check 	("--check"),
+	Check 	("--check"),
     Dump    ("--dump");
     static private Map<String, CompilerMode> modes;
     static {

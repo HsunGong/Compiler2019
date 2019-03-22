@@ -5,12 +5,19 @@ import java.util.List;
 
 import mxcompiler.ast.Node;
 import mxcompiler.ast.Location;
+import mxcompiler.ast.ASTDump;
 /**
  * Current No use for AST maybe can transfer all List<varNode> into this class
  * 
  * @see can not add later, have to add outside
  */
 public class VarDeclListNode extends Node {
+		@Override
+	public void _dump(ASTDump d) {
+		for (VarDeclNode decl : varList) {
+			decl._dump(d);
+		}
+	}
 
 
 	private List<VarDeclNode> varList;

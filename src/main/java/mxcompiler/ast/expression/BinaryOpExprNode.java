@@ -2,8 +2,13 @@ package mxcompiler.ast.expression;
 
 
 import mxcompiler.type.Type;
-import mxcompiler.ast.Location;
+import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
 public class BinaryOpExprNode extends ExprNode {
+		@Override
+	public void _dump(ASTDump d) {
+				d.printf("<BinaryOpExprNode> %s\n", location.toString());
+		d.printf(" op: %s\n", getOp().toString());
+	}
 	public static enum Oper {
 		MUL("*"), DIV("/"), MOD("%"), 
 		ADD("+"), SUB("-"), 

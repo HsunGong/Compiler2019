@@ -1,10 +1,10 @@
-int __print() {
+int p_rint() {
 
 }
 int main() {
 	string x = "asdaefbasdf \n \\\" is \" asd";
 int a = (new int[123])[31];
-__print();
+p_rint();
 }
 
 

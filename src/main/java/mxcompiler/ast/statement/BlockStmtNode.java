@@ -7,8 +7,12 @@ import java.util.List;
 import mxcompiler.ast.declaration.VarDeclListNode;
 import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.entity.scope.LocalScope;
-import mxcompiler.ast.Location;
+import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
 public class BlockStmtNode extends StmtNode {
+			@Override
+	public void _dump(ASTDump d) {
+		d.printf("<BlockStmtNode> %s\n", location.toString());
+	}
 	private List<StmtNode> stmts;
 	private List<VarDeclNode> varList;
     private LocalScope scope;

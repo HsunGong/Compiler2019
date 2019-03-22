@@ -1,8 +1,10 @@
 package mxcompiler.main;
 
+import org.antlr.v4.gui.TestRig;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.InputStream;
+import java.io.PrintStream;
 
 import mxcompiler.parser.*;
 import mxcompiler.exception.*;
@@ -21,26 +23,25 @@ public final class Compiler {
     }
     
     private Compiler (String name) {
-        this.errHandler = new ExceptionHandler(name);
+		this.errHandler = new ExceptionHandler(name);
+		in = System.in;
+		out = System.out;
     }
     
     private void execute(String[] args) throws Exception {
         // parse options
         Option opts = new Option(args);
-        this.src = opts.sourceFile();
-        
+		this.in = opts.sourceFile();
+		
         switch(opts.mode()) {
             case Default: // So
                 compile(opts);
-                System.out.println(opts.mode().toString());
                 break;
             case Dump:
                 compileDump(opts);
-                System.out.println(opts.mode().toString());
                 break;
             case Check: // throw all Exception without errorHandler
                 compileCheck(opts);
-                System.out.println(opts.mode().toString());
                 break;
             default:
             throw new Exception("No Compile Mode selected");
@@ -48,8 +49,8 @@ public final class Compiler {
         
     }
     
-    private InputStream src;
-    // PrintStream outputAST;
+    private InputStream in;
+    private PrintStream out;
     private ASTNode root;
 
 
@@ -95,13 +96,14 @@ public final class Compiler {
 
     // no errorHandler
     private void compileCheck(Option opts) throws Exception {
-        buildAST(opts.mode());
+		
+		buildAST(opts.mode());
     }
 
 
     private void buildAST(CompilerMode mode) throws Exception {
         // System.out.println(src.toString());
-        MxLexer lexer = new MxLexer(CharStreams.fromStream(src));
+        MxLexer lexer = new MxLexer(CharStreams.fromStream(in));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         MxParser parser = new MxParser(tokens);
         // parser.removeErrorListeners();
@@ -115,7 +117,7 @@ public final class Compiler {
         root = (ASTNode) astBuilder.visit(tree);
 		
 		if (mode == CompilerMode.Dump) {
-			new ASTDump(System.out).visit(root);
+			new ASTDump(out).visit(root);
 		}
     }
 

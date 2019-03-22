@@ -1,9 +1,16 @@
 package mxcompiler.ast.expression;
 
 
-import mxcompiler.ast.Location;
-/** For variable identifier in primary expr */
+import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
+/** For variable identifier in primary expr 
+ * Or maybe called nameExprNode is better?
+*/
 public class IdentifierExprNode extends ExprNode {
+		@Override
+	public void _dump(ASTDump d) {
+				d.printf("<IdentifierExprNode> %s\n", location.toString());
+		d.printf("identifier: %s\n", getIdentifier());
+	}
 
     private String identifier;
     private boolean needMemOp = false;

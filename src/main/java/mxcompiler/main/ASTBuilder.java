@@ -186,7 +186,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	public Node visitFunctionDeclaration(MxParser.FunctionDeclarationContext ctx) {
 		TypeNode returnType;
 		// UGLY: new NullType() for null
-		returnType = (ctx.typeReturn() == null) ? null : (TypeNode) visit(ctx.typeReturn());
+		returnType = (ctx.typeReturn() == null) ? new TypeNode(new NullType(), new Location(ctx))
+				: (TypeNode) visit(ctx.typeReturn());
 
 		String name = ctx.Identifier().getText();
 		VarDeclListNode varList = (VarDeclListNode) visit(ctx.paramDeclarationList());

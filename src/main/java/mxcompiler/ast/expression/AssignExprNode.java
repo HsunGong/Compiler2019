@@ -1,9 +1,13 @@
 package mxcompiler.ast.expression;
 
 
-import mxcompiler.ast.Location;
+import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
 /** no auto transfer type */
 public class AssignExprNode extends ExprNode {
+		@Override
+	public void _dump(ASTDump d) {
+		d.printf("<AssignExprNode> %s\n", location.toString());
+	}
     private ExprNode lhs;
     private ExprNode rhs;
 

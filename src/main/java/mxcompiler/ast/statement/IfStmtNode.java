@@ -2,8 +2,11 @@ package mxcompiler.ast.statement;
 
 
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;
+import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
 public class IfStmtNode extends StmtNode {
+			@Override
+	public void _dump(ASTDump d) {		d.printf("<IfStmtNode> %s\n", location.toString());
+}
     private ExprNode cond;
     private StmtNode thenBody;
     /** may be null */

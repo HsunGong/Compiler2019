@@ -4,9 +4,14 @@ import java.util.List;
 
 
 import mxcompiler.ast.TypeNode;
-import mxcompiler.ast.Location;
+import mxcompiler.ast.Location;import mxcompiler.ast.ASTDump;
 /** for creator */
 public class NewExprNode extends ExprNode {
+			@Override
+	public void _dump(ASTDump d) {
+		d.printf("<NewExprNode> %s\n", location.toString());
+		d.printf(" numDim: %d\n", num);
+	}
 
     private TypeNode newType;
     private List<ExprNode> dims;

@@ -3,8 +3,6 @@ package mxcompiler.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.v4.runtime.tree.ParseTree;
-
 import mxcompiler.ast.declaration.DeclNode;
 import mxcompiler.entity.scope.ToplevelScope;
 
@@ -15,6 +13,11 @@ import mxcompiler.entity.scope.ToplevelScope;
  * Here we simplify
  */
 public class ASTNode extends Node {
+	@Override
+	public void _dump(ASTDump d) {
+		d.println("Program Start");
+		d.printf("<ASTNode> %s\n", location.toString());
+	}
 
     private List<DeclNode> declarations;
     private ToplevelScope scope;
@@ -27,8 +30,6 @@ public class ASTNode extends Node {
         if (decl == null) decl = new ArrayList<DeclNode>();
         else this.declarations = decl;
     }
-
-    public void visit(ParseTree tree){}
 
     public List<DeclNode> getDecl() { return declarations; }
     public void addDeclaration(DeclNode n) { declarations.add(n); }
