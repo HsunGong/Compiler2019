@@ -1,19 +1,19 @@
 package mxcompiler.ast.declaration;
 
-import mxcompiler.ast.*;
 import mxcompiler.ast.expression.ExprNode;
-import mxcompiler.ast.Location;
-import mxcompiler.ast.*;;
+import mxcompiler.ast.*;
+
 /**
  * Will be used in declaration and statement Specially, change block-decl and
  * for-decl into vardecl, so as to cancel {@code varDeclStmt}
  */
 public class VarDeclNode extends DeclNode {
-		@Override
+	@Override
 	public void _dump(ASTDump d) {
 		d.printf("<VarDeclNode> %s\n", location.toString());
 		d.printf(" name: %s\n", getName());
 	}
+
 	/** to support type transfer, maybe change into typeNode */
 	private TypeNode type;
 	private ExprNode init;
@@ -35,7 +35,8 @@ public class VarDeclNode extends DeclNode {
 	public ExprNode getInit() {
 		return init;
 	}
-		@Override
+
+	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}

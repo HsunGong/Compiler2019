@@ -43,9 +43,11 @@ public class ASTDump implements ASTVisitor {
 	public void print(String str) {
 		os.print(getTab() + str);
 	}
-
-	@Deprecated
+	
+	// UGLY: FIX: visit DeclNode but can not change into detail instance
+	// 2, accept function to fix
 	public void visit(Node node) {
+		node.accept(this);
 	}
 
 	public void visit(ASTNode node) {
@@ -68,11 +70,13 @@ public class ASTDump implements ASTVisitor {
 
 	// UGLY: FIX: visit DeclNode but can not change into detail instance
 	// 1, instanceof to fix
-	// 2, accept function to fix
 	public void visit(DeclNode node) {
-		if(node instanceof ClassDeclNode) visit((ClassDeclNode) node);
-		if(node instanceof FuncDeclNode) visit((FuncDeclNode) node);
-		if(node instanceof VarDeclNode) visit((VarDeclNode) node);
+		if (node instanceof ClassDeclNode)
+			visit((ClassDeclNode) node);
+		if (node instanceof FuncDeclNode)
+			visit((FuncDeclNode) node);
+		if (node instanceof VarDeclNode)
+			visit((VarDeclNode) node);
 	}
 
 	public void visit(ClassDeclNode node) {
@@ -117,6 +121,7 @@ public class ASTDump implements ASTVisitor {
 		node._dump(this);
 	}
 
+	// UGLY
 	public void visit(LhsExprNode node) {
 		node.accept(this);
 	}
@@ -188,7 +193,7 @@ public class ASTDump implements ASTVisitor {
 
 	// UGLY: as DeclNode
 	public void visit(ExprNode node) {
-
+		node.accept(this);
 	}
 
 	public void visit(FuncallExprNode node) {
@@ -205,14 +210,13 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-
 	public void visit(NewExprNode node) {
-				addTab();
+		addTab();
 		node._dump(this);
-        println(" newType:");
+		println(" newType:");
 		visit(node.getNewType());
 		printExprList("dims:", node.getDims());
-        
+
 		delTab();
 	}
 
@@ -284,8 +288,8 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	@Deprecated
 	public void visit(StmtNode node) {
+		node.accept(this);
 	}
 
 	public void visit(WhileStmtNode node) {
@@ -330,7 +334,8 @@ public class ASTDump implements ASTVisitor {
 		} else
 			println(" null");
 	}
-private void printExprList(String s, List<ExprNode> list) {
+
+	private void printExprList(String s, List<ExprNode> list) {
 		print(s);
 		if (!list.isEmpty()) {
 			print("\n");

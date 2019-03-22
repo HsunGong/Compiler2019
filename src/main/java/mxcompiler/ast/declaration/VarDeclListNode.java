@@ -4,20 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mxcompiler.ast.*;
+
 /**
  * Current No use for AST maybe can transfer all List<varNode> into this class
  * 
- * @see can not add later, have to add outside
- * VI: List can be null
+ * @see can not add later, have to add outside VI: List can be null
  */
 public class VarDeclListNode extends Node {
-		@Override
+	@Override
 	public void _dump(ASTDump d) {
 		for (VarDeclNode decl : varList) {
 			decl._dump(d);
 		}
 	}
-
 
 	private List<VarDeclNode> varList;
 
@@ -33,7 +32,8 @@ public class VarDeclListNode extends Node {
 	public void add(VarDeclNode n) {
 		varList.add(n);
 	}
-		@Override
+
+	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}
