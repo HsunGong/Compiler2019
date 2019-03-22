@@ -166,11 +166,11 @@ type from Book: @critical @high @today
 		✔ <assoc = right> expression op = '||' expression	# binaryExpr @done(03-21 15)
 		// assign
 		✔ <assoc = right> expression op = '=' expression # assignExpr @done(03-21 15)
-	☐ FIX 2 bug @started(03-21 16)
+	✔ FIX 2 bug @started(03-21 16) @done(03-22 21) @lasted(1d5h7m1s)
 		✔ 1, list add null -> have to check for it @done(03-21 17)
-		☐ 2, escape sequence
+		✔ 2, escape sequence -> fixed in stringliteral Node @done(03-22 21)
 		✔ 3, for each rule have to check set-null @done(03-21 17)
 		✔ Opt with ? : operator @done(03-21 17)
-		☐ 4, visit DeclNode but can not change into detail instance 
+		✔ 4, visit DeclNode but can not change into detail instance @done(03-22 20)
 			-> fix by: 1, add acceptfunction in each node 2, specify each node in visit(abstract Node)
 

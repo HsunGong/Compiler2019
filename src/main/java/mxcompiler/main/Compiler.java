@@ -1,6 +1,5 @@
 package mxcompiler.main;
 
-import org.antlr.v4.gui.TestRig;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.InputStream;
@@ -15,7 +14,6 @@ public final class Compiler {
     static final public String Version = "1.0.0";
 
     private final ExceptionHandler errHandler;
-
     
     public static void main (String[] args) throws Exception {
         Compiler c = new Compiler(ProgName);
@@ -33,19 +31,7 @@ public final class Compiler {
         Option opts = new Option(args);
 		this.in = opts.sourceFile();
 		
-        switch(opts.mode()) {
-            case Default: // So
-                compile(opts);
-                break;
-            case Dump:
-                compileDump(opts);
-                break;
-            case Check: // throw all Exception without errorHandler
-                compileCheck(opts);
-                break;
-            default:
-            throw new Exception("No Compile Mode selected");
-        }
+        compile(opts);
         
     }
     
@@ -87,19 +73,6 @@ public final class Compiler {
             // new NASMPrinter(nasmOutS).visit(ir);
         */
     }
-
-    // file compiler with errorHandler
-    private void compileDump(Option opts) throws Exception {
-        buildAST(opts.mode());
-        // dumpAST();
-    }
-
-    // no errorHandler
-    private void compileCheck(Option opts) throws Exception {
-		
-		buildAST(opts.mode());
-    }
-
 
     private void buildAST(CompilerMode mode) throws Exception {
         // System.out.println(src.toString());

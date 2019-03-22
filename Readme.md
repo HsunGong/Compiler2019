@@ -66,6 +66,28 @@ locals, throws, catch, finally, mode, options, tokens
 
 ctrl alt - -> back (after press f12)
 
+1 workspace is used for 1 project
+which as seen may the same level as maven, springboot...
+but large workspace may include diff langurages.
+
+1, if ctx.params == null -> can not get params.param; can not use for(:)
+2, if varListNode == null or varListNode.varList == null it is diff
+
+
+## Part 2-Type Check
+
+变量引用消除              类型名字消除
+			类型定义检查
+	   表达式有效性检查
+	    静态类型检查
+
+变量引用：确定作用域
+类型名称：似乎不用，因为不会有只声明不定义的情况
+类型定义：语义方面，会不会有null类型数组，void类型的bulabula，自身作为自身结构体
+表达式有效性：1++无法执行的表达式；内置的表达式
+静态类型：不允许类型转换
+
+
 
 [C.g4]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/C.g4
 [1]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/java.g4

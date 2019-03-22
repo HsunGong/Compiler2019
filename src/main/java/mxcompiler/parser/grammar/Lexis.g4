@@ -195,13 +195,13 @@ StringLiteral
 
 fragment SChar
 	: ~["\r\n\\]
-	| '\\' ["n\\]
-	// | EscapeSequence
+	// | '\\' ["n\\]
+	| EscapeSequence
 	;
 
 // @Deprecated
 fragment EscapeSequence
-	: '\\' ['"?abfnrtv\\]
+	: '\\' [bfnrt'"\\]
 	;
 
 
