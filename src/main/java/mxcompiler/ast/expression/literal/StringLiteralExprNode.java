@@ -7,7 +7,7 @@ import mxcompiler.ast.*;
 public class StringLiteralExprNode extends ExprNode {
 	@Override
 	public void _dump(ASTDump d) {
-		d.printf("<StringExprNode> %s\n", location.toString());
+		d.printf("<StringLiteralNode> %s\n", location.toString());
 		d.printf(" value: %s\n", getValue());
 	}
 

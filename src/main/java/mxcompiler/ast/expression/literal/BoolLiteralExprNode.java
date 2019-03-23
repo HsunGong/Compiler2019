@@ -7,7 +7,7 @@ import mxcompiler.ast.*;
 public class BoolLiteralExprNode extends ExprNode {
 		@Override
 	public void _dump(ASTDump d) {
-				d.printf("<BoolExprNode> %s\n", location.toString());
+				d.printf("<BoolLiteralNode> %s\n", location.toString());
 		d.printf(" value: %b\n", getValue());
 	}
 	private boolean value;

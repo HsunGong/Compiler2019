@@ -83,8 +83,8 @@ public class ASTDump implements ASTVisitor {
 		addTab();
 		node._dump(this);
 
-		printVarDeclList(" varDecls:", node.getVar());
-		printFuncDeclList(" funcMember:", node.getFunc());
+		printDeclList(" varDecls:", node.getVar());
+		printDeclList(" funcMember:", node.getFunc());
 
 		delTab();
 	}
@@ -100,7 +100,7 @@ public class ASTDump implements ASTVisitor {
 		// } else
 		// d.println(" null");
 
-		printVarDeclList(" parameterList:", node.getVar());
+		printDeclList(" parameterList:", node.getVar());
 		println(" body:");
 		visit(node.getBody());
 		delTab();

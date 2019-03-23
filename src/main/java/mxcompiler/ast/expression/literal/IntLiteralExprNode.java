@@ -7,7 +7,7 @@ import mxcompiler.ast.*;
 public class IntLiteralExprNode extends ExprNode {
 		@Override
 	public void _dump(ASTDump d) {
-				d.printf("<IntExprNode> %s\n", location.toString());
+				d.printf("<IntLiteralNode> %s\n", location.toString());
 		d.printf(" value: %d\n", getValue());
 	}
 	private int value;
