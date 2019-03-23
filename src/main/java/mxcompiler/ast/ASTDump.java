@@ -10,7 +10,7 @@ import mxcompiler.ast.expression.literal.*;
 import mxcompiler.ast.expression.lhs.*;
 import mxcompiler.ast.expression.unary.*;
 
-public class ASTDump implements ASTVisitor {
+public class ASTDump extends Visitor {
 	private PrintStream os;
 	private int tab; // tabSize
 	private final String t = "\t";
@@ -46,11 +46,11 @@ public class ASTDump implements ASTVisitor {
 	
 	// UGLY: FIX: visit DeclNode but can not change into detail instance
 	// 2, accept function to fix
-	public void visit(Node node) {
+	@Override	public void visit(Node node) {
 		node.accept(this);
 	}
 
-	public void visit(ASTNode node) {
+	@Override	public void visit(ASTNode node) {
 		node._dump(this);
 
 		print(" declarations:");
@@ -62,7 +62,7 @@ public class ASTDump implements ASTVisitor {
 			println(" null");
 	}
 
-	public void visit(TypeNode node) {
+	@Override	public void visit(TypeNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
@@ -70,7 +70,7 @@ public class ASTDump implements ASTVisitor {
 
 	// UGLY: FIX: visit DeclNode but can not change into detail instance
 	// 1, instanceof to fix
-	public void visit(DeclNode node) {
+	@Override	public void visit(DeclNode node) {
 		if (node instanceof ClassDeclNode)
 			visit((ClassDeclNode) node);
 		if (node instanceof FuncDeclNode)
@@ -79,7 +79,7 @@ public class ASTDump implements ASTVisitor {
 			visit((VarDeclNode) node);
 	}
 
-	public void visit(ClassDeclNode node) {
+	@Override	public void visit(ClassDeclNode node) {
 		addTab();
 		node._dump(this);
 
@@ -89,7 +89,7 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(FuncDeclNode node) {
+	@Override	public void visit(FuncDeclNode node) {
 		addTab();
 		node._dump(this);
 
@@ -106,7 +106,7 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(VarDeclNode node) {
+	@Override	public void visit(VarDeclNode node) {
 		addTab();
 		node._dump(this);
 
@@ -117,16 +117,16 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(VarDeclListNode node) {
+	@Override	public void visit(VarDeclListNode node) {
 		node._dump(this);
 	}
 
 	// UGLY
-	public void visit(LhsExprNode node) {
+	@Override	public void visit(LhsExprNode node) {
 		node.accept(this);
 	}
 
-	public void visit(ArefExprNode node) {
+	@Override	public void visit(ArefExprNode node) {
 		addTab();
 		node._dump(this);
 
@@ -135,39 +135,39 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(MemberExprNode node) {
+	@Override	public void visit(MemberExprNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" expr:", node.getExpr());
 		delTab();
 	}
 
-	public void visit(BoolLiteralExprNode node) {
+	@Override	public void visit(BoolLiteralExprNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(IntLiteralExprNode node) {
+	@Override	public void visit(IntLiteralExprNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(StringLiteralExprNode node) {
+	@Override	public void visit(StringLiteralExprNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(PrefixExprNode node) {
+	@Override	public void visit(PrefixExprNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" expr:", node.getExpr());
 		delTab();
 	}
 
-	public void visit(SuffixExprNode node) {
+	@Override	public void visit(SuffixExprNode node) {
 		addTab();
 		node._dump(this);
 
@@ -175,7 +175,7 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(AssignExprNode node) {
+	@Override	public void visit(AssignExprNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" lhs:", node.getLhs());
@@ -183,7 +183,7 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(BinaryOpExprNode node) {
+	@Override	public void visit(BinaryOpExprNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" lhs:", node.getLhs());
@@ -191,12 +191,7 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	// UGLY: as DeclNode
-	public void visit(ExprNode node) {
-		node.accept(this);
-	}
-
-	public void visit(FuncallExprNode node) {
+	@Override	public void visit(FuncallExprNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" expr:", node.getExpr()); // FIX: getFunc
@@ -204,13 +199,13 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(IdentifierExprNode node) {
+	@Override	public void visit(IdentifierExprNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(NewExprNode node) {
+	@Override	public void visit(NewExprNode node) {
 		addTab();
 		node._dump(this);
 		println(" newType:");
@@ -220,19 +215,19 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(NullExprNode node) {
+	@Override	public void visit(NullExprNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(ThisExprNode node) {
+	@Override	public void visit(ThisExprNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(BlockStmtNode node) {
+	@Override	public void visit(BlockStmtNode node) {
 		addTab();
 		node._dump(this);
 		printStmtList(" stmts:", node.getStmts());
@@ -241,26 +236,26 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(BreakStmtNode node) {
+	@Override	public void visit(BreakStmtNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(ContinueStmtNode node) {
+	@Override	public void visit(ContinueStmtNode node) {
 		addTab();
 		node._dump(this);
 		delTab();
 	}
 
-	public void visit(ExprStmtNode node) {
+	@Override	public void visit(ExprStmtNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" expr:", node.getExpr());
 		delTab();
 	}
 
-	public void visit(ForStmtNode node) {
+	@Override	public void visit(ForStmtNode node) {
 		addTab();
 		node._dump(this);
 
@@ -272,7 +267,7 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(IfStmtNode node) {
+	@Override	public void visit(IfStmtNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" cond:", node.getCond());
@@ -281,18 +276,14 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	public void visit(ReturnStmtNode node) {
+	@Override	public void visit(ReturnStmtNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" value:", node.getExpr());
 		delTab();
 	}
 
-	public void visit(StmtNode node) {
-		node.accept(this);
-	}
-
-	public void visit(WhileStmtNode node) {
+	@Override	public void visit(WhileStmtNode node) {
 		addTab();
 		node._dump(this);
 		printExpr(" cond:", node.getCond());

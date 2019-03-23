@@ -11,6 +11,13 @@ import mxcompiler.ast.expression.lhs.*;
 import mxcompiler.ast.expression.unary.*;
 
 /**
+ * if any operator you gonna do during non-terminal node or terminal node, just
+ * rewrite visit function
+ * <p>
+ * ATTITION: take care of null Node
+ * <p>
+ * Maybe it is no use, but give a good example of how to write visitor
+ * <p>
  * use this class, so that dont need to implement all visit func in ASTVisitor
  */
 abstract public class Visitor implements ASTVisitor {
