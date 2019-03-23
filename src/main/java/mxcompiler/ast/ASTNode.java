@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mxcompiler.ast.declaration.DeclNode;
-import mxcompiler.entity.scope.ToplevelScope;
+import mxcompiler.utils.scope.ToplevelScope;
 
 /**
  * {@code AST} is the root or socalled pragram root

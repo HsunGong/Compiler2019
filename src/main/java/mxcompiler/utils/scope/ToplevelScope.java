@@ -1,20 +1,15 @@
-package mxcompiler.entity.scope;
+package mxcompiler.utils.scope;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import mxcompiler.entity.Entity;
+import mxcompiler.utils.entity.Entity;
 import mxcompiler.exception.SemanticException;
 
 public class ToplevelScope extends Scope {
-	// FIX: DeclNode is alse Entity
-	public Map<String, Entity> entities; 
-    // public List<DeclNode> staticVariables;
-
     public ToplevelScope() {
         super(null);
         entities = new LinkedHashMap<String, Entity>();
-        // staticVariables = null;
     }
 
     @Override

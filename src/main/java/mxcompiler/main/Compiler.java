@@ -43,7 +43,21 @@ public final class Compiler {
     // file compiler with errorHandler
     private void compile(Option opts) throws Exception {
         buildAST(opts.mode());
-        /* 
+		/* 
+		        AST ast = parseFile(srcPath, opts);
+        if (dumpAST(ast, opts.mode())) return;
+        TypeTable types = opts.typeTable();
+        AST sem = semanticAnalyze(ast, types, opts);
+        if (dumpSemant(sem, opts.mode())) return;
+        IR ir = new IRGenerator(types, errorHandler).generate(sem);
+        if (dumpIR(ir, opts.mode())) return;
+        AssemblyCode asm = generateAssembly(ir, opts);
+        if (dumpAsm(asm, opts.mode())) return;
+        if (printAsm(asm, opts.mode())) return;
+		writeFile(destPath, asm.toSource());
+		
+
+		
             // SemanticAnalyze sem = new SemanticAnalyze.visit(ast);
             
             // IR ir = new ir.visit(ast);

@@ -5,7 +5,7 @@ import java.util.List;
 
 import mxcompiler.ast.declaration.VarDeclListNode;
 import mxcompiler.ast.declaration.VarDeclNode;
-import mxcompiler.entity.scope.LocalScope;
+import mxcompiler.utils.scope.LocalScope;
 import mxcompiler.ast.*;
 
 public class BlockStmtNode extends StmtNode {

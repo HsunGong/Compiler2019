@@ -18,43 +18,42 @@ import mxcompiler.ast.expression.unary.*;
  */
 public interface ASTVisitor {
     /** No use just for display how to do a type */
-	void visit(Node node);
-	void visit(ASTNode node);
-	void visit(TypeNode node);
+	public void visit(Node node);
+	public void visit(ASTNode node);
+	public void visit(TypeNode node);
 
-	void visit(DeclNode node);
-	void visit(ClassDeclNode node);
-	void visit(FuncDeclNode node);
-	void visit(VarDeclNode node);
-	void visit(VarDeclListNode node);
-	
-	void visit(LhsExprNode node);
-	void visit(ArefExprNode node);
-	void visit(MemberExprNode node);
+	public void visit(DeclNode node);
+	public void visit(ClassDeclNode node);
+	public void visit(FuncDeclNode node);
+	public void visit(VarDeclNode node);
+	public void visit(VarDeclListNode node);
 
-	void visit(BoolLiteralExprNode node);
-	void visit(IntLiteralExprNode node);
-	void visit(StringLiteralExprNode node);
+	public void visit(LhsExprNode node);
+	public void visit(ArefExprNode node);
+	public void visit(MemberExprNode node);
 
-	void visit(PrefixExprNode node);
-	void visit(SuffixExprNode node);
+	public void visit(BoolLiteralExprNode node);
+	public void visit(IntLiteralExprNode node);
+	public void visit(StringLiteralExprNode node);
+	public void visit(PrefixExprNode node);
+	public void visit(SuffixExprNode node);
 
-	void visit(AssignExprNode node);
-	void visit(BinaryOpExprNode node);
-	void visit(ExprNode node);
-	void visit(FuncallExprNode node);
-	void visit(IdentifierExprNode node);
-	void visit(NewExprNode node);
-	void visit(NullExprNode node);
-	void visit(ThisExprNode node);
+	public void visit(AssignExprNode node);
+	public void visit(BinaryOpExprNode node);
+	public void visit(ExprNode node);
+	public void visit(FuncallExprNode node);
+	public void visit(IdentifierExprNode node);
+	public void visit(NewExprNode node);
+	public void visit(NullExprNode node);
+	public void visit(ThisExprNode node);
 
-	void visit(BlockStmtNode node);
-	void visit(BreakStmtNode node);
-	void visit(ContinueStmtNode node);
-	void visit(ExprStmtNode node);
-	void visit(ForStmtNode node);
-	void visit(IfStmtNode node);
-	void visit(ReturnStmtNode node);
-	void visit(StmtNode node);
-	void visit(WhileStmtNode node);
+	public void visit(BlockStmtNode node);
+	public void visit(BreakStmtNode node);
+	public void visit(ContinueStmtNode node);
+	public void visit(ExprStmtNode node);
+	public void visit(ForStmtNode node);
+	public void visit(IfStmtNode node);
+	public void visit(ReturnStmtNode node);
+	public void visit(StmtNode node);
+	public void visit(WhileStmtNode node);
 }

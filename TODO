@@ -65,34 +65,7 @@ ASTNode: @today
 	☐ check ASTBuilder out @today @started(19-03-18 21:27)
 
 
-TypeResolve:
 
-	✔ type 	@done(03-17 22)
-		✔ array @done(03-17 22)
-		✔ func, class @done(03-17 22)
-		✔ int, bool, string @done(03-17 22)
-		✔ null void @done(03-17 22)
-
-	✔ Scope init @done(03-16 16)
-
-    ☐ entity
-        ☐  what is diff between type and entity
-
-    ☐ remain may be used for asm in Scope
-        static private final String KEY_PREFIX = "$"
-        static private final String VAR_PREFIX = "$VAR$"
-        static private final String CLASS_PREFIX = "$CLASS$"
-        static private final String FUNC_PREFIX = "$FUNC$"
-        static public final String ARRAY_CLASS_NAME = "__array"
-        static public final String STRING_CLASS_NAME = "__string"
-        static public final String THIS_PARA_NAME = "__this_para"
-	
-		configuration for reg size
-
-type from Book: @critical @high @today 
-    ☐ change arrayList into LinkedHashSet or not? @started(19-03-16 17:30)
-	☐ add Location type
-	
 
 ✔ G4 file outline with ASTBuilder: @done(03-21 16)
 	✔ compilationUnit @done(03-21 08)
@@ -173,4 +146,27 @@ type from Book: @critical @high @today
 		✔ Opt with ? : operator @done(03-21 17)
 		✔ 4, visit DeclNode but can not change into detail instance @done(03-22 20)
 			-> fix by: 1, add acceptfunction in each node 2, specify each node in visit(abstract Node)
+		✔ add Location type @done(03-23 13)
+		☐ change arrayList into LinkedHashSet or not? @started(19-03-16 17:30)
 
+TypeResolve:
+	✔ type 	@done(03-17 22)
+		✔ array @done(03-17 22)
+		✔ func, class @done(03-17 22)
+		✔ int, bool, string @done(03-17 22)
+		✔ null void @done(03-17 22)
+	✔ Scope init -> also called as symbol-table @done(03-16 16)
+
+    ☐ entity
+        ☐  what is diff between type and entity
+    ✘ remain may be used for asm in Scope @cancelled(03-23 13)
+        static private final String KEY_PREFIX = "$"
+        static private final String VAR_PREFIX = "$VAR$"
+        static private final String CLASS_PREFIX = "$CLASS$"
+        static private final String FUNC_PREFIX = "$FUNC$"
+        static public final String ARRAY_CLASS_NAME = "__array"
+        static public final String STRING_CLASS_NAME = "__string"
+        static public final String THIS_PARA_NAME = "__this_para"
+		configuration for reg size
+
+	

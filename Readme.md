@@ -76,16 +76,17 @@ but large workspace may include diff langurages.
 
 ## Part 2-Type Check
 
-变量引用消除              类型名字消除
-			类型定义检查
-	   表达式有效性检查
-	    静态类型检查
+变量引用消除				类型名字消除
+						  类型定义检查
+	    	表达式有效性检查
+	    	  静态类型检查
 
-变量引用：确定作用域
-类型名称：似乎不用，因为不会有只声明不定义的情况
-类型定义：语义方面，会不会有null类型数组，void类型的bulabula，自身作为自身结构体
-表达式有效性：1++无法执行的表达式；内置的表达式
-静态类型：不允许类型转换
+变量引用：确定作用域 -> LocalResolver
+类型名称：似乎不用，因为不会有只声明不定义的情况 -> TypeResolver
+类型定义：语义方面，会不会有null类型数组，void类型的bulabula，自身作为自身结构体 -> TypeTable
+表达式有效性：1++无法执行的表达式；内置的表达式 -> DereferenceChecker
+静态类型：不允许类型转换 -> TypeChecker
+
 
 
 

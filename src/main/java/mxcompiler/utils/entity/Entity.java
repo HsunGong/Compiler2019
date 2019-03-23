@@ -1,4 +1,4 @@
-package mxcompiler.entity;
+package mxcompiler.utils.entity;
 
 abstract public class Entity {
     

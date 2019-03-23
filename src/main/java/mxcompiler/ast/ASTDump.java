@@ -236,7 +236,7 @@ public class ASTDump implements ASTVisitor {
 		addTab();
 		node._dump(this);
 		printStmtList(" stmts:", node.getStmts());
-		printVarDeclList(" varDecls:", node.getVar());
+		printDeclList(" varDecls:", node.getVar());
 
 		delTab();
 	}
@@ -264,7 +264,7 @@ public class ASTDump implements ASTVisitor {
 		addTab();
 		node._dump(this);
 
-		printVarDeclList(" varDecl:", node.getVar());
+		printDeclList(" varDecl:", node.getVar());
 		printExpr(" init:", node.getInit());
 		printExpr(" cond:", node.getCond());
 		printExpr(" incr:", node.getIncr());
@@ -302,22 +302,12 @@ public class ASTDump implements ASTVisitor {
 		delTab();
 	}
 
-	private void printVarDeclList(String s, List<VarDeclNode> list) {
-		print(s);
-		if (!list.isEmpty()) {
-			print("\n");
-			for (VarDeclNode param : list) {
-				visit(param);
-			}
-		} else
-			println(" null");
-	}
 
-	private void printFuncDeclList(String s, List<FuncDeclNode> list) {
+	private void printDeclList(String s, List< ? extends DeclNode> list) {
 		print(s);
 		if (!list.isEmpty()) {
 			print("\n");
-			for (FuncDeclNode param : list) {
+			for (DeclNode param : list) {
 				visit(param);
 			}
 		} else
