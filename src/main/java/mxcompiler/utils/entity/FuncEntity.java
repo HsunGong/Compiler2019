@@ -20,7 +20,7 @@ public class FuncEntity extends Entity {
 
 	// what is the diff between ???
 	public boolean isBuiltIn = false;// if true -> outInfluence is true
-	public boolean outInfluence = false; 
+	// public boolean outInfluence = false; //FIX: seems no use
 
 	public FuncEntity(String name, Type type) {
 		super(name, type);
