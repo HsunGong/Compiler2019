@@ -157,16 +157,12 @@ TypeResolve:
 		✔ null void @done(03-17 22)
 	✔ Scope init -> also called as symbol-table @done(03-16 16)
 
-    ☐ entity
-        ☐  what is diff between type and entity
-    ✘ remain may be used for asm in Scope @cancelled(03-23 13)
-        static private final String KEY_PREFIX = "$"
-        static private final String VAR_PREFIX = "$VAR$"
-        static private final String CLASS_PREFIX = "$CLASS$"
-        static private final String FUNC_PREFIX = "$FUNC$"
-        static public final String ARRAY_CLASS_NAME = "__array"
-        static public final String STRING_CLASS_NAME = "__string"
-        static public final String THIS_PARA_NAME = "__this_para"
-		configuration for reg size
+    ✔ entity @done(03-23 16) what is diff between type and entity
+	
+	✔ globalScopePreScanner.visit(ast); @done(03-23 20)
+	☐ new ClassVarMemberScanner(globalScope).visit(ast);
+	☐ new FunctionScopeScanner(globalScope).visit(ast);
+	☐ new StaticUsagePreScanner(globalScope).visit(ast);
 
+	// FIX: seems no need to store childs for scopes
 	

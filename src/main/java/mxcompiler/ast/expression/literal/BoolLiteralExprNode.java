@@ -1,15 +1,15 @@
 package mxcompiler.ast.expression.literal;
 
-
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
 
 public class BoolLiteralExprNode extends ExprNode {
-		@Override
+	@Override
 	public void _dump(ASTDump d) {
-				d.printf("<BoolLiteralNode> %s\n", location.toString());
+		d.printf("<BoolLiteralNode> %s\n", location.toString());
 		d.printf(" value: %b\n", getValue());
 	}
+
 	private boolean value;
 
 	public BoolLiteralExprNode(boolean b, Location location) {
@@ -20,7 +20,8 @@ public class BoolLiteralExprNode extends ExprNode {
 	public boolean getValue() {
 		return value;
 	}
-		@Override
+
+	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}

@@ -11,7 +11,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * <p>
  * The {@linkplain mxcompiler.ast.ASTNode} is root Node
  * <p>
- *  AST dump is realized in {@linkplain mxcompiler.ast.ASTDump} 
+ * AST dump is realized in {@linkplain mxcompiler.ast.ASTDump}
+ * 
  * @author Xun
  * @since 1.0
  */
@@ -23,8 +24,13 @@ abstract public class Node {
 
 	protected Location location;
 
+	public final Location getLocation() {
+		return location;
+	}
+
 	// abstract void visit(ASTVisitor visitor);
 
 	abstract public void _dump(ASTDump d);
+
 	abstract public void accept(ASTVisitor visitor);
 }

@@ -1,28 +1,27 @@
 package mxcompiler.ast.expression.unary;
 
-
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
+
 /**
  * No longer support UnaryArithmeticOpNode It is included in {@code suffix} and
  * {@code prefix}
  */
 public class PrefixExprNode extends ExprNode {
-		@Override
+	@Override
 	public void _dump(ASTDump d) {
 		d.printf("<SuffixExprNode> %s\n", location.toString());
 		d.printf(" op: %s\n", getOp().toString());
 	}
+
 	public static enum Op {
-		PRE_INC("++"), PRE_DEC("--"),
-		POSI("+"), NEGA("-"), 
-		LOGIC_NOT("!"), BIT_NOT("~");
+		PRE_INC("++"), PRE_DEC("--"), POSI("+"), NEGA("-"), LOGIC_NOT("!"), BIT_NOT("~");
 
 		private String label;
 
 		private Op(String label) {
-				this.label = label;
-			}
+			this.label = label;
+		}
 	}
 
 	private Op prefixOp;
@@ -42,6 +41,7 @@ public class PrefixExprNode extends ExprNode {
 	public ExprNode getExpr() {
 		return prefixExpr;
 	}
+
 	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);

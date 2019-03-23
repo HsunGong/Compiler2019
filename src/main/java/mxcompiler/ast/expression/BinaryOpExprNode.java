@@ -1,23 +1,18 @@
 package mxcompiler.ast.expression;
 
-
-import mxcompiler.type.Type;
 import mxcompiler.ast.*;
+
 public class BinaryOpExprNode extends ExprNode {
-		@Override
+	@Override
 	public void _dump(ASTDump d) {
-				d.printf("<BinaryOpExprNode> %s\n", location.toString());
+		d.printf("<BinaryOpExprNode> %s\n", location.toString());
 		d.printf(" op: %s\n", getOp().toString());
 	}
+
 	public static enum Oper {
-		MUL("*"), DIV("/"), MOD("%"), 
-		ADD("+"), SUB("-"), 
-		SH_L("<<"), SH_R(">>"), 
-		GREATER(">"), LESS("<"), 
-		GREATER_EQUAL(">="), LESS_EQUAL("<="), 
-		EQUAL("=="), INEQUAL("!="), 
-		BIT_AND("&"), BIT_OR("|"), BIT_XOR("^"), 
-		LOGIC_AND("&&"), LOGIC_OR("||");
+		MUL("*"), DIV("/"), MOD("%"), ADD("+"), SUB("-"), SH_L("<<"), SH_R(">>"), GREATER(">"), LESS(
+				"<"), GREATER_EQUAL(">="), LESS_EQUAL("<="), EQUAL(
+						"=="), INEQUAL("!="), BIT_AND("&"), BIT_OR("|"), BIT_XOR("^"), LOGIC_AND("&&"), LOGIC_OR("||");
 
 		private String label;
 
@@ -33,7 +28,7 @@ public class BinaryOpExprNode extends ExprNode {
 	public BinaryOpExprNode(ExprNode lhs, String op, ExprNode rhs, Location location) {
 		super(location);
 		// this.type = type;
-		// UGLY: will throw IllegalArgumentException 
+		// UGLY: will throw IllegalArgumentException
 		this.op = Oper.valueOf(op);
 		this.lhs = lhs;
 		this.rhs = rhs;
@@ -58,7 +53,8 @@ public class BinaryOpExprNode extends ExprNode {
 	public Oper getOp() {
 		return op;
 	}
-		@Override
+
+	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}

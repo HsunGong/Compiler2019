@@ -22,9 +22,9 @@ public class StringLiteralExprNode extends ExprNode {
 	private String solve(String origin) {
 		StringBuilder s = new StringBuilder();
 		int len = origin.length();
-		if (origin.charAt(0) != '\"' || origin.charAt(len-1) != '\"')
+		if (origin.charAt(0) != '\"' || origin.charAt(len - 1) != '\"')
 			throw new Error("no such escaped char");
-		for (int i = 1; i < len-1; ++i) {
+		for (int i = 1; i < len - 1; ++i) {
 			if (i + 1 < origin.length() && origin.charAt(i) == '\\') {
 				switch (origin.charAt(i + 1)) {
 				case '\\':

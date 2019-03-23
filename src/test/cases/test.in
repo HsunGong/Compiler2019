@@ -3,7 +3,9 @@ int p_rint() {
 }
 int main() {
 	string x = "asdaefbasdf \n \\\" is \" asd";
-int a = (new int[123])[31];
+int[][][] a;
+a = new int[123][31][];
+
 p_rint();
 }
 

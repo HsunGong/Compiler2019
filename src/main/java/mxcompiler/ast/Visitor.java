@@ -63,7 +63,7 @@ abstract public class Visitor implements ASTVisitor {
 	}
 
 	public void visit(VarDeclListNode node) {
-		// null
+		visitDeclList(node.getList());
 	}
 
 	public void visit(LhsExprNode node) {
@@ -141,8 +141,8 @@ abstract public class Visitor implements ASTVisitor {
 	}
 
 	public void visit(BlockStmtNode node) {
-		visitStmtList(node.getStmts());
 		visitDeclList(node.getVar());
+		visitStmtList(node.getStmts());
 	}
 
 	public void visit(BreakStmtNode node) {

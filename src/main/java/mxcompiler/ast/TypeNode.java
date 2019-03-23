@@ -7,12 +7,12 @@ import mxcompiler.type.Type;
  * inbuild types which details are in {@linkplain mxcompiler.type.Type }
  */
 public class TypeNode extends Node {
-		@Override
+	@Override
 	public void _dump(ASTDump d) {
 		d.printf("<TypeNode> %s\n", location.toString());
 		d.printf(" type: %s\n", getType().toString());
 	}
-	
+
 	protected Type type;
 	// protected dim; // UGLY:
 
@@ -32,6 +32,7 @@ public class TypeNode extends Node {
 	public boolean isEqual(TypeNode rhs) {
 		return rhs.type == this.type;
 	}
+
 	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);

@@ -56,6 +56,7 @@ public class ASTDump extends Visitor {
 		print(" declarations:");
 		if (!node.getDecl().isEmpty()) {
 			print("\n");
+			delTab(); // too high
 			for (DeclNode decl : node.getDecl())
 				visit(decl);
 		} else

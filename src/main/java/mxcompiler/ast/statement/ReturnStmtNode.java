@@ -1,23 +1,31 @@
 package mxcompiler.ast.statement;
 
-
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
+
 public class ReturnStmtNode extends StmtNode {
-			@Override
-	public void _dump(ASTDump d) {		d.printf("<ReturnStmtNode> %s\n", location.toString());
-}
-    /** can be null */
-    private ExprNode expr;
+	@Override
+	public void _dump(ASTDump d) {
+		d.printf("<ReturnStmtNode> %s\n", location.toString());
+	}
 
-    public ReturnStmtNode(ExprNode expr, Location location) {
+	/** can be null */
+	private ExprNode expr;
+
+	public ReturnStmtNode(ExprNode expr, Location location) {
 		super(location);
-        this.expr = expr;
-    }
+		this.expr = expr;
+	}
 
-    public void setExpr(ExprNode e) { this.expr = e; }
-    public ExprNode getExpr() { return this.expr; }
-    	@Override
+	public void setExpr(ExprNode e) {
+		this.expr = e;
+	}
+
+	public ExprNode getExpr() {
+		return this.expr;
+	}
+
+	@Override
 	public void accept(ASTVisitor visitor) {
 		visitor.visit(this);
 	}

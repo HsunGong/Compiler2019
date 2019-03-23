@@ -8,6 +8,18 @@ import mxcompiler.utils.entity.Entity;
 import mxcompiler.exception.*;
 
 abstract public class Scope {
+	/** reserved name of class
+	 * FIX: maybe also builtIn Func?
+	 */
+	public enum BuiltIn {
+		ARRAY("_array"),
+		STRING("_string");
+
+		private String label;
+		private BuiltIn(String label) { this.label = label; }
+		public String toString() { return label; }
+	}
+
 	/** naive tree Node of Scope */
     protected List<LocalScope> children; 
 	protected Scope parent;

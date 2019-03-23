@@ -17,7 +17,7 @@ public class FuncDeclNode extends DeclNode {
 
 	private boolean isConstruct;
 	private TypeNode returnType;
-	private List<VarDeclNode> varList;
+	private List<VarDeclNode> paramList;
 	private BlockStmtNode body; // or stmts???
 	// private list<stmts> ir; // TODO for IR
 	// public int cntregister;
@@ -34,7 +34,7 @@ public class FuncDeclNode extends DeclNode {
 	/**
 	 * List can not add later
 	 */
-	public FuncDeclNode(String name, TypeNode returnType, List<VarDeclNode> varList, BlockStmtNode body,
+	public FuncDeclNode(String name, TypeNode returnType, List<VarDeclNode> params, BlockStmtNode body,
 			Location location) {
 		super(name, location);
 
@@ -46,10 +46,10 @@ public class FuncDeclNode extends DeclNode {
 		else
 			this.isConstruct = false;
 
-		if (varList != null)
-			this.varList = varList;
+		if (params != null)
+			this.paramList = params;
 		else
-			this.varList = new ArrayList<VarDeclNode>();
+			this.paramList = new ArrayList<VarDeclNode>();
 		this.body = body;
 	}
 
@@ -62,7 +62,7 @@ public class FuncDeclNode extends DeclNode {
 	}
 
 	public List<VarDeclNode> getVar() {
-		return varList;
+		return paramList;
 	}
 
 	public BlockStmtNode getBody() {

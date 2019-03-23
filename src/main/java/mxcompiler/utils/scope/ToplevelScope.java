@@ -21,7 +21,7 @@ public class ToplevelScope extends Scope {
     public Entity get(String k) throws SemanticException{
         Entity v = entities.get(k);
         if (v == null) { // error
-            throw new SemanticException();
+            throw new SemanticException("not found "+k);
         }
         return v;
     }
@@ -31,7 +31,7 @@ public class ToplevelScope extends Scope {
     public void put(String k, Entity v) throws SemanticException{
         Entity check = entities.get(k);
         if (check != null) {
-            throw new SemanticException();
+            throw new SemanticException("already have "+k);
         }
         entities.put(k, v);
     }
