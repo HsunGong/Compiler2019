@@ -19,14 +19,16 @@ import mxcompiler.ast.expression.lhs.*;
 import mxcompiler.ast.expression.unary.*;
 import mxcompiler.ast.*;
 
-public class LocalResolver extends Visitor {
+public class Resolver extends Visitor {
 	/** means can not change LinkedList's type */
 	private final LinkedList<Scope> scopeStack;
 	// private int isInLoop = 0;
 	private ClassType curClass;
 	// private FuncTypeNode currentFunc;
 
-	public LocalResolver() {
+	public Resolver() {
+		System.out.print("Resolver begin");
+
 		scopeStack = new LinkedList<Scope>();
 		curClass = null;
 	}
@@ -35,7 +37,8 @@ public class LocalResolver extends Visitor {
 	 * start localresolver not main (cause use {@code this.visit(ASTNode node)}) or
 	 * so called pre-scanner But just this top-level
 	 * <p>
-	 * add funcs, classes - for only top decl FIX: why not top vars?
+	 * add global-funcs, classes-funcs, classes
+	 *  - for only top decl FIX: not vars?
 	 */
 	protected void preResolve(ASTNode root) {
 		ToplevelScope toplevelScope; // FIX:??no need to add to member
@@ -44,6 +47,7 @@ public class LocalResolver extends Visitor {
 
 		putBuiltIn(toplevelScope);
 
+		// add class and g-func
 		if (!root.getDecl().isEmpty())
 			for (DeclNode decl : root.getDecl()) {
 				try {
@@ -62,8 +66,15 @@ public class LocalResolver extends Visitor {
 				}
 			}
 
+		// TODO: move to checker: checkMainFunc((FuncEntity) toplevelScope.get("main"));
 		try {
-			checkMainFunc((FuncEntity) toplevelScope.get("main"));
+			FuncEntity mainFunc = (FuncEntity) toplevelScope.get("main");
+			if (mainFunc == null)
+				throw new Error("\"main\" function not found");
+			if (!(mainFunc.getReturnType() instanceof IntType))
+				throw new Error("\"main\" function's return type should be \"int\"");
+			if (!mainFunc.params.isEmpty())
+				throw new Error("\"main\" function should have no parameter");
 		} catch (SemanticException e) {
 			throw new Error("No main funcion");
 		}
@@ -73,12 +84,52 @@ public class LocalResolver extends Visitor {
 	public void visit(ASTNode node) {
 		preResolve(node);
 
+		// if (!node.getDecl().isEmpty())
+		// for (DeclNode decl : node.getDecl())
+		// if (!(decl instanceof ClassDeclNode))
+		// continue;
+		// else
+		// visit(decl);
+
 		if (!node.getDecl().isEmpty())
 			for (DeclNode decl : node.getDecl())
 				visit(decl);
 
 		node.setScope((ToplevelScope) getCurScope());
+
+		scopeStack.remove();
+		assert(scopeStack.isEmpty() == true);
 	}
+
+	/** class scope */
+	@Override
+	public void visit(ClassDeclNode node) {
+		assert (getCurScope() instanceof ToplevelScope);
+
+		try {
+			ClassEntity entity = (ClassEntity) getCurScope().get(node.getName());
+
+			pushScope(entity.getScope());
+			// replaced by curClass = new ClassType(entity.getName());
+			curClass = (ClassType) entity.getType();
+
+			// means only this level
+			// round 1 - check member vars
+			// FIX: decl can add leter via getCurScope
+			resolveMember(node.getVar(), entity.getName());
+
+			// round 2 - check functions
+			visitDeclList(node.getFunc());
+			// currentOffset = 0;
+			// entity.setMemorySize(currentOffset);
+
+			popScope();
+			curClass = null;
+		} catch (SemanticException e) {
+			throw new Error("classEntity " + e);
+		}
+	}
+
 
 	/**
 	 * func scope is included in block-body
@@ -109,8 +160,10 @@ public class LocalResolver extends Visitor {
 					throw new Error("Function " + node.getName() + " do not belong to class");
 
 				// can not be construct 2-type
-				if ((node.getName() != curClass.getName()))
-					throw new Error("Function " + node.getName() + " should have a return type");
+				// UGLY: NOTE: == or != means the memory-Location
+				if (!node.getName().equals(curClass.getName()))
+					throw new Error(
+							"Function " + node.getName() + " should have a return type or construct name is wrong");
 
 				// reserved as class this operator
 				getCurScope().put("__this", new VarEntity("__this", curClass));
@@ -123,96 +176,92 @@ public class LocalResolver extends Visitor {
 
 			// body
 			node.getBody().setScope((LocalScope) getCurScope());
-			visit(node.getBody());
-
 			popScope();
+			visit(node.getBody());
 		} catch (SemanticException e) {
 			throw new Error("classEntityt " + e);
 		}
 	}
 
-	/** class scope */
+	/**
+	 * resolve variable into class cause class-name is included
+	 */
+	public void resolveMember(List<VarDeclNode> list, String className) {
+		if (!list.isEmpty())
+			for (VarDeclNode node : list)
+				resolve(node, className);
+	}
+
 	@Override
-	public void visit(ClassDeclNode node) {
-		assert (getCurScope() instanceof ToplevelScope);
+	public void visit(VarDeclNode node) {
+		resolve(node, null);
+	}
 
+	private void checkVarDeclInit(VarDeclNode node) {
+		// if (node.getInit() != null) {
+		// 	visit(node.getInit());
+
+		// 	boolean invalidInitType;
+		// 	if (node.getType().getType() instanceof VoidType || node.getInit().getType() instanceof VoidType)
+		// 		invalidInitType = true;
+		// 	else if (node.getType().getType().equals(node.getInit().getType()))
+		// 		invalidInitType = false;
+		// 	else if (node.getInit().getType() instanceof NullType)
+		// 		invalidInitType = !(node.getType().getType() instanceof ClassType
+		// 				|| node.getType().getType() instanceof ArrayType);
+		// 	else
+		// 		invalidInitType = true;
+		// 	if (invalidInitType)
+		// 		throw new Error("Invalid initialization value" + "expected" + node.getType().getType().toString()
+		// 				+ " but got " + node.getInit().getType().toString());
+		// }
+	}
+
+	/** resolve variable into cur scope */
+	public void resolve(VarDeclNode node, String className) {
 		try {
-			ClassEntity entity = (ClassEntity) getCurScope().get(node.getName());
+			// check type
+			if (node.getType().getType() instanceof ClassType) {
+				String typeName = ((ClassType) node.getType().getType()).getName();
+				assert (getCurScope().get(typeName) instanceof ClassEntity);
+			}
 
-			pushScope(entity.getScope());
-			// replaced by curClass = new ClassType(entity.getName());
-			curClass = (ClassType) entity.getType();
+			// check init
+			checkVarDeclInit(node);
 
-			// means only this level FIX: decl can add leter via getCurScope
-			visitDeclList(node.getVar());
-			visitDeclList(node.getFunc());
-			// entity.setScope(popScope());
-			popScope();
-			curClass = null;
+			VarEntity entity = (className == null) ? new VarEntity(node.getName(), node.getType().getType())
+					: new VarEntity(node.getName(), node.getType().getType(), className);
 
-			// currentOffset = 0;
-			// entity.setMemorySize(currentOffset);
+			entity.isGlobal = (getCurScope() instanceof ToplevelScope);
+
+			// entity.setAddrOffset(currentOffset);
+			// currentOffset += node.getType().getType().getVarSize();
+
+			getCurScope().put(node.getName(), entity);
 		} catch (SemanticException e) {
-			throw new Error("classEntity " + e);
+			throw new Error("VarEntity " + e);
 		}
 	}
 
 	/**
 	 * {@inheritDoc} temportory scope
 	 * <p>
-	 * {@literal add scope outside}
+	 * {@literal add scope inside}
 	 */
 	@Override
 	public void visit(BlockStmtNode node) {
+		if (node.getScope() == null) node.setScope(new LocalScope(getCurScope()));
+		pushScope(node.getScope());
+
+		visitDeclList(node.getVar());
 		visitStmtList(node.getStmts());
-	}
-
-	/** resolve variable into cur scope */
-	@Override
-	public void visit(VarDeclNode node) {
-		try {
-			VarEntity entity;
-			if (node.getType().getType() instanceof ClassType) {
-				String ClassName = ((ClassType) node.getType().getType()).getName();
-				getCurScope().get(ClassName);
-				checkVarDeclInit(node);
-				entity = new VarEntity(node.getName(), node.getType().getType(), ClassName);
-			} else {
-				checkVarDeclInit(node);
-				entity = new VarEntity(node.getName(), node.getType().getType());
-			}
-
-			// entity.setAddrOffset(currentOffset);
-			// FIX: currentOffset += node.getType().getType().getVarSize();
-			getCurScope().put(entity.getName(), entity);
-		} catch (SemanticException e) {
-			throw new Error("VarEntity " + e);
-		}
+		popScope();
 	}
 
 
-	protected void checkVarDeclInit(VarDeclNode node) {
-		if (node.getInit() != null) {
-			visit(node.getInit());
-
-			boolean invalidInitType;
-			if (node.getType().getType() instanceof VoidType 
-			|| node.getInit().getType() instanceof VoidType)
-				invalidInitType = true;
-			else if (node.getType().getType().equals(node.getInit().getType()))
-				invalidInitType = false;
-			else if (node.getInit().getType() instanceof NullType)
-				invalidInitType = !(node.getType().getType() instanceof ClassType
-						|| node.getType().getType() instanceof ArrayType);
-			else
-				invalidInitType = true;
-			if (invalidInitType)
-				throw new Error("Invalid initialization value" + "expected" + node.getType().getType().toString()
-						+ " but got " + node.getInit().getType().toString());
-		}
-	}
 
 	// ------------- build-in classes and functions ---------------
+	/** add BuiltIn func and BuiltIn class */
 	private void putBuiltIn(ToplevelScope toplevelScope) {
 		/** builtIn class */
 		String name = Scope.BuiltIn.STRING.toString();
@@ -278,9 +327,8 @@ public class LocalResolver extends Visitor {
 		putBuiltInFunc(curScope, name, params, returnType);
 
 		// type = new StringType();
-		params = Arrays.asList(new VarEntity("__this", type));
-		params.add(new VarEntity("left", new IntType()));
-		params.add(new VarEntity("right", new IntType()));
+		params = Arrays.asList(new VarEntity("__this", type), new VarEntity("left", new IntType()),
+				new VarEntity("right", new IntType()));
 		returnType = new StringType();
 		name = "substring";
 		putBuiltInFunc(curScope, name, params, returnType);
@@ -292,8 +340,8 @@ public class LocalResolver extends Visitor {
 		putBuiltInFunc(curScope, name, params, returnType);
 
 		// type = new StringType();
-		params = Arrays.asList(new VarEntity("__this", type));
-		params.add(new VarEntity("pos", new IntType()));
+		params = Arrays.asList(new VarEntity("__this", type), new VarEntity("pos", new IntType()));
+
 		// returnType = new IntType();
 		name = "ord";
 		putBuiltInFunc(curScope, name, params, returnType);
@@ -334,16 +382,6 @@ public class LocalResolver extends Visitor {
 		} catch (SemanticException e) {
 			throw new Error("Fuck idiot!");
 		}
-	}
-
-	// check main is exist
-	private void checkMainFunc(FuncEntity mainFunc) {
-		if (mainFunc == null)
-			throw new Error("\"main\" function not found");
-		if (!(mainFunc.getReturnType() instanceof IntType))
-			throw new Error("\"main\" function's return type should be \"int\"");
-		if (!mainFunc.params.isEmpty())
-			throw new Error("\"main\" function should have no parameter");
 	}
 
 	// --------------- scope - stack -----------------------

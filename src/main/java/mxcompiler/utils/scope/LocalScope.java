@@ -38,6 +38,7 @@ public class LocalScope extends Scope {
 	@Override
 	public void put(String k, Entity v) throws SemanticException {
 		Entity check = entities.get(k);
+		// FIX: what if a class New var ? is vatType or ClassType?
 		if (check != null && (check.getType() == v.getType())) {
             throw new SemanticException("already have "+k);
         }

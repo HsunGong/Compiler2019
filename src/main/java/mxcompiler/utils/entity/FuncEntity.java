@@ -2,32 +2,31 @@ package mxcompiler.utils.entity;
 
 import mxcompiler.ast.declaration.FuncDeclNode;
 import mxcompiler.ast.declaration.VarDeclNode;
+import mxcompiler.ast.statement.BlockStmtNode;
 import mxcompiler.type.FuncType;
 import mxcompiler.type.Type;
+import mxcompiler.utils.Dump;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * returnType is NullType if construct!
- * no entity cause, func has body of block(which has a scope) // harm to build
- * scope tree function is a scope!!! 
+ * returnType is NullType if construct! no entity cause, func has body of
+ * block(which has a scope) // harm to build scope tree function is a scope!!!
  * FIX: from local resolver
  */
 public class FuncEntity extends Entity {
-	// private boolean isConstruct = false;
 	private Type returnType;
 	public List<VarEntity> params = new ArrayList<VarEntity>();;
 
 	public String className = "";
 	public boolean isMember = false;
 
-	// what is the diff between ???
 	public boolean isBuiltIn = false;// if true -> outInfluence is true
-	// public boolean outInfluence = false; //FIX: seems no use
 
 	public FuncEntity(String name, Type type, Type returnType) {
 		super(name, type);
+		this.returnType = returnType;
 	}
 
 	public FuncEntity(FuncDeclNode node) {
@@ -67,5 +66,21 @@ public class FuncEntity extends Entity {
 		return (returnType.getInnerType() == Type.InnerType.NULL);
 	}
 
-	public Type getReturnType() { return returnType; }
+	public Type getReturnType() {
+		return returnType;
+	}
+
+	public void _dump(Dump d) {
+		d.printf("<Func Entity>:  name: %s, Type: %s\n", name, type.toString());
+		d.printf(" returnType: %s, isBuiltIn: %b\n", returnType.toString(), isBuiltIn);
+		d.printf(" isMember: %b, ClassName: %s\n", isMember, className);
+		d.println(" params:");
+		d.addTab();
+		if(!params.isEmpty())
+		for (VarEntity e : params) 
+			e._dump(d);
+		else d.println("null");
+		// scope._dump(d);// FIX: ???
+		d.delTab();
+	}
 }

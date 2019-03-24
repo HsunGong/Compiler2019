@@ -104,11 +104,11 @@ blockBody
 
 /* ------------------------------ expression -------------------------------- */
 expression
-	: primaryExpression							# primaryExpr
-	| expression op = ('++' | '--')				# suffixExpr
-	| expression '.' Identifier					# memberExpr // under lhs
+	: primaryExpression								# primaryExpr
+	| expression op = ('++' | '--')					# suffixExpr
+	| expression '.' Identifier						# memberExpr // under lhs
 	| arr = expression '[' index = expression ']'	# arefExpr // under lhs
-	| expression '(' paramList? ')'				# funcallExpr
+	| expression '(' paramList? ')'					# funcallExpr
 	// prefix unary
 	| <assoc = right> op = ('++' | '--') expression	# prefixExpr
 	| <assoc = right> op = ('+' | '-') expression	# prefixExpr

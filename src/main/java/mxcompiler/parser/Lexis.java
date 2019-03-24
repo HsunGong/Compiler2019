@@ -53,7 +53,7 @@ public class Lexis extends Lexer {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'break'", "'continue'", "'default'", "'else'", "'for'", "'if'", 
-			"'int'", "'String'", "'return'", "'class'", "'void'", "'while'", "'bool'", 
+			"'int'", "'string'", "'return'", "'class'", "'void'", "'while'", "'bool'", 
 			"'('", "')'", "'['", "']'", "'{'", "'}'", "'<'", "'<='", "'>'", "'>='", 
 			"'<<'", "'>>'", "'+'", "'++'", "'-'", "'--'", "'*'", "'/'", "'%'", "'&'", 
 			"'|'", "'&&'", "'||'", "'^'", "'!'", "'~'", "'?'", "':'", "';'", "','", 
@@ -201,7 +201,7 @@ public class Lexis extends Lexer {
 		"\7n\2\2\u00a2\u00a3\7u\2\2\u00a3\u00a4\7g\2\2\u00a4\n\3\2\2\2\u00a5\u00a6"+
 		"\7h\2\2\u00a6\u00a7\7q\2\2\u00a7\u00a8\7t\2\2\u00a8\f\3\2\2\2\u00a9\u00aa"+
 		"\7k\2\2\u00aa\u00ab\7h\2\2\u00ab\16\3\2\2\2\u00ac\u00ad\7k\2\2\u00ad\u00ae"+
-		"\7p\2\2\u00ae\u00af\7v\2\2\u00af\20\3\2\2\2\u00b0\u00b1\7U\2\2\u00b1\u00b2"+
+		"\7p\2\2\u00ae\u00af\7v\2\2\u00af\20\3\2\2\2\u00b0\u00b1\7u\2\2\u00b1\u00b2"+
 		"\7v\2\2\u00b2\u00b3\7t\2\2\u00b3\u00b4\7k\2\2\u00b4\u00b5\7p\2\2\u00b5"+
 		"\u00b6\7i\2\2\u00b6\22\3\2\2\2\u00b7\u00b8\7t\2\2\u00b8\u00b9\7g\2\2\u00b9"+
 		"\u00ba\7v\2\2\u00ba\u00bb\7w\2\2\u00bb\u00bc\7t\2\2\u00bc\u00bd\7p\2\2"+

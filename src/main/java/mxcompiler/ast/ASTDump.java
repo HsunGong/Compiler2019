@@ -35,6 +35,9 @@ public class ASTDump extends Visitor {
 	public void println(String x) {
 		os.println(getTab() + x);
 	}
+	public void printplainln(String x) {
+		os.println(x);
+	}
 
 	public void printf(String str, Object... args) {
 		os.printf(getTab() + str, args);
@@ -48,7 +51,7 @@ public class ASTDump extends Visitor {
 	public void visit(ASTNode node) {
 		node._dump(this);
 
-		print(" declarations:");
+		print("declarations are below:");
 		if (!node.getDecl().isEmpty()) {
 			print("\n");
 			delTab(); // too high
@@ -303,52 +306,52 @@ public class ASTDump extends Visitor {
 	private void printDeclList(String s, List<? extends DeclNode> list) {
 		print(s);
 		if (!list.isEmpty()) {
-			print("\n");
+			printplainln("");
 			for (DeclNode param : list) {
 				visit(param);
 			}
 		} else
-			println(" null");
+			printplainln(" null");
 	}
 
 	private void printStmtList(String s, List<StmtNode> list) {
 		print(s);
 		if (!list.isEmpty()) {
-			print("\n");
+			printplainln("");
 			for (StmtNode param : list) {
 				visit(param);
 			}
 		} else
-			println(" null");
+			printplainln(" null");
 	}
 
 	private void printExprList(String s, List<ExprNode> list) {
 		print(s);
 		if (!list.isEmpty()) {
-			print("\n");
+			printplainln("");
 			for (ExprNode param : list) {
 				visit(param);
 			}
 		} else
-			println(" null");
+			printplainln(" null");
 	}
 
 	private void printStmt(String s, StmtNode stmt) {
 		print(s);
 		if (stmt != null) {
-			print("\n");
+			printplainln("");
 			visit(stmt);
 		} else
-			println(" null");
+			printplainln(" null");
 	}
 
 	private void printExpr(String s, ExprNode expr) {
 		print(s);
 		if (expr != null) {
-			print("\n");
+			printplainln("");
 			visit(expr);
 		} else
-			println(" null");
+			printplainln(" null");
 	}
 
 	protected final void visitStmtList(List<? extends StmtNode> stmts) {

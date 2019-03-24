@@ -4,6 +4,7 @@ import mxcompiler.ast.declaration.*;
 import mxcompiler.exception.SemanticException;
 import mxcompiler.type.ClassType;
 import mxcompiler.type.Type;
+import mxcompiler.utils.Dump;
 import mxcompiler.utils.scope.*;
 
 public class ClassEntity extends Entity {
@@ -36,5 +37,12 @@ public class ClassEntity extends Entity {
 
 	public LocalScope getScope() {
 		return scope;
+	}
+
+	public void _dump(Dump d) {
+		d.printf("<Class Entity>:  name: %s, Type: %s\n", name, type.toString());
+		d.addTab();
+		scope._dump(d);
+		d.delTab();
 	}
 }

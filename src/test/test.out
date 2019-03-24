@@ -1,0 +1,154 @@
+Program Start
+<ASTNode> 1:0
+ declarations:
+<FuncDeclNode> 1:0
+ name: p_rint
+ isContruct: false
+ returnType:
+	<TypeNode> 1:0
+	 type: int
+ parameterList: null
+ body:
+	<BlockStmtNode> 1:13
+	 stmts:
+		<BlockStmtNode> 3:1
+		 stmts: null
+		 varDecls:
+			<VarDeclNode> 4:6
+			 name: x
+			 type:
+				<TypeNode> 4:2
+				 type: int
+			 init:
+				<IntLiteralNode> 4:10
+				 value: 10
+	 varDecls:
+		<VarDeclNode> 2:5
+		 name: a
+		 type:
+			<TypeNode> 2:1
+			 type: int
+		 init:
+			<IntLiteralNode> 2:9
+			 value: 120
+<FuncDeclNode> 7:0
+ name: p_srint
+ isContruct: false
+ returnType:
+	<TypeNode> 7:0
+	 type: int
+ parameterList:
+	<VarDeclNode> 7:12
+	 name: a
+	 type:
+		<TypeNode> 7:12
+		 type: int
+	 init: null
+ body:
+	<BlockStmtNode> 7:19
+	 stmts:
+		<ReturnStmtNode> 8:1
+		 value:
+			<IntLiteralNode> 8:8
+			 value: 0
+	 varDecls: null
+<ClassDeclNode> 11:0
+ name: pp
+ varDecls:
+	<VarDeclNode> 13:5
+	 name: para1
+	 type:
+		<TypeNode> 13:1
+		 type: int
+	 init: null
+	<VarDeclNode> 14:8
+	 name: para2
+	 type:
+		<TypeNode> 14:1
+		 type: string
+	 init: null
+ funcMember:
+	<FuncDeclNode> 12:1
+	 name: pp
+	 isContruct: true
+	 returnType:
+		<TypeNode> 12:1
+		 type: null
+	 parameterList:
+		<VarDeclNode> 12:4
+		 name: a
+		 type:
+			<TypeNode> 12:4
+			 type: int
+		 init: null
+	 body:
+		<BlockStmtNode> 12:10
+		 stmts: null
+		 varDecls: null
+	<FuncDeclNode> 15:1
+	 name: ss
+	 isContruct: false
+	 returnType:
+		<TypeNode> 15:1
+		 type: void
+	 parameterList:
+		<VarDeclNode> 15:9
+		 name: a
+		 type:
+			<TypeNode> 15:9
+			 type: int
+		 init: null
+	 body:
+		<BlockStmtNode> 15:15
+		 stmts: null
+		 varDecls: null
+<FuncDeclNode> 20:0
+ name: main
+ isContruct: false
+ returnType:
+	<TypeNode> 20:0
+	 type: int
+ parameterList: null
+ body:
+	<BlockStmtNode> 20:11
+	 stmts:
+		<ExprStmtNode> 23:1
+		 expr:
+			<AssignExprNode> 23:1
+			 lhs:
+				<IdentifierExprNode> 23:1
+				identifier: a
+			 rhs:
+				<NewExprNode> 23:9
+				 numDim: 3
+				 newType:
+					<TypeNode> 23:9
+					 type: array
+				dims:
+					<IntLiteralNode> 23:13
+					 value: 123
+					<IntLiteralNode> 23:18
+					 value: 31
+		<ExprStmtNode> 25:1
+		 expr:
+			<FuncallExprNode> 25:1
+			 expr:
+				<IdentifierExprNode> 25:1
+				identifier: p_rint
+			 args: null
+	 varDecls:
+		<VarDeclNode> 21:8
+		 name: x
+		 type:
+			<TypeNode> 21:1
+			 type: string
+		 init:
+			<StringLiteralNode> 21:12
+			 value: asdaefbasdf 
+ \" is " asd
+		<VarDeclNode> 22:11
+		 name: a
+		 type:
+			<TypeNode> 22:1
+			 type: array
+		 init: null

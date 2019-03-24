@@ -3,7 +3,9 @@ package mxcompiler.utils.scope;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import mxcompiler.utils.Dump;
 import mxcompiler.utils.entity.Entity;
 import mxcompiler.exception.*;
 
@@ -44,4 +46,18 @@ abstract public class Scope {
 	// FIX: update ??
 	// FIX: assert have key
 	// FIX: check - get/put/contain
+
+	public final void _dump(Dump d) {
+		d.printf("Scope: isTop: %b\n", isToplevel());
+		for(Entry<String, Entity> e : entities.entrySet()){
+			e.getValue()._dump(d);
+		}
+		// FIX: what is children to specify which function is their father?
+		for(Scope s : this.children) {
+			d.addTab();
+			d.print(">>>> child");
+			s._dump(d);
+			d.delTab();
+		}
+	}
 }

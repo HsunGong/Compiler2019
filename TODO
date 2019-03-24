@@ -48,7 +48,7 @@ ASTNode: @today
                 ✔ bool 	@done(03-17 16)
             ✔ null 	@done(03-17 16)
         ✔ typeNode @done(03-20 18)
-		✔ compare my g4 with fanzhou @high @started(03-20 18) @done(03-21 14) @lasted(20h14m37s)
+		✔ compare my g4 with fanzhou @started(03-20 18) @done(03-21 14) @lasted(20h14m37s)
 			typeOrVoid -> typeFuncName
 			parameterDeclarationList -> paramDeclarationList
 			memberDeclaration -> classBody
@@ -62,7 +62,7 @@ ASTNode: @today
 
 
 
-	☐ check ASTBuilder out @today @started(19-03-18 21:27)
+	✘ check ASTBuilder out @started(19-03-18 21:27) @cancelled(03-24 20) @wasted()
 
 
 
@@ -147,7 +147,7 @@ ASTNode: @today
 		✔ 4, visit DeclNode but can not change into detail instance @done(03-22 20)
 			-> fix by: 1, add acceptfunction in each node 2, specify each node in visit(abstract Node)
 		✔ add Location type @done(03-23 13)
-		☐ change arrayList into LinkedHashSet or not? @started(19-03-16 17:30)
+		✘ change arrayList into LinkedHashSet or not? @started(19-03-16 17:30) @cancelled(03-24 20) @wasted()
 
 TypeResolve:
 	✔ type 	@done(03-17 22)
@@ -161,8 +161,10 @@ TypeResolve:
 	
 	✔ globalScopePreScanner.visit(ast); @done(03-23 20)
 	✔ new ClassVarMemberScanner(globalScope).visit(ast); @done(03-24 13)
-	☐ new FunctionScopeScanner(globalScope).visit(ast);
+	Do tormorrow:
+	☐ new FunctionScopeScanner(globalScope).visit(ast); @high @today @started(03-24 20)
 	☐ new StaticUsagePreScanner(globalScope).visit(ast);
+	
 
 	✔ FIX: all VarEntity's type is varType, and baseType is selfdefined @started(03-24 09) @done(03-24 09) @lasted(47m29s)
 	// FIX: seems no need to store childs for scopes

@@ -25,7 +25,7 @@ Int
 	: 'int'
 	;
 String
-	: 'String'
+	: 'string' // attention
 	;
 Return
 	: 'return'

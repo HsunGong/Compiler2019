@@ -26,7 +26,7 @@
 			"grammar": "src/main/java/mxcompiler/parser/grammar/Mx.g4",
 			"startRule": "compilationUnit",
 			"printParseTree": true,
-			"visualParseTree": true
+			"visualParseTree": true,
 		},
 		{
 			"type": "java",

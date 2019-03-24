@@ -162,14 +162,14 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 
 	/** Nonarray, non-function */
 	private Type getType(MxParser.TypeNameContext ctx) {
-		if (ctx.Identifier() != null)
-			return new ClassType(ctx.Identifier().getText());
 		if (ctx.Int() != null)
 			return new IntType();
 		if (ctx.Bool() != null)
 			return new BoolType();
 		if (ctx.String() != null)
 			return new StringType();
+		if (ctx.Identifier() != null)
+			return new ClassType(ctx.Identifier().getText());
 
 		throw new Error("Invalid Type");
 	}

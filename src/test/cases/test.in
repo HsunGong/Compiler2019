@@ -1,19 +1,28 @@
 int p_rint() {
-
+	int a = 120;
+	{
+		int x = 10;
+	}
+}
+int p_srint(int a) {
+	return 0;
 }
 
 class pp {
-	pp(){}
+	pp(int a){}
 	int para1;
 	string para2;
+	void ss(int a){
+
+	}
 }
 
 int main() {
 	string x = "asdaefbasdf \n \\\" is \" asd";
-int[][][] a;
-a = new int[123][31][];
+	int[][][] a;
+	a = new int[123][31][];
 
-p_rint();
+	p_rint();
 }
 
 
