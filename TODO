@@ -160,10 +160,11 @@ TypeResolve:
     ✔ entity @done(03-23 16) what is diff between type and entity
 	
 	✔ globalScopePreScanner.visit(ast); @done(03-23 20)
-	☐ new ClassVarMemberScanner(globalScope).visit(ast);
+	✔ new ClassVarMemberScanner(globalScope).visit(ast); @done(03-24 13)
 	☐ new FunctionScopeScanner(globalScope).visit(ast);
 	☐ new StaticUsagePreScanner(globalScope).visit(ast);
 
 	✔ FIX: all VarEntity's type is varType, and baseType is selfdefined @started(03-24 09) @done(03-24 09) @lasted(47m29s)
 	// FIX: seems no need to store childs for scopes
 	☐ FIX: funcEntity not have scope, but body have, how to connect them?
+	☐ FIX: What I thought Visitor of visitList might be wrong @critical 

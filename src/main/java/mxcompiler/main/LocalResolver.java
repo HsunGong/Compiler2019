@@ -145,7 +145,6 @@ public class LocalResolver extends Visitor {
 
 			// means only this level FIX: decl can add leter via getCurScope
 			visitDeclList(node.getVar());
-varTypeExprCheck
 			visitDeclList(node.getFunc());
 			// entity.setScope(popScope());
 			popScope();
@@ -165,14 +164,14 @@ varTypeExprCheck
 	 */
 	@Override
 	public void visit(BlockStmtNode node) {
-		visit();
+		visitStmtList(node.getStmts());
 	}
 
 	/** resolve variable into cur scope */
 	@Override
 	public void visit(VarDeclNode node) {
-		VarEntity entity;
 		try {
+			VarEntity entity;
 			if (node.getType().getType() instanceof ClassType) {
 				String ClassName = ((ClassType) node.getType().getType()).getName();
 				getCurScope().get(ClassName);
@@ -191,17 +190,14 @@ varTypeExprCheck
 		}
 	}
 
-	@Override
-	public void visit(StringLiteralExprNode node) {
-		node.setEntry(constantTable.intern(node.value()));
-		return null;
-	}
 
 	protected void checkVarDeclInit(VarDeclNode node) {
 		if (node.getInit() != null) {
-			node.getInit().accept(this);
+			visit(node.getInit());
+
 			boolean invalidInitType;
-			if (node.getType().getType() instanceof VoidType || node.getInit().getType() instanceof VoidType)
+			if (node.getType().getType() instanceof VoidType 
+			|| node.getInit().getType() instanceof VoidType)
 				invalidInitType = true;
 			else if (node.getType().getType().equals(node.getInit().getType()))
 				invalidInitType = false;
@@ -239,7 +235,7 @@ varTypeExprCheck
 
 		// type = new StringType(m4);
 		// params = Collections.singletonList(new VarEntity("str", type));
-		// returnType = new VoidType();
+		// returnType = nmew VoidType();
 		name = "println";
 		putBuiltInFunc(toplevelScope, name, params, returnType);
 

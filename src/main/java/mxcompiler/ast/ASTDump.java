@@ -44,13 +44,6 @@ public class ASTDump extends Visitor {
 		os.print(getTab() + str);
 	}
 
-	// UGLY: FIX: visit DeclNode but can not change into detail instance
-	// 2, accept function to fix
-	@Override
-	public void visit(Node node) {
-		node.accept(this);
-	}
-
 	@Override
 	public void visit(ASTNode node) {
 		node._dump(this);
@@ -70,18 +63,6 @@ public class ASTDump extends Visitor {
 		addTab();
 		node._dump(this);
 		delTab();
-	}
-
-	// UGLY: FIX: visit DeclNode but can not change into detail instance
-	// 1, instanceof to fix
-	@Override
-	public void visit(DeclNode node) {
-		if (node instanceof ClassDeclNode)
-			visit((ClassDeclNode) node);
-		if (node instanceof FuncDeclNode)
-			visit((FuncDeclNode) node);
-		if (node instanceof VarDeclNode)
-			visit((VarDeclNode) node);
 	}
 
 	@Override
@@ -128,12 +109,6 @@ public class ASTDump extends Visitor {
 	@Override
 	public void visit(VarDeclListNode node) {
 		node._dump(this);
-	}
-
-	// UGLY
-	@Override
-	public void visit(LhsExprNode node) {
-		node.accept(this);
 	}
 
 	@Override
