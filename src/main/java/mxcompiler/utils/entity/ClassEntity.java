@@ -34,7 +34,7 @@ public class ClassEntity extends Entity {
 		}
 	}
 
-	public Scope getScope() {
+	public LocalScope getScope() {
 		return scope;
 	}
 }

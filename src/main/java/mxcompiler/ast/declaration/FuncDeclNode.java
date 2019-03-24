@@ -5,8 +5,13 @@ import java.util.List;
 
 import mxcompiler.ast.statement.BlockStmtNode;
 import mxcompiler.type.NullType;
+import mxcompiler.type.Type;
 import mxcompiler.ast.*;;
 
+/** no need to judge if return type is null
+ * no need to judge if return type is construct
+ * cause, returnType is NullType; if construct
+ */
 public class FuncDeclNode extends DeclNode {
 	@Override
 	public void _dump(ASTDump d) {
@@ -15,7 +20,7 @@ public class FuncDeclNode extends DeclNode {
 		d.printf(" isContruct: %b\n", isConstruct());
 	}
 
-	private boolean isConstruct;
+	// private boolean isConstruct;
 	private TypeNode returnType;
 	private List<VarDeclNode> paramList;
 	private BlockStmtNode body; // or stmts???
@@ -41,10 +46,10 @@ public class FuncDeclNode extends DeclNode {
 		this.returnType = returnType;
 		if (returnType == null)
 			throw new Error("function set returnType Error");
-		if (returnType.getType() instanceof NullType)
-			this.isConstruct = true;
-		else
-			this.isConstruct = false;
+		// if (returnType.getType() instanceof NullType)
+		// 	this.isConstruct = true;
+		// else
+		// 	this.isConstruct = false;
 
 		if (params != null)
 			this.paramList = params;
@@ -54,7 +59,7 @@ public class FuncDeclNode extends DeclNode {
 	}
 
 	public boolean isConstruct() {
-		return isConstruct;
+		return returnType.getType().getInnerType() == Type.InnerType.NULL;
 	}
 
 	public TypeNode getReturnType() {

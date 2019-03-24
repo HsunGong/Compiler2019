@@ -2,6 +2,9 @@ package mxcompiler.utils.entity;
 
 import mxcompiler.type.Type;
 
+/** The type here is functional type
+ * means, only class, function, variable type is supported
+ */
 abstract public class Entity {
 	protected String name;
 	protected Type type; // not TypeNode anymore

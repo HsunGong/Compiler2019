@@ -39,7 +39,6 @@ public class ClassDeclNode extends DeclNode {
 		this(name, varList.getList(), funcList, location);
 	}
 
-	// TODO : add varNode here????/???? or add at init place ??
 	public void putVar(VarDeclNode var) {
 		varList.add(var);
 	}

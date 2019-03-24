@@ -6,14 +6,15 @@ abstract public class Type {
      * get compare by type.X.compareTo()
     */
     public static enum InnerType {
-        ARRAY("array"), 
-        INT("int"), 
+		INT("int"), 
         BOOL("bool"), 
         STRING("string"), 
-        CLASS("class"), 
+        ARRAY("array"), 
         NULL("null"), 
-        FUNCTION("function"), 
-        VOID("void");
+        VOID("void"),
+        CLASS("class"), 
+		FUNCTION("function"), 
+		VARIABLE("variable");
 
         private String label;
         private InnerType(String label) { this.label = label; }

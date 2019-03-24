@@ -1,6 +1,13 @@
 int p_rint() {
 
 }
+
+class pp {
+	pp(){}
+	int para1;
+	string para2;
+}
+
 int main() {
 	string x = "asdaefbasdf \n \\\" is \" asd";
 int[][][] a;

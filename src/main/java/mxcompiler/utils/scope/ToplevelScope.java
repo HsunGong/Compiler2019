@@ -29,8 +29,9 @@ public class ToplevelScope extends Scope {
     // better say define nor declare
     @Override
     public void put(String k, Entity v) throws SemanticException{
-        Entity check = entities.get(k);
-        if (check != null) {
+		Entity check = entities.get(k);
+		// FIX: is it work ??
+        if (check != null && (check.getType() == v.getType())) {
             throw new SemanticException("already have "+k);
         }
         entities.put(k, v);

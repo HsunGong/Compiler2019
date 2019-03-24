@@ -16,7 +16,6 @@ public class IdentifierExprNode extends ExprNode {
 	private String identifier;
 	private boolean needMemOp = false;
 	private boolean checked = false;
-	// private VarEntity varEntity = null;
 
 	public IdentifierExprNode(String identifier, Location location) {
 		super(location);

@@ -23,11 +23,12 @@ public class LocalResolver extends Visitor {
 	/** means can not change LinkedList's type */
 	private final LinkedList<Scope> scopeStack;
 	// private int isInLoop = 0;
-	// private ClassTypeNode currentClass;
+	private ClassType curClass;
 	// private FuncTypeNode currentFunc;
 
 	public LocalResolver() {
 		scopeStack = new LinkedList<Scope>();
+		curClass = null;
 	}
 
 	/**
@@ -75,36 +76,126 @@ public class LocalResolver extends Visitor {
 		if (!node.getDecl().isEmpty())
 			for (DeclNode decl : node.getDecl())
 				visit(decl);
+
+		node.setScope((ToplevelScope) getCurScope());
 	}
 
-	/** func scope */
+	/**
+	 * func scope is included in block-body
+	 */
 	@Override
 	public void visit(FuncDeclNode node) {
-		pushScope(node.getVar());
-		visit(node.getBody()); // FIX: what is return, param ...
-		node.Scope = popScope();
+		try {
+			// pre add support no error
+			FuncEntity entity = (FuncEntity) getCurScope().get(node.getName());
+
+			// to add scope first
+			pushScope();
+
+			// return Type
+			// FIX: allowed class{class{{}}}
+			// check class exist
+			if (entity.getReturnType() instanceof ClassType) {
+				// cause scope may not be the toplevel
+				String name = ((ClassType) entity.getReturnType()).getName();
+				// UGLY: curScope can not find anything
+				assert (getCurScope().get(name) instanceof ClassEntity);
+			}
+			// check construct
+			// FIX： noramlly, construct dont have params
+			if (node.isConstruct()) {
+				// can not be construct 1-type
+				if (curClass == null)
+					throw new Error("Function " + node.getName() + " do not belong to class");
+
+				// can not be construct 2-type
+				if ((node.getName() != curClass.getName()))
+					throw new Error("Function " + node.getName() + " should have a return type");
+
+				// reserved as class this operator
+				getCurScope().put("__this", new VarEntity("__this", curClass));
+			} else
+				;
+			// ATTENTION:FIX: already add func name from global or from class-decl
+
+			// Parameters
+			visitDeclList(node.getVar()); // varTypeExprCheck
+
+			// body
+			node.getBody().setScope((LocalScope) getCurScope());
+			visit(node.getBody());
+
+			popScope();
+		} catch (SemanticException e) {
+			throw new Error("classEntityt " + e);
+		}
 	}
 
 	/** class scope */
 	@Override
 	public void visit(ClassDeclNode node) {
-		pushScope();
-		visit(node.getFunc());
-		visitDeclList(node.getVar());
-		node.Scope = popScope();
+		assert (getCurScope() instanceof ToplevelScope);
 
+		try {
+			ClassEntity entity = (ClassEntity) getCurScope().get(node.getName());
+
+			pushScope(entity.getScope());
+			// replaced by curClass = new ClassType(entity.getName());
+			curClass = (ClassType) entity.getType();
+
+			// means only this level FIX: decl can add leter via getCurScope
+			visitDeclList(node.getVar());
+varTypeExprCheck
+			visitDeclList(node.getFunc());
+			// entity.setScope(popScope());
+			popScope();
+			curClass = null;
+
+			// currentOffset = 0;
+			// entity.setMemorySize(currentOffset);
+		} catch (SemanticException e) {
+			throw new Error("classEntity " + e);
+		}
 	}
 
-	/** temportory scope */
+	/**
+	 * {@inheritDoc} temportory scope
+	 * <p>
+	 * {@literal add scope outside}
+	 */
 	@Override
 	public void visit(BlockStmtNode node) {
-		pushScope();
 		visit();
-		node.Scope = popScope();
 	}
 
 	/** resolve variable into cur scope */
 	@Override
+	public void visit(VarDeclNode node) {
+		VarEntity entity;
+		try {
+			if (node.getType().getType() instanceof ClassType) {
+				String ClassName = ((ClassType) node.getType().getType()).getName();
+				getCurScope().get(ClassName);
+				checkVarDeclInit(node);
+				entity = new VarEntity(node.getName(), node.getType().getType(), ClassName);
+			} else {
+				checkVarDeclInit(node);
+				entity = new VarEntity(node.getName(), node.getType().getType());
+			}
+
+			// entity.setAddrOffset(currentOffset);
+			// FIX: currentOffset += node.getType().getType().getVarSize();
+			getCurScope().put(entity.getName(), entity);
+		} catch (SemanticException e) {
+			throw new Error("VarEntity " + e);
+		}
+	}
+
+	@Override
+	public void visit(StringLiteralExprNode node) {
+		node.setEntry(constantTable.intern(node.value()));
+		return null;
+	}
 
 	protected void checkVarDeclInit(VarDeclNode node) {
 		if (node.getInit() != null) {
@@ -146,7 +237,7 @@ public class LocalResolver extends Visitor {
 		name = "print";
 		putBuiltInFunc(toplevelScope, name, params, returnType);
 
-		// type = new StringType();
+		// type = new StringType(m4);
 		// params = Collections.singletonList(new VarEntity("str", type));
 		// returnType = new VoidType();
 		name = "println";
@@ -228,11 +319,12 @@ public class LocalResolver extends Visitor {
 	 * From array, string
 	 * <p>
 	 * From global
+	 * <p>
+	 * Attention: FIX:BUG: these func dont have sub-scope!!!!!!!
 	 */
 	private void putBuiltInFunc(Scope curScope, String name, List<VarEntity> parameters, Type returnType) {
-		FuncEntity entity = new FuncEntity(name, new FuncType(name));
+		FuncEntity entity = new FuncEntity(name, new FuncType(name), returnType);
 		entity.params = parameters;
-		entity.returnType = returnType;
 		entity.isBuiltIn = true;
 
 		// FIX: why??
@@ -252,23 +344,20 @@ public class LocalResolver extends Visitor {
 	private void checkMainFunc(FuncEntity mainFunc) {
 		if (mainFunc == null)
 			throw new Error("\"main\" function not found");
-		if (!(mainFunc.returnType instanceof IntType))
+		if (!(mainFunc.getReturnType() instanceof IntType))
 			throw new Error("\"main\" function's return type should be \"int\"");
 		if (!mainFunc.params.isEmpty())
 			throw new Error("\"main\" function should have no parameter");
 	}
 
 	// --------------- scope - stack -----------------------
-	/** push with vars */
-	private void pushScope(List<? extends DefinedVariable> vars) {
-		LocalScope scope = new LocalScope(currentScope());
-		for (DefinedVariable var : vars) {
-			if (scope.isDefinedLocally(var.name())) {
-				error(var.location(), "duplicated variable in scope: " + var.name());
-			} else {
-				scope.defineVariable(var);
-			}
-		}
+	/** push without vars */
+	private void pushScope() {
+		LocalScope scope = new LocalScope(getCurScope());
+		scopeStack.addLast(scope);
+	}
+
+	private void pushScope(LocalScope scope) {
 		scopeStack.addLast(scope);
 	}
 
@@ -284,4 +373,24 @@ public class LocalResolver extends Visitor {
 	private Scope getCurScope() {
 		return scopeStack.getLast();
 	}
+
+	// --------------- add List -----------------------
+	protected final void visitStmtList(List<? extends StmtNode> stmts) {
+		if (!stmts.isEmpty())
+			for (StmtNode n : stmts)
+				visit(n);
+	}
+
+	protected final void visitExprList(List<? extends ExprNode> exprs) {
+		if (!exprs.isEmpty())
+			for (ExprNode n : exprs)
+				visit(n);
+	}
+
+	protected final void visitDeclList(List<? extends DeclNode> decls) {
+		if (!decls.isEmpty())
+			for (DeclNode n : decls)
+				visit(n);
+	}
+
 }

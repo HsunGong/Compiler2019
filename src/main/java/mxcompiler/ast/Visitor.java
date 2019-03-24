@@ -187,25 +187,25 @@ abstract public class Visitor implements ASTVisitor {
 		visit(node.getBody());
 	}
 
-	// FIX: use ? extends Node to replace <Node>
-	protected void visitStmtList(List<? extends StmtNode> stmts) {
-		if (!stmts.isEmpty())
-			for (StmtNode s : stmts)
-				visit(s);
+	// FIX: use ? extends Node to replace <Node>/**
+	/* ATTENTION: can not use visit(this) for each node, cause error
+	 * {@code 
+	 * if (!decls.isEmpty()) for (DeclNode e : decls) visit(e); }
+	 */
+	abstract protected void visitStmtList(List<? extends StmtNode> stmts);
 
-	}
+	/**
+	 * {@code
+	 * if (!decls.isEmpty()) for (DeclNode e : decls) visit(e);
+	 * }
+	 */
+	abstract protected void visitExprList(List<? extends ExprNode> exprs);
 
-	protected void visitExprList(List<? extends ExprNode> exprs) {
-		if (!exprs.isEmpty())
-			for (ExprNode e : exprs)
-				visit(e);
+	/**
+	 * {@code
+	 * if (!decls.isEmpty()) for (DeclNode e : decls) visit(e);
+	 * }
+	 */
+	abstract protected void visitDeclList(List<? extends DeclNode> decls);
 
-	}
-
-	protected void visitDeclList(List<? extends DeclNode> decls) {
-		if (!decls.isEmpty())
-			for (DeclNode e : decls)
-				visit(e);
-
-	}
 }
