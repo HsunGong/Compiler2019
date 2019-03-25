@@ -1,5 +1,7 @@
 package mxcompiler.ast.expression;
 
+import java.util.HashMap;
+
 import mxcompiler.ast.*;
 
 public class BinaryOpExprNode extends ExprNode {
@@ -9,27 +11,39 @@ public class BinaryOpExprNode extends ExprNode {
 		d.printf(" op: %s\n", getOp().toString());
 	}
 
-	public static enum Oper {
+	public static enum Op {
 		MUL("*"), DIV("/"), MOD("%"), ADD("+"), SUB("-"), SH_L("<<"), SH_R(">>"), GREATER(">"), LESS(
 				"<"), GREATER_EQUAL(">="), LESS_EQUAL("<="), EQUAL(
 						"=="), INEQUAL("!="), BIT_AND("&"), BIT_OR("|"), BIT_XOR("^"), LOGIC_AND("&&"), LOGIC_OR("||");
 
 		private String label;
 
-		private Oper(String label) {
+		private Op(String label) {
 			this.label = label;
+		}
+
+		// NOTE: need this to transfer
+		private static final HashMap<String, Op> keyMap = new HashMap<String, Op>();
+		static {
+			for (Op op : Op.values()) {
+				keyMap.put(op.label, op);
+			}
+		}
+
+		public static Op get(String key) {
+			return keyMap.get(key);
 		}
 	}
 
 	private ExprNode lhs, rhs;
-	private Oper op;
+	private Op op;
 
 	/** type can be null and add later */
 	public BinaryOpExprNode(ExprNode lhs, String op, ExprNode rhs, Location location) {
 		super(location);
 		// this.type = type;
 		// UGLY: will throw IllegalArgumentException
-		this.op = Oper.valueOf(op);
+		this.op = Op.get(op);
 		this.lhs = lhs;
 		this.rhs = rhs;
 	}
@@ -50,7 +64,7 @@ public class BinaryOpExprNode extends ExprNode {
 		this.rhs = rhs;
 	}
 
-	public Oper getOp() {
+	public Op getOp() {
 		return op;
 	}
 

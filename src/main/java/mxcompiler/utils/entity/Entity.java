@@ -1,6 +1,7 @@
 package mxcompiler.utils.entity;
 
 import mxcompiler.type.Type;
+import mxcompiler.type.VarType;
 import mxcompiler.utils.Dump;
 
 /**
@@ -23,6 +24,7 @@ abstract public class Entity {
 	}
 
 	public Type getType() {
+		// if (type instanceof VarType) return ((VarType) type).getBaseType();
 		return type;
 	}
 

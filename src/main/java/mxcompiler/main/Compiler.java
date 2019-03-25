@@ -67,7 +67,7 @@ public final class Compiler {
 		// checker.visit(root);
 
 		if (mode == CompilerMode.Dump) {
-			// new ScopeDump(out).visit(root);
+			new ScopeDump(out).visit(root);
 		}
 
 		
@@ -87,7 +87,7 @@ public final class Compiler {
 		root = (ASTNode) astBuilder.visit(tree);
 
 		if (mode == CompilerMode.Dump) {
-			new ASTDump(out).visit(root);
+			// new ASTDump(out).visit(root);
 		}
 	}
 }

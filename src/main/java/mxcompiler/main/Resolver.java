@@ -1,6 +1,5 @@
 package mxcompiler.main;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -20,10 +19,11 @@ import mxcompiler.ast.expression.unary.*;
 import mxcompiler.ast.*;
 
 public class Resolver extends Visitor {
+
 	/** means can not change LinkedList's type */
 	private final LinkedList<Scope> scopeStack;
 	// private int isInLoop = 0;
-	private ClassType curClass;
+	private ClassEntity curClass;
 	private int loop;
 	private Type curReturnType;
 	private FuncEntity curFuncEntity;
@@ -34,6 +34,7 @@ public class Resolver extends Visitor {
 		scopeStack = new LinkedList<Scope>();
 		curClass = null;
 		curReturnType = null;
+		curFuncEntity = null;
 		loop = 0;
 	}
 
@@ -42,6 +43,11 @@ public class Resolver extends Visitor {
 	 * so called pre-scanner But just this top-level
 	 * <p>
 	 * add global-funcs, classes-funcs, classes - for only top decl FIX: not vars?
+	 * 
+	 * <p>
+	 * class and function can not be override, and within sameScope, name can not be
+	 * the same However, to support class.fun can be the same name as class and
+	 * global fun, add special id with class name
 	 */
 	protected void preResolve(ASTNode root) {
 		ToplevelScope toplevelScope; // FIX:??no need to add to member
@@ -87,13 +93,6 @@ public class Resolver extends Visitor {
 	public void visit(ASTNode node) {
 		preResolve(node);
 
-		// if (!node.getDecl().isEmpty())
-		// for (DeclNode decl : node.getDecl())
-		// if (!(decl instanceof ClassDeclNode))
-		// continue;
-		// else
-		// visit(decl);
-
 		if (!node.getDecl().isEmpty())
 			for (DeclNode decl : node.getDecl())
 				visit(decl);
@@ -113,8 +112,7 @@ public class Resolver extends Visitor {
 			ClassEntity entity = (ClassEntity) getCurScope().get(node.getName());
 
 			pushScope(entity.getScope());
-			// replaced by curClass = new ClassType(entity.getName());
-			curClass = (ClassType) entity.getType();
+			curClass = entity;// replaced by curClass = new ClassType(entity.getName());
 
 			// means only this level
 			// round 1 - check member vars
@@ -123,9 +121,10 @@ public class Resolver extends Visitor {
 
 			// round 2 - check functions
 			visitDeclList(node.getFunc());
+
+			// TODO: after resolve member, set Size
 			// currentOffset = 0;
 			// entity.setMemorySize(currentOffset);
-
 			curClass = null;
 			popScope();
 		} catch (SemanticException e) {
@@ -140,24 +139,27 @@ public class Resolver extends Visitor {
 	public void visit(FuncDeclNode node) {
 		try {
 			// pre add support no error
-			FuncEntity entity = (FuncEntity) getCurScope().get(node.getName());
-
+			FuncEntity entity;
+			if (curClass == null)
+				entity = (FuncEntity) getCurScope().get(node.getName());
+			else
+				entity = (FuncEntity) getCurScope().get(curClass.getDomain() + node.getName());
 			// to add scope first
 			pushScope();
-
-			// return Type
-			// FIX: allowed class{class{{}}}
-			// check class exist
 			curReturnType = entity.getReturnType();
+
+			// check return Type
+			// FIX: allowed class{class{{}}}
+			// // check class exist
 			if (curReturnType instanceof ClassType) {
-				// cause scope may not be the toplevel
 				String name = ((ClassType) curReturnType).getName();
-				// UGLY: curScope can not find anything
+
+				// cause scope may not be the toplevel * UGLY: curScope can not find anything
 				assert (getCurScope().get(name) instanceof ClassEntity);
-			} else if (curReturnType instanceof NullType && node.isConstruct()) {
+			} else if (node.isConstruct()) {
 				// can not be construct 1-type
 				if (curClass == null)
-					throw new Error("Function " + node.getName() + " do not belong to class");
+					throw new Error("Construct Function " + node.getName() + " do not belong to class");
 
 				// can not be construct 2-type
 				// UGLY: NOTE: == or != means the memory-Location
@@ -166,9 +168,13 @@ public class Resolver extends Visitor {
 							"Function " + node.getName() + " should have a return type or construct name is wrong");
 			}
 
-			// class mem add __this
+			/**
+			 * class mem add __this; funcentity dont have __this; cause para dont need; use
+			 * func-entity-body to have __this is enough
+			 */
+
 			if (curClass != null) {
-				getCurScope().put("__this", new VarEntity("__this", curClass));
+				getCurScope().put("__this", new VarEntity("__this", curClass.getType()));
 			}
 
 			// ATTENTION:FIX: already add func name from global or from class-decl
@@ -179,7 +185,9 @@ public class Resolver extends Visitor {
 			// body
 			node.getBody().setScope((LocalScope) getCurScope());
 			popScope();
+
 			visit(node.getBody());
+
 			curReturnType = null;
 		} catch (SemanticException e) {
 			throw new Error("classEntityt " + e);
@@ -201,25 +209,25 @@ public class Resolver extends Visitor {
 	}
 
 	private void checkVarDeclInit(VarDeclNode node) {
-		// if (node.getInit() != null) {
-		// visit(node.getInit());
+		if (node.getInit() != null) {
+			visit(node.getInit());
 
-		// boolean invalidInitType;
-		// if (node.getType().getType() instanceof VoidType || node.getInit().getType()
-		// instanceof VoidType)
-		// invalidInitType = true;
-		// else if (node.getType().getType().equals(node.getInit().getType()))
-		// invalidInitType = false;
-		// else if (node.getInit().getType() instanceof NullType)
-		// invalidInitType = !(node.getType().getType() instanceof ClassType
-		// || node.getType().getType() instanceof ArrayType);
-		// else
-		// invalidInitType = true;
-		// if (invalidInitType)
-		// throw new Error("Invalid initialization value" + "expected" +
-		// node.getType().getType().toString()
-		// + " but got " + node.getInit().getType().toString());
-		// }
+			boolean invalid; // init
+			// UGLY: no need to check init-voidtype, cause never happen then
+			if (node.getType().getType() instanceof VoidType || node.getInit().getType() instanceof VoidType)
+				invalid = true;
+			else if (node.getType().getType().isEqual(node.getInit().getType()))
+				invalid = false;
+			else if (node.getInit().getType() instanceof MNullType) // UGLY: can not use var without init
+				invalid = !(node.getType().getType() instanceof ClassType
+						|| node.getType().getType() instanceof ArrayType);
+			else
+				invalid = true;
+
+			if (invalid)
+				throw new Error("Invalid variable init value: expected" + node.getType().getType().toString()
+						+ " but got " + node.getInit().getType().toString());
+		}
 	}
 
 	/** resolve variable into cur scope */
@@ -239,9 +247,9 @@ public class Resolver extends Visitor {
 
 			entity.isGlobal = (getCurScope() instanceof ToplevelScope);
 
+			// TODO : get memorySize
 			// entity.setAddrOffset(currentOffset);
 			// currentOffset += node.getType().getType().getVarSize();
-
 			getCurScope().put(node.getName(), entity);
 		} catch (SemanticException e) {
 			throw new Error("VarEntity " + e);
@@ -264,8 +272,7 @@ public class Resolver extends Visitor {
 		popScope();
 	}
 
-	// ----------------------------------- type checking
-	// -------------------------------
+	// ------------------------------- type checking -------------------------------
 
 	@Override
 	public void visit(IfStmtNode node) {
@@ -280,26 +287,35 @@ public class Resolver extends Visitor {
 
 	@Override
 	public void visit(WhileStmtNode node) {
-		++loop;
 		visit(node.getCond());
+		// UGLY: maybe can check not to define cond-int again
 		// CHECKING
 		if (!(node.getCond().getType() instanceof BoolType))
 			throw new Error("Condition expression of while loop statement should have type \"bool\"");
 
+		++loop;
 		visit(node.getBody());
 		--loop;
 	}
 
 	@Override
 	public void visit(ForStmtNode node) {
-		++loop;
 		visit(node.getCond());
 		if (!(node.getCond().getType() instanceof BoolType))
 			throw new Error("Condition expression of for loop statement should have type \"bool\"");
 
 		visit(node.getInit());
-		visitDeclList(node.getVar());
 		visit(node.getIncr());
+
+		if (!node.getVar().isEmpty()) {
+			pushScope();
+			visitDeclList(node.getVar()); // FIX: this
+			popScope();
+			assert (node.getBody() instanceof BlockStmtNode);
+			((BlockStmtNode) node.getBody()).setScope((LocalScope) getCurScope());
+		}
+
+		++loop;
 		visit(node.getBody());
 		--loop;
 	}
@@ -318,19 +334,22 @@ public class Resolver extends Visitor {
 
 	@Override
 	public void visit(ReturnStmtNode node) {
+		// UGLY: change all invalid into valid
 		boolean invalid = false;
+		visit(node.getExpr());
+
 		if (node.getExpr() == null) {
 			if (!(curReturnType instanceof NullType || curReturnType instanceof VoidType))
 				invalid = true;
 		} else {
-			visit(node.getExpr());
 			if (node.getExpr().getType() instanceof NullType || node.getExpr().getType() instanceof VoidType)
 				invalid = true;
-			else if (node.getExpr().getType() instanceof NullType)
+			else if (node.getExpr().getType() instanceof MNullType)
 				invalid = !(curReturnType instanceof ClassType || curReturnType instanceof ArrayType);
 			else if (!(node.getExpr().getType().isEqual(curReturnType)))
 				invalid = true;
 		}
+
 		if (invalid) {
 			if (curReturnType instanceof NullType || curReturnType instanceof VoidType)
 				throw new Error("Return statement should have no return value");
@@ -347,6 +366,7 @@ public class Resolver extends Visitor {
 					+ node.getExpr().getType().toString());
 		if (!(node.getExpr().isLeftValue()))
 			throw new Error("Operator " + node.getOp().toString() + " cannot be applied to right value");
+
 		node.setType(new IntType());
 		node.setIsLeftValue(false);
 	}
@@ -355,7 +375,8 @@ public class Resolver extends Visitor {
 	public void visit(ArefExprNode node) {
 		visit(node.getExpr());
 		if (!(node.getExpr().getType() instanceof ArrayType))
-			throw new Error("Type" + node.getExpr().getType().toString() + " is not arrayType");
+			throw new Error("Type " + node.getExpr().getType().toString() + " is not arrayType");
+
 		visit(node.getIndex());
 		if (!(node.getIndex().getType() instanceof IntType))
 			throw new Error("ArrayIndexType should have Int but got " + node.getExpr().getType().toString());
@@ -369,8 +390,9 @@ public class Resolver extends Visitor {
 	public void visit(MemberExprNode node) {
 		visit(node.getExpr());
 		String className = null;
-		Entity memEntity;
+		Entity memEntity = null;
 
+		// get mother class
 		if (node.getExpr().getType() instanceof ClassType) {
 			className = ((ClassType) node.getExpr().getType()).getName();
 		} else if (node.getExpr().getType() instanceof StringType) {
@@ -383,9 +405,17 @@ public class Resolver extends Visitor {
 
 		try {
 			ClassEntity classEntity = (ClassEntity) getCurScope().get(className);
-			memEntity = classEntity.getScope().getCur(node.getMember());
-			// FIX: if(memEntity instanceof FuncEntity) curFuncEntity = (FuncEntity)
-			// memEntity;
+			try {
+				memEntity = classEntity.getScope().getCur(classEntity.getDomain() + node.getMember()); // NOTE: is
+																										// getCur
+			} catch (Exception e) {
+				memEntity = classEntity.getScope().getCur(node.getMember()); // NOTE: is getCur
+				assert (memEntity instanceof VarEntity);
+			}
+
+			// contain a funcall expr from before
+			if (memEntity instanceof FuncEntity)
+				curFuncEntity = (FuncEntity) memEntity;
 		} catch (Exception e) {
 			throw new Error(e);
 		}
@@ -397,46 +427,283 @@ public class Resolver extends Visitor {
 	public void visit(FuncallExprNode node) {
 		visit(node.getExpr());
 		if (!(node.getExpr().getType() instanceof FuncType))
-			throw new Error(node.getExpr().getType().toString() + " is not callable");
+			throw new Error(node.getExpr().getType().toString() + " is not funcall expr");
 
-		node.funcEntity = curFuncEntity;
+		// FIX: get funcEntity
+		FuncEntity funcallEntity = curFuncEntity;
+		node.funcEntity = funcallEntity;
+		if (node.funcEntity == null) {
+			throw new Error("May be never happen, but no cur func can be found");
+		}
 
-		int paraNum = curFuncEntity.params.size();
+		// check param size
+		int paraNum = funcallEntity.params.size();
 		int firstParaIdx = node.funcEntity.isMember ? 1 : 0;
 		if (paraNum - firstParaIdx != node.getParam().size())
-			throw new Error("Function call has inconsistent number of arguments, expected" + paraNum + "but got"
-					+ node.getParam().size());
+			throw new Error(
+					node.getLocation().toString() + "Function call has inconsistent number of arguments, expected "
+							+ paraNum + " but got " + node.getParam().size());
 
+		// check param type
 		boolean invalid; // invalid of param type
 		for (int i = 0; i < paraNum - firstParaIdx; ++i) {
 			ExprNode curParam = node.getParam().get(i);
+			VarEntity defParam = funcallEntity.params.get(i + firstParaIdx); // define in fun-decl
 			visit(curParam);
-			if (curParam.getType() instanceof VoidType)
+			if (curParam.getType() instanceof VoidType) // UGLY: cause funcall-void
 				invalid = true;
-			else if (curParam.getType() instanceof NullType)
-				invalid = !(curFuncEntity.params.get(i + firstParaIdx).getType() instanceof ClassType
-						|| curFuncEntity.params.get(i + firstParaIdx).getType() instanceof ArrayType);
+			else if (curParam.getType() instanceof MNullType)
+				invalid = !(defParam.getType() instanceof ClassType || defParam.getType() instanceof ArrayType);
 			else
-				invalid = !(curFuncEntity.params.get(i + firstParaIdx).getType().equals(curParam.getType()));
+				invalid = !(defParam.getType().isEqual(curParam.getType()));
 
 			if (invalid) {
-				throw new Error("Function call has inconsistent type of arguments, expected"
-						+ curFuncEntity.params.get(i + firstParaIdx).getType().toString() + "but got "
-						+ curParam.getType().toString());
+				throw new Error(curParam.getLocation().toString() + "Function call has inconsistent type of arguments, expected "
+						+ defParam.getType().toString() + " but got " + curParam.getType().toString());
 			}
 		}
 
-		node.setType(curFuncEntity.getReturnType());
+		node.setType(funcallEntity.getReturnType());
 		node.setIsLeftValue(false);
 	}
 
 	@Override
 	public void visit(PrefixExprNode node) {
-		
+		ExprNode preExpr = node.getExpr(); // prefix-expr
+		visit(preExpr);
+
+		switch (node.getOp()) {
+		case PRE_DEC:
+		case PRE_INC:
+			if (!(preExpr.getType() instanceof IntType))
+				throw new Error("Operator " + node.getOp().toString() + " cannot be applied to type"
+						+ preExpr.getType().toString());
+			if (!(preExpr.isLeftValue()))
+				throw new Error("Operator " + node.getOp().toString() + " cannot be applied to right value");
+
+			node.setType(new IntType());
+			node.setIsLeftValue(true);
+			break;
+		case POSI:
+		case NEGA:
+		case BIT_NOT:
+			if (!(preExpr.getType() instanceof IntType))
+				throw new Error("Operator " + node.getOp().toString() + " cannot be applied to type "
+						+ preExpr.getType().toString());
+			node.setType(new IntType());
+			node.setIsLeftValue(false);
+			break;
+		case LOGIC_NOT:
+			if (!(preExpr.getType() instanceof BoolType))
+				throw new Error("Operator " + node.getOp().toString() + " cannot be applied to type "
+						+ preExpr.getType().toString());
+			node.setType(new BoolType());
+			node.setIsLeftValue(false);
+			break;
+		default:
+			throw new Error("Invalid prefix operator");
+		}
 	}
 
+	@Override
+	public void visit(NewExprNode node) {
+		if (node.getDims() != null) {
+			for (ExprNode dim : node.getDims()) {
+				visit(dim);
+				if (!(dim.getType() instanceof IntType)) {
+					throw new Error("dimension size of array should be integer type");
+				}
+			}
+		}
+		// FIX: new construct ??
 
+		node.setType(node.getNewType().getType());
+		node.setIsLeftValue(false);
+	}
 
+	@Override
+	public void visit(BinaryOpExprNode node) {
+		visit(node.getLhs());
+		visit(node.getRhs());
+		Type lhsType = node.getLhs().getType();
+		Type rhsType = node.getRhs().getType();
+
+		switch (node.getOp()) {
+		case MUL:
+		case DIV:
+		case MOD:
+		case ADD:
+			if (lhsType instanceof StringType && rhsType instanceof StringType) {
+				node.setType(new StringType());
+				node.setIsLeftValue(false);
+				break;
+			}
+		case SUB:
+		case SH_L:
+		case SH_R:
+		case BIT_OR:
+		case BIT_AND:
+		case BIT_XOR:
+			if (!(lhsType instanceof IntType))
+				throw new Error(node.getLocation().toString() + " Operator " + node.getOp().toString()
+						+ " cannot be applied to type " + lhsType.toString());
+			if (!(rhsType instanceof IntType))
+				throw new Error(node.getLocation().toString() + "Operator " + node.getOp().toString()
+						+ " cannot be applied to type " + rhsType.toString());
+
+			node.setType(new IntType());
+			node.setIsLeftValue(false);
+			break;
+		case GREATER:
+		case LESS:
+		case GREATER_EQUAL:
+		case LESS_EQUAL:
+			if (!(lhsType.isEqual(rhsType)))
+				throw new Error(node.getLocation().toString()+"Operator " + node.getOp().toString() + " cannot be applied to different types "
+						+ rhsType.toString() + " and " + lhsType.toString());
+			if (!(lhsType instanceof IntType || lhsType instanceof StringType))
+				throw new Error(
+						"Operator " + node.getOp().toString() + " cannot be applied to type " + lhsType.toString());
+			// UGLY: can del this
+			if (!(rhsType instanceof IntType || rhsType instanceof StringType))
+				throw new Error(
+						"Operator " + node.getOp().toString() + " cannot be applied to type " + lhsType.toString());
+
+			node.setType(new BoolType());
+			node.setIsLeftValue(false);
+			break;
+		case EQUAL:
+		case INEQUAL:
+			boolean invalid;
+			if (lhsType instanceof VoidType || rhsType instanceof VoidType)
+				invalid = true;
+			else if (lhsType.isEqual(rhsType))
+				invalid = false;
+			else if (lhsType instanceof MNullType)
+				invalid = !(rhsType instanceof ClassType || rhsType instanceof ArrayType);
+			else if (rhsType instanceof MNullType)
+				invalid = !(lhsType instanceof ClassType || lhsType instanceof ArrayType);
+			else
+				invalid = true;
+
+			if (invalid)
+				throw new Error("Operator " + node.getOp().toString() + " cannot be applied to different types"
+						+ lhsType.toString() + " and " + rhsType.toString());
+
+			node.setType(new BoolType());
+			node.setIsLeftValue(false);
+			break;
+		case LOGIC_OR:
+		case LOGIC_AND:
+			if (!(lhsType instanceof BoolType))
+				throw new Error("Operator " + node.getOp().toString() + " cannot be applied to different types"
+						+ lhsType.toString());
+			if (!(rhsType instanceof BoolType))
+				throw new Error("Operator " + node.getOp().toString() + " cannot be applied to different types"
+						+ rhsType.toString());
+
+			node.setType(new BoolType());
+			node.setIsLeftValue(false);
+			break;
+		default:
+			throw new Error("Invalid binary operator");
+		}
+	}
+
+	@Override
+	public void visit(AssignExprNode node) {
+		visit(node.getLhs());
+		visit(node.getRhs());
+		Type lhsType = node.getLhs().getType();
+		Type rhsType = node.getRhs().getType();
+
+		if (!(node.getLhs().isLeftValue()))
+			throw new Error("Lhs of assignment statement should be left value");
+
+		boolean invalid;
+		if (lhsType instanceof VoidType || rhsType instanceof VoidType)
+			invalid = true;
+		else if (lhsType.isEqual(rhsType))
+			invalid = false;
+		else if (rhsType instanceof MNullType)
+			invalid = !(lhsType instanceof ClassType || lhsType instanceof ArrayType);
+		else
+			invalid = true;
+
+		if (invalid)
+			throw new Error("Assignment operator cannot be applied to different types " + lhsType.toString() + " and "
+					+ rhsType.toString());
+
+		// FIX: support for a = b = c
+		node.setType(lhsType);
+		node.setIsLeftValue(false);
+	}
+
+	@Override
+	public void visit(IdentifierExprNode node) {
+		try {
+			String name = node.getIdentifier();
+
+			// toplevel or class-level
+			Entity entity = getCurScope().get(name);
+			assert (!(entity instanceof ClassEntity));
+
+			if (entity instanceof VarEntity) {
+				node.entity = (VarEntity) entity;
+				node.setIsLeftValue(true);
+			} else if (entity instanceof FuncEntity) {
+				curFuncEntity = (FuncEntity) entity;
+				node.setIsLeftValue(false);
+			} else
+				throw new Error("Invalid entity type for identifier");
+
+			node.setType(entity.getType());
+		} catch (Exception e) {
+			throw new Error(e);
+		}
+
+	}
+
+	@Override
+	public void visit(ThisExprNode node) {
+		try {
+			// UGLY: how about add __this in class-scope not function-scope??
+			Entity entity = getCurScope().get("__this");
+
+			if (!(entity instanceof VarEntity))
+				throw new Error("Invalid entity type for \"this\"");
+
+			node.setIsLeftValue(false);
+			node.setType(entity.getType());
+		} catch (Exception e) {
+			throw new Error(e);
+		}
+
+	}
+
+	@Override
+	public void visit(IntLiteralExprNode node) {
+		node.setType(new IntType());
+		node.setIsLeftValue(false);
+	}
+
+	@Override
+	public void visit(StringLiteralExprNode node) {
+		node.setType(new StringType());
+		node.setIsLeftValue(false);
+	}
+
+	@Override
+	public void visit(BoolLiteralExprNode node) {
+		node.setType(new BoolType());
+		node.setIsLeftValue(false);
+	}
+
+	@Override
+	public void visit(NullExprNode node) {
+		node.setType(new MNullType());
+		node.setIsLeftValue(false);
+	}
 
 	// ------------- build-in classes and functions ---------------
 	/** add BuiltIn func and BuiltIn class */

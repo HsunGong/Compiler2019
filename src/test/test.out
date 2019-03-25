@@ -1,154 +1,376 @@
-Program Start
-<ASTNode> 1:0
- declarations:
-<FuncDeclNode> 1:0
- name: p_rint
- isContruct: false
- returnType:
-	<TypeNode> 1:0
-	 type: int
- parameterList: null
- body:
-	<BlockStmtNode> 1:13
-	 stmts:
-		<BlockStmtNode> 3:1
-		 stmts: null
-		 varDecls:
-			<VarDeclNode> 4:6
-			 name: x
-			 type:
-				<TypeNode> 4:2
-				 type: int
-			 init:
-				<IntLiteralNode> 4:10
-				 value: 10
-	 varDecls:
-		<VarDeclNode> 2:5
-		 name: a
-		 type:
-			<TypeNode> 2:1
-			 type: int
-		 init:
-			<IntLiteralNode> 2:9
-			 value: 120
-<FuncDeclNode> 7:0
- name: p_srint
- isContruct: false
- returnType:
-	<TypeNode> 7:0
-	 type: int
- parameterList:
-	<VarDeclNode> 7:12
-	 name: a
-	 type:
-		<TypeNode> 7:12
-		 type: int
-	 init: null
- body:
-	<BlockStmtNode> 7:19
-	 stmts:
-		<ReturnStmtNode> 8:1
-		 value:
-			<IntLiteralNode> 8:8
-			 value: 0
-	 varDecls: null
-<ClassDeclNode> 11:0
- name: pp
- varDecls:
-	<VarDeclNode> 13:5
-	 name: para1
-	 type:
-		<TypeNode> 13:1
-		 type: int
-	 init: null
-	<VarDeclNode> 14:8
-	 name: para2
-	 type:
-		<TypeNode> 14:1
-		 type: string
-	 init: null
- funcMember:
-	<FuncDeclNode> 12:1
-	 name: pp
-	 isContruct: true
-	 returnType:
-		<TypeNode> 12:1
-		 type: null
-	 parameterList:
-		<VarDeclNode> 12:4
-		 name: a
-		 type:
-			<TypeNode> 12:4
-			 type: int
-		 init: null
-	 body:
-		<BlockStmtNode> 12:10
-		 stmts: null
-		 varDecls: null
-	<FuncDeclNode> 15:1
-	 name: ss
-	 isContruct: false
-	 returnType:
-		<TypeNode> 15:1
-		 type: void
-	 parameterList:
-		<VarDeclNode> 15:9
-		 name: a
-		 type:
-			<TypeNode> 15:9
-			 type: int
-		 init: null
-	 body:
-		<BlockStmtNode> 15:15
-		 stmts: null
-		 varDecls: null
-<FuncDeclNode> 20:0
- name: main
- isContruct: false
- returnType:
-	<TypeNode> 20:0
-	 type: int
- parameterList: null
- body:
-	<BlockStmtNode> 20:11
-	 stmts:
-		<ExprStmtNode> 23:1
-		 expr:
-			<AssignExprNode> 23:1
-			 lhs:
-				<IdentifierExprNode> 23:1
-				identifier: a
-			 rhs:
-				<NewExprNode> 23:9
-				 numDim: 3
-				 newType:
-					<TypeNode> 23:9
-					 type: array
-				dims:
-					<IntLiteralNode> 23:13
-					 value: 123
-					<IntLiteralNode> 23:18
-					 value: 31
-		<ExprStmtNode> 25:1
-		 expr:
-			<FuncallExprNode> 25:1
-			 expr:
-				<IdentifierExprNode> 25:1
-				identifier: p_rint
-			 args: null
-	 varDecls:
-		<VarDeclNode> 21:8
-		 name: x
-		 type:
-			<TypeNode> 21:1
-			 type: string
-		 init:
-			<StringLiteralNode> 21:12
-			 value: asdaefbasdf 
- \" is " asd
-		<VarDeclNode> 22:11
-		 name: a
-		 type:
-			<TypeNode> 22:1
-			 type: array
-		 init: null
+Scope: isTop: true
+<Func Entity>:  name: print, Type: function print
+ returnType: void, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	<Var Entity>:  name: str, Type: string
+	 isMember: false, ClassName: null
+	 isGlobal: false
+<Func Entity>:  name: println, Type: function println
+ returnType: void, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	<Var Entity>:  name: str, Type: string
+	 isMember: false, ClassName: null
+	 isGlobal: false
+<Func Entity>:  name: getString, Type: function getString
+ returnType: string, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	null
+<Func Entity>:  name: getInt, Type: function getInt
+ returnType: int, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	null
+<Func Entity>:  name: toString, Type: function toString
+ returnType: string, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	<Var Entity>:  name: i, Type: int
+	 isMember: false, ClassName: null
+	 isGlobal: false
+<Class Entity>:  name: _array, Type: class _array
+	Scope: isTop: false
+	<Func Entity>:  name: size, Type: function size
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: array
+		 isMember: false, ClassName: null
+		 isGlobal: false
+<Class Entity>:  name: _string, Type: class _string
+	Scope: isTop: false
+	<Func Entity>:  name: length, Type: function length
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: substring, Type: function substring
+	 returnType: string, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: left, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: right, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: parseInt, Type: function parseInt
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: ord, Type: function ord
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: pos, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+<Class Entity>:  name: Test, Type: class Test
+	Scope: isTop: false
+	<Func Entity>:  name: id, Type: function id
+	 returnType: bool, isBuiltIn: false
+	 isMember: true, ClassName: Test
+	 params:
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id_, Type: bool
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: Test, Type: function Test
+	 returnType: , isBuiltIn: false
+	 isMember: true, ClassName: Test
+	 params:
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: test, Type: function test
+	 returnType: void, isBuiltIn: false
+	 isMember: true, ClassName: Test
+	 params:
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id_, Type: bool
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: x, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: y, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+			>>>> child			Scope: isTop: false
+			<Var Entity>:  name: id, Type: bool
+			 isMember: false, ClassName: null
+			 isGlobal: false
+				>>>> child				Scope: isTop: false
+				<Var Entity>:  name: id, Type: int
+				 isMember: false, ClassName: null
+				 isGlobal: false
+					>>>> child					Scope: isTop: false
+						>>>> child						Scope: isTop: false
+			>>>> child			Scope: isTop: false
+			<Var Entity>:  name: id, Type: class Test
+			 isMember: false, ClassName: null
+			 isGlobal: false
+				>>>> child				Scope: isTop: false
+				<Var Entity>:  name: id, Type: int
+				 isMember: false, ClassName: null
+				 isGlobal: false
+					>>>> child					Scope: isTop: false
+					<Var Entity>:  name: test, Type: class Test
+					 isMember: false, ClassName: null
+					 isGlobal: false
+						>>>> child						Scope: isTop: false
+<Func Entity>:  name: func, Type: function func
+ returnType: array, isBuiltIn: false
+ isMember: false, ClassName: 
+ params:
+	<Var Entity>:  name: t, Type: array
+	 isMember: false, ClassName: null
+	 isGlobal: false
+<Func Entity>:  name: main, Type: function main
+ returnType: int, isBuiltIn: false
+ isMember: false, ClassName: 
+ params:
+	null
+<Class Entity>:  name: A, Type: class A
+	Scope: isTop: false
+	<Func Entity>:  name: method, Type: function method
+	 returnType: class B, isBuiltIn: false
+	 isMember: true, ClassName: A
+	 params:
+		<Var Entity>:  name: __this, Type: class A
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Var Entity>:  name: b, Type: class B
+	 isMember: true, ClassName: A
+	 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class A
+		 isMember: false, ClassName: null
+		 isGlobal: false
+<Class Entity>:  name: B, Type: class B
+	Scope: isTop: false
+	<Func Entity>:  name: method, Type: function method
+	 returnType: class A, isBuiltIn: false
+	 isMember: true, ClassName: B
+	 params:
+		<Var Entity>:  name: __this, Type: class B
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Var Entity>:  name: a, Type: class A
+	 isMember: true, ClassName: B
+	 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class B
+		 isMember: false, ClassName: null
+		 isGlobal: false
+<Var Entity>:  name: id, Type: int
+ isMember: false, ClassName: null
+ isGlobal: true
+<Var Entity>:  name: a, Type: class A
+ isMember: false, ClassName: null
+ isGlobal: true
+<Var Entity>:  name: b, Type: class B
+ isMember: false, ClassName: null
+ isGlobal: true
+<Var Entity>:  name: aa, Type: class A
+ isMember: false, ClassName: null
+ isGlobal: true
+	>>>> child	Scope: isTop: false
+	<Func Entity>:  name: length, Type: function length
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: substring, Type: function substring
+	 returnType: string, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: left, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: right, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: parseInt, Type: function parseInt
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: ord, Type: function ord
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: pos, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Func Entity>:  name: size, Type: function size
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: 
+	 params:
+		<Var Entity>:  name: __this, Type: array
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Func Entity>:  name: id, Type: function id
+	 returnType: bool, isBuiltIn: false
+	 isMember: true, ClassName: Test
+	 params:
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id_, Type: bool
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: Test, Type: function Test
+	 returnType: , isBuiltIn: false
+	 isMember: true, ClassName: Test
+	 params:
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: test, Type: function test
+	 returnType: void, isBuiltIn: false
+	 isMember: true, ClassName: Test
+	 params:
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id_, Type: bool
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: x, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: y, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Test
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: id, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+			>>>> child			Scope: isTop: false
+			<Var Entity>:  name: id, Type: bool
+			 isMember: false, ClassName: null
+			 isGlobal: false
+				>>>> child				Scope: isTop: false
+				<Var Entity>:  name: id, Type: int
+				 isMember: false, ClassName: null
+				 isGlobal: false
+					>>>> child					Scope: isTop: false
+						>>>> child						Scope: isTop: false
+			>>>> child			Scope: isTop: false
+			<Var Entity>:  name: id, Type: class Test
+			 isMember: false, ClassName: null
+			 isGlobal: false
+				>>>> child				Scope: isTop: false
+				<Var Entity>:  name: id, Type: int
+				 isMember: false, ClassName: null
+				 isGlobal: false
+					>>>> child					Scope: isTop: false
+					<Var Entity>:  name: test, Type: class Test
+					 isMember: false, ClassName: null
+					 isGlobal: false
+						>>>> child						Scope: isTop: false
+	>>>> child	Scope: isTop: false
+	<Func Entity>:  name: method, Type: function method
+	 returnType: class B, isBuiltIn: false
+	 isMember: true, ClassName: A
+	 params:
+		<Var Entity>:  name: __this, Type: class A
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Var Entity>:  name: b, Type: class B
+	 isMember: true, ClassName: A
+	 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class A
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Func Entity>:  name: method, Type: function method
+	 returnType: class A, isBuiltIn: false
+	 isMember: true, ClassName: B
+	 params:
+		<Var Entity>:  name: __this, Type: class B
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Var Entity>:  name: a, Type: class A
+	 isMember: true, ClassName: B
+	 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class B
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Var Entity>:  name: t, Type: array
+	 isMember: false, ClassName: null
+	 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Var Entity>:  name: test, Type: class Test
+	 isMember: false, ClassName: null
+	 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: test, Type: array
+		 isMember: false, ClassName: null
+		 isGlobal: false
+			>>>> child			Scope: isTop: false

@@ -3,9 +3,12 @@ package mxcompiler.utils.entity;
 import mxcompiler.ast.declaration.FuncDeclNode;
 import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.ast.statement.BlockStmtNode;
+import mxcompiler.type.ClassType;
 import mxcompiler.type.FuncType;
+import mxcompiler.type.NullType;
 import mxcompiler.type.Type;
 import mxcompiler.utils.Dump;
+import mxcompiler.utils.scope.Scope;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +49,10 @@ public class FuncEntity extends Entity {
 	FuncEntity(FuncDeclNode node, String className) {
 		super(node.getName(), new FuncType(node.getName()));
 
+		// FIX: need to add here? may influence resolver-funcall-paramcheck
+		// attentino: the order matters, __this should be first
+		params.add(new VarEntity(Scope.BuiltIn.THIS.toString(), new ClassType(className)));
+
 		for (VarDeclNode para : node.getVar()) {
 			params.add(new VarEntity(para));
 		}
@@ -55,15 +62,12 @@ public class FuncEntity extends Entity {
 		else
 			returnType = node.getReturnType().getType();
 		// isConstruct = node.isConstruct();
-
-		// FIX: to add a lead Node: parameters.add(new VarEntity(Scope.THIS_PARA_NAME,
-		// new ClassType(className)));
 		isMember = true;
 		this.className = className;
 	}
 
 	public boolean isConstruct() {
-		return (returnType.getInnerType() == Type.InnerType.NULL);
+		return (returnType instanceof NullType);
 	}
 
 	public Type getReturnType() {
@@ -76,10 +80,11 @@ public class FuncEntity extends Entity {
 		d.printf(" isMember: %b, ClassName: %s\n", isMember, className);
 		d.println(" params:");
 		d.addTab();
-		if(!params.isEmpty())
-		for (VarEntity e : params) 
-			e._dump(d);
-		else d.println("null");
+		if (!params.isEmpty())
+			for (VarEntity e : params)
+				e._dump(d);
+		else
+			d.println("null");
 		// scope._dump(d);// FIX: ???
 		d.delTab();
 	}

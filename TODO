@@ -162,7 +162,7 @@ TypeResolve:
 	✔ globalScopePreScanner.visit(ast); @done(03-23 20)
 	✔ new ClassVarMemberScanner(globalScope).visit(ast); @done(03-24 13)
 	Do tormorrow:
-	☐ new FunctionScopeScanner(globalScope).visit(ast); @high @today @started(03-24 20)
+	✔ new FunctionScopeScanner(globalScope).visit(ast); @high @today @started(03-24 20) @done(03-25 20) @lasted(1d8m44s)
 	☐ new StaticUsagePreScanner(globalScope).visit(ast);
 	
 
@@ -170,3 +170,9 @@ TypeResolve:
 	// FIX: seems no need to store childs for scopes
 	☐ FIX: funcEntity not have scope, but body have, how to connect them?
 	☐ FIX: What I thought Visitor of visitList might be wrong @critical 
+	☐ FIX: newExpr-node, dim and Expr<dim> is the same size? or dim is really dim, but Expr only store inited expr?
+	
+	☐ UGLY: change all invalid into valid
+	☐ UGLY: classify Error
+	☐ UGLY: change Error into each node, no need to specify Error with invalid
+	☐ UGLY: change all isEqual to equals

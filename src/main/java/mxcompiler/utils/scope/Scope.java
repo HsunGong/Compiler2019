@@ -1,6 +1,7 @@
 package mxcompiler.utils.scope;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,11 +16,24 @@ abstract public class Scope {
 	 */
 	public enum BuiltIn {
 		ARRAY("_array"),
-		STRING("_string");
+		STRING("_string"),
+		THIS("__this"),
+		DOMAIN(".");
 
 		private String label;
 		private BuiltIn(String label) { this.label = label; }
 		public String toString() { return label; }
+
+		private static final HashMap<String, BuiltIn> keyMap = new HashMap<String, BuiltIn>();
+		static {
+			for (BuiltIn op : BuiltIn.values()) {
+				keyMap.put(op.label, op);
+			}
+		}
+
+		public static BuiltIn get(String key) {
+			return keyMap.get(key);
+		}
 	}
 
 	/** naive tree Node of Scope */

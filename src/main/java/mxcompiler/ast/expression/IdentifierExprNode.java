@@ -1,6 +1,7 @@
 package mxcompiler.ast.expression;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.entity.VarEntity;
 
 /**
  * For variable identifier in primary expr Or maybe called nameExprNode is
@@ -16,6 +17,7 @@ public class IdentifierExprNode extends ExprNode {
 	private String identifier;
 	private boolean needMemOp = false;
 	private boolean checked = false;
+	public VarEntity entity = null;
 
 	public IdentifierExprNode(String identifier, Location location) {
 		super(location);

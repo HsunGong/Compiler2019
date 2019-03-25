@@ -12,6 +12,7 @@ public class NewExprNode extends ExprNode {
 		d.printf(" numDim: %d\n", num);
 	}
 
+	/** newType may still be arrayType(recurrence) */
 	private TypeNode newType;
 	private List<ExprNode> dims;
 	private int num; // for dimension-number

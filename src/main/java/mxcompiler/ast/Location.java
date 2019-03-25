@@ -20,5 +20,5 @@ public class Location {
 
 	public int getLine() { return line;}
 	public int getColumn() { return column; }
-	public String toString() { return String.valueOf(line) + ":" + String.valueOf(column); }
+	public String toString() { return '('+String.valueOf(line) + ":" + String.valueOf(column)+')'; }
 }

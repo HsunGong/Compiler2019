@@ -17,6 +17,9 @@ public class ClassEntity extends Entity {
 		// FIX: to specifiy is class scope or not
 		this.scope = new LocalScope(parentScope);
 	}
+	public String getDomain() {
+		return this.name + Scope.BuiltIn.DOMAIN.toString();
+	}
 
 	public ClassEntity(ClassDeclNode node, Scope parentScope) {
 		super(node.getName(), new ClassType(node.getName()));
@@ -26,7 +29,7 @@ public class ClassEntity extends Entity {
 		for (FuncDeclNode func : node.getFunc()) {
 			try {
 				scope.put(
-					func.getName(), 
+					getDomain()+func.getName(), 
 					new FuncEntity(func, node.getName())
 				);
 			} catch (SemanticException e) {

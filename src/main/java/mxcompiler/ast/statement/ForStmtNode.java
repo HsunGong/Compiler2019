@@ -36,7 +36,7 @@ public class ForStmtNode extends StmtNode {
 
 	public ForStmtNode(ExprNode init, ExprNode cond, ExprNode incr, StmtNode body, VarDeclListNode varList,
 			Location location) {
-		this(init, cond, incr, body, varList.getList(), location);
+		this(init, cond, incr, body, (varList == null) ? null : varList.getList(), location);
 	}
 
 	public List<VarDeclNode> getVar() {

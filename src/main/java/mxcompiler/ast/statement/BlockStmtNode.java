@@ -20,15 +20,12 @@ public class BlockStmtNode extends StmtNode {
 
 	public BlockStmtNode(List<StmtNode> stmts, List<VarDeclNode> varList, Location location) {
 		super(location);
-		if (stmts == null)
-			this.stmts = new ArrayList<StmtNode>();
-		else
-			this.stmts = stmts;
+		
+		this.stmts = (stmts != null) ? stmts : new ArrayList<StmtNode>();
 
-		if (varList == null)
-			this.varList = new ArrayList<VarDeclNode>();
-		else
-			this.varList = varList;
+		this.varList = (varList != null) ? varList : new ArrayList<VarDeclNode>();
+
+		scope = null;
 	}
 
 	public BlockStmtNode(List<StmtNode> stmts, VarDeclListNode varList, Location location) {

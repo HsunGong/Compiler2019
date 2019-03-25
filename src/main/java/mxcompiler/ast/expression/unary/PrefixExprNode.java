@@ -1,6 +1,9 @@
 package mxcompiler.ast.expression.unary;
 
 import mxcompiler.ast.expression.ExprNode;
+
+import java.util.HashMap;
+
 import mxcompiler.ast.*;
 
 /**
@@ -22,6 +25,17 @@ public class PrefixExprNode extends ExprNode {
 		private Op(String label) {
 			this.label = label;
 		}
+
+		private static final HashMap<String, Op> keyMap = new HashMap<String, Op>();
+		static {
+			for (Op op : Op.values()) {
+				keyMap.put(op.label, op);
+			}
+		}
+
+		public static Op get(String key) {
+			return keyMap.get(key);
+		}
 	}
 
 	private Op prefixOp;
@@ -29,7 +43,7 @@ public class PrefixExprNode extends ExprNode {
 
 	public PrefixExprNode(String prefixOp, ExprNode prefixExpr, Location location) {
 		super(location);
-		this.prefixOp = Op.valueOf(prefixOp);
+		this.prefixOp = Op.get(prefixOp);
 		this.prefixExpr = prefixExpr;
 	}
 

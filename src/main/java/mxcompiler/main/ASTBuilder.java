@@ -401,17 +401,12 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitForInitStmt(MxParser.ForInitStmtContext ctx) {
-		ExprNode init, cond, incr;
-		VarDeclListNode varList = null;
-		StmtNode body;
+		ExprNode cond = (ctx.cond == null) ? null : (ExprNode) visit(ctx.cond);
+		ExprNode incr = (ctx.incr == null) ? null : (ExprNode) visit(ctx.incr);
+		VarDeclListNode varList = (VarDeclListNode) visit(ctx.init);
+		StmtNode body = (StmtNode) visit(ctx.statement());
 
-		init = null;
-		cond = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
-		incr = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
-		varList = (VarDeclListNode) visit(ctx.init);
-		body = (StmtNode) visit(ctx.statement());
-
-		return new ForStmtNode(init, cond, incr, body, varList, new Location(ctx));
+		return new ForStmtNode(null, cond, incr, body, varList, new Location(ctx));
 	}
 
 	/**
@@ -424,14 +419,12 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitForNoneStmt(MxParser.ForNoneStmtContext ctx) {
-		ExprNode init, cond, incr;
-		StmtNode body;
 		VarDeclListNode varList = null;
 
-		init = (ctx.init == null) ? null : (ExprNode) visit(ctx.init);
-		cond = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
-		incr = (ctx.init == null) ? null : (ExprNode) visit(ctx.cond);
-		body = (StmtNode) visit(ctx.statement());
+		ExprNode init = (ctx.init == null) ? null : (ExprNode) visit(ctx.init);
+		ExprNode cond = (ctx.cond == null) ? null : (ExprNode) visit(ctx.cond);
+		ExprNode incr = (ctx.incr == null) ? null : (ExprNode) visit(ctx.incr);
+		StmtNode body = (StmtNode) visit(ctx.statement());
 
 		return new ForStmtNode(init, cond, incr, body, varList, new Location(ctx));
 	}
@@ -524,7 +517,8 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Deprecated // cause cannot transfer vardecl into expr
 	@Override
 	public Node visitParamList(MxParser.ParamListContext ctx) {
-		return visitChildren(ctx);
+		throw new Error("What happened ??");
+		// return visitChildren(ctx);
 	}
 
 	/**
@@ -571,11 +565,13 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 				dims.add((ExprNode) visit(dim));
 			}
 		int num = ctx.LeftBracket().size();
+		// int num = (ctx.getChildCount() - 1 - dims.size()) / 2;
 
-		// UGLY: NOTE: current is no array plain type how to figure how many dims is
+		// FIX: UGLY: NOTE: current is no array plain type how to figure how many dims
+		// is
 		// needed??
-		// for (int i = 0; i < numDim; ++i) newType.setType(new
-		// ArrayType(newType.getType()));
+		for (int i = 0; i < num; ++i)
+			newType.setType(new ArrayType(newType.getType()));
 		newType.setType(new ArrayType(newType.getType()));
 
 		return new NewExprNode(newType, dims, num, new Location(ctx));
