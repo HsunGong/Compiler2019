@@ -21,14 +21,10 @@ abstract public class ExprNode extends Node {
 	}
 
 	public boolean isEqual(Type rhs) {
-		return rhs == this.type;
+		return rhs.isEqual(this.type);
 	}
 
-	// protected boolean isLeftValue;
-	// public void setIsLeftValue(boolean s) { this.isLeftValue = s; }
-	// public boolean isLeftValue() { return isLeftValue; }
-	public boolean isLeftValue() {
-		return false;
-	}
-
+	protected boolean isLeftValue = false;
+	public void setIsLeftValue(boolean s) { this.isLeftValue = s; }
+	public boolean isLeftValue() { return isLeftValue; }
 }

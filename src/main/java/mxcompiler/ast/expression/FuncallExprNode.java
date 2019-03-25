@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.entity.FuncEntity;
 
 /** Also for class method */
 public class FuncallExprNode extends ExprNode {
@@ -14,7 +15,9 @@ public class FuncallExprNode extends ExprNode {
 
 	private ExprNode expr;
 	private List<ExprNode> params;
-	// UGLY: funcEntity ?
+	
+	// resolver
+	public FuncEntity funcEntity;
 
 	public FuncallExprNode(ExprNode e, List<ExprNode> params, Location location) {
 		super(location);

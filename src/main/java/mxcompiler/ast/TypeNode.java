@@ -30,7 +30,7 @@ public class TypeNode extends Node {
 	}
 
 	public boolean isEqual(TypeNode rhs) {
-		return rhs.type == this.type;
+		return rhs.type.isEqual(this.type);
 	}
 
 	@Override
