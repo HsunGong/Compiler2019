@@ -8,9 +8,8 @@ abstract public class Type {
 	 * type.X.compareTo()
 	 */
 	public static enum InnerType {
-		INT("int"), BOOL("bool"), STRING("string"), ARRAY("array"), 
-		NULL(""), VOID("void"), CLASS(
-				"class"), FUNCTION("function"), VARIABLE("variable"), MNULL("null");
+		INT("int"), BOOL("bool"), STRING("string"), ARRAY("array"), NULL(""), VOID("void"), CLASS("class"), FUNCTION(
+				"function"), VARIABLE("variable"), MNULL("null");
 
 		private String label;
 
@@ -44,17 +43,24 @@ abstract public class Type {
 		this.innerType = inner;
 	}
 
-	protected int varSize;
+	// protected int varSize;
 
-	public int getSize() {
-		return varSize;
-	}
+	// public int getSize() {
+	// return varSize;
+	// }
 
 	// ATTENTION:
-	// FIX: UGLY:NOTE: this can not be rewrite, cause, ifso new Bool Type != new Bool Type
+	// FIX: UGLY:NOTE: this can not be rewrite, cause, ifso new Bool Type != new
+	// Bool Type
 	// have to compare with innerType
 	public boolean isEqual(Type rhs) {
+		while (rhs.innerType.equals(InnerType.ARRAY) && this.innerType.equals(InnerType.ARRAY)) {
+			Type x = ((ArrayType) rhs).getBaseType();
+			Type y = ((ArrayType) this).getBaseType();
+			return x.isEqual(y);
+		}
 		return rhs.innerType.equals(this.innerType);
+
 	}
 
 	/** only for InnerType output(output name) */

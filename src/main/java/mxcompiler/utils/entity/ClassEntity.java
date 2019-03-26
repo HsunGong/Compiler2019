@@ -1,6 +1,7 @@
 package mxcompiler.utils.entity;
 
 import mxcompiler.ast.declaration.*;
+import mxcompiler.exception.CompileError;
 import mxcompiler.exception.SemanticException;
 import mxcompiler.type.ClassType;
 import mxcompiler.type.Type;
@@ -14,7 +15,7 @@ public class ClassEntity extends Entity {
 
 	public ClassEntity(String name, Type type, Scope parentScope) {
 		super(name, type);
-		assert (type instanceof ClassType);
+		if(!(type instanceof ClassType)) throw new CompileError("init class entity err");
 
 		this.scope = new LocalScope(parentScope);
 	}

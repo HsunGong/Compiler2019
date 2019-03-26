@@ -10,6 +10,7 @@ import mxcompiler.utils.entity.*;
 import mxcompiler.type.*;
 
 import mxcompiler.ast.statement.*;
+import mxcompiler.exception.CompileError;
 import mxcompiler.exception.SemanticException;
 import mxcompiler.ast.declaration.*;
 import mxcompiler.ast.expression.*;
@@ -27,6 +28,10 @@ public class Resolver extends Visitor {
 	private int loop;
 	private Type curReturnType;
 	private FuncEntity curFuncEntity;
+	private boolean hasReturn;
+	// if no-return -> change to true;
+	// if need return, change to false; and when has
+	// return change to true
 
 	public Resolver() {
 		scopeStack = new LinkedList<Scope>();
@@ -34,6 +39,7 @@ public class Resolver extends Visitor {
 		curReturnType = null;
 		curFuncEntity = null;
 		loop = 0;
+		hasReturn = true;
 	}
 
 	/**
@@ -48,7 +54,8 @@ public class Resolver extends Visitor {
 	 * global fun, add special id with class name
 	 */
 	protected void resolve(ASTNode root) {
-		assert (getCurScope() instanceof ToplevelScope);
+		if (!(getCurScope() instanceof ToplevelScope))
+			throw new CompileError("toplevel");
 		ToplevelScope toplevelScope = (ToplevelScope) getCurScope();
 
 		putBuiltIn(toplevelScope);
@@ -85,7 +92,9 @@ public class Resolver extends Visitor {
 	public void resolve(ClassDeclNode node) {
 		try {
 			ClassEntity entity = new ClassEntity((ClassDeclNode) node, getCurScope());
-			assert (getCurScope() instanceof ToplevelScope);
+			if (!(getCurScope() instanceof ToplevelScope))
+				throw new CompileError("toplevel");
+
 			getCurScope().put(node.getName(), entity);
 
 			pushScope(entity.getScope());
@@ -138,7 +147,8 @@ public class Resolver extends Visitor {
 	public void resolve(FuncDeclNode node) {
 		try {
 			if (curClass == null) { // global-fun
-				assert (getCurScope() instanceof ToplevelScope);
+				if (!(getCurScope() instanceof ToplevelScope))
+					throw new CompileError("toplevel");
 
 				FuncEntity entity = new FuncEntity(node);
 				getCurScope().put(node.getName(), entity);
@@ -169,13 +179,16 @@ public class Resolver extends Visitor {
 		node.setScope((ToplevelScope) getCurScope());
 
 		scopeStack.remove();
-		assert (scopeStack.isEmpty() == true);
+		if (!scopeStack.isEmpty())
+			throw new CompileError("Scope stack err");
+
 	}
 
 	/** class scope */
 	@Override
 	public void visit(ClassDeclNode node) {
-		assert (getCurScope() instanceof ToplevelScope);
+		if (!(getCurScope() instanceof ToplevelScope))
+			throw new CompileError("toplevel");
 
 		try {
 			ClassEntity entity = (ClassEntity) getCurScope().get(node.getName());
@@ -209,13 +222,13 @@ public class Resolver extends Visitor {
 			FuncEntity entity;
 
 			if (curClass == null) {
-				assert (getCurScope() instanceof ToplevelScope);
+				if (!(getCurScope() instanceof ToplevelScope))
+					throw new CompileError("toplevel");
 				entity = (FuncEntity) getCurScope().get(node.getName());
 			} else
 				entity = (FuncEntity) getCurScope().get(curClass.getDomain() + node.getName());
 
 			curReturnType = entity.getReturnType();
-
 			// check return Type
 			if (!node.hasReturn()) { // may be construct
 				// can not be construct 1-type
@@ -230,9 +243,13 @@ public class Resolver extends Visitor {
 				// check class exist
 				if (curReturnType instanceof ClassType) {
 					String name = ((ClassType) curReturnType).getName();
-					assert (getCurScope().get(name) instanceof ClassEntity);
+					if (!(getCurScope().get(name) instanceof ClassEntity))
+						throw new CompileError("no such class");
 				}
+
 			}
+			if (node.hasReturn() && !(curReturnType instanceof VoidType))
+				hasReturn = false;
 
 			// to add scope first
 			pushScope();
@@ -256,7 +273,10 @@ public class Resolver extends Visitor {
 			popScope();
 
 			visit(node.getBody());
-
+			if (hasReturn == false)
+				throw new Error("dont get return");
+			else
+				hasReturn = true;
 			curReturnType = null;
 		} catch (SemanticException e) {
 			throw new Error("Func Entity check " + e);
@@ -274,7 +294,8 @@ public class Resolver extends Visitor {
 			// check type
 			if (node.getType().getType() instanceof ClassType) {
 				String typeName = ((ClassType) node.getType().getType()).getName();
-				assert (getCurScope().get(typeName) instanceof ClassEntity);
+				if (!(getCurScope().get(typeName) instanceof ClassEntity))
+					throw new CompileError("no such class");
 			}
 
 			// check init
@@ -304,8 +325,8 @@ public class Resolver extends Visitor {
 	/**
 	 * {@inheritDoc} temportory scope
 	 * <p>
-	 * {@literal add scope inside or outside}
-	 * cause the block has order to define var, can not add var first
+	 * {@literal add scope inside or outside} cause the block has order to define
+	 * var, can not add var first
 	 */
 	@Override
 	public void visit(BlockStmtNode node) {
@@ -315,10 +336,10 @@ public class Resolver extends Visitor {
 
 		if (!node.getAll().isEmpty())
 			for (Node n : node.getAll()) {
+				visit(n);
 				if (n instanceof VarDeclNode) {
 					resolve((VarDeclNode) n); // add first, then check
 				}
-				visit(n);
 			}
 
 		popScope();
@@ -361,14 +382,15 @@ public class Resolver extends Visitor {
 
 		if (!node.getVar().isEmpty()) {
 			pushScope();
-			// visitDeclList(node.getVar()); 
+			// visitDeclList(node.getVar());
 			for (VarDeclNode var : node.getVar()) {
 				resolve(var);
 				visit(var);
 			}
 			popScope();
-			
-			assert (node.getBody() instanceof BlockStmtNode);
+
+			if (!(node.getBody() instanceof BlockStmtNode))
+				throw new CompileError("Body is not block");
 			((BlockStmtNode) node.getBody()).setScope((LocalScope) getCurScope());
 		}
 
@@ -413,6 +435,9 @@ public class Resolver extends Visitor {
 			else
 				throw new Error("Return statement should have return value of type " + curReturnType.toString());
 		}
+
+		if (!hasReturn)
+			hasReturn = true;
 	}
 
 	@Override
@@ -467,7 +492,8 @@ public class Resolver extends Visitor {
 																										// getCur
 			} catch (Exception e) {
 				memEntity = classEntity.getScope().getCur(node.getMember()); // NOTE: is getCur
-				assert (memEntity instanceof VarEntity);
+				if (!(memEntity instanceof VarEntity))
+					throw new Error("not varEntity of member");
 			}
 
 			// contain a funcall expr from before
@@ -702,10 +728,12 @@ public class Resolver extends Visitor {
 	public void visit(IdentifierExprNode node) {
 		try {
 			String name = node.getIdentifier();
+			Entity entity;
 
 			// toplevel or class-level
-			Entity entity = getCurScope().get(name);
-			assert (!(entity instanceof ClassEntity));
+			entity = getCurScope().getVarFun(name, (curClass == null) ? "" : curClass.getDomain());
+			if (entity instanceof ClassEntity)
+				throw new Error("get Idenfier as class");
 
 			if (entity instanceof VarEntity) {
 				node.entity = (VarEntity) entity;
@@ -720,7 +748,6 @@ public class Resolver extends Visitor {
 		} catch (Exception e) {
 			throw new Error(e);
 		}
-
 	}
 
 	@Override
@@ -767,15 +794,8 @@ public class Resolver extends Visitor {
 	// ------------- build-in classes and functions ---------------
 	/** add BuiltIn func and BuiltIn class */
 	private void putBuiltIn(ToplevelScope toplevelScope) {
-		/** builtIn class */
-		String name = Scope.BuiltIn.STRING.toString();
-		Type type = new ClassType(name);
-		ClassEntity stringEntity = new ClassEntity(name, type, toplevelScope);
-
-		name = Scope.BuiltIn.ARRAY.toString();
-		type = new ClassType(name);
-		ClassEntity arrayEntity = new ClassEntity(name, type, toplevelScope);
-
+		String name;
+		Type type;
 		/** global builtIn funcs */
 		List<VarEntity> params;
 		Type returnType;
@@ -811,44 +831,53 @@ public class Resolver extends Visitor {
 		putBuiltInFunc(toplevelScope, name, params, returnType);
 
 		/** class builtIn funcs */
-		Scope curScope;
 		// array
-		curScope = arrayEntity.getScope();
-		type = new ArrayType(new NullType());
-		// FIX: why need para??
-		params = Arrays.asList(new VarEntity("__this", type));
-		returnType = new IntType();
-		name = "size";
-		putBuiltInFunc(curScope, name, params, returnType);
+		name = Scope.BuiltIn.ARRAY.toString();
+		type = new ClassType(name);
+		ClassEntity arrayEntity = new ClassEntity(name, type, toplevelScope);
+		curClass = arrayEntity;
+		{
+			type = new ArrayType(new NullType());
+			params = Arrays.asList(new VarEntity("__this", type));
+			returnType = new IntType();
+			name = "size";
+			putBuiltInFunc(arrayEntity.getScope(), name, params, returnType);
+		}
+		curClass = null;
 
 		// string
-		curScope = stringEntity.getScope();
+		name = Scope.BuiltIn.STRING.toString();
+		type = new ClassType(name);
+		ClassEntity stringEntity = new ClassEntity(name, type, toplevelScope);
+		curClass = stringEntity;
+		{
+			type = new StringType();
+			params = Arrays.asList(new VarEntity("__this", type));
+			returnType = new IntType();
+			name = "length";
+			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
-		type = new StringType();
-		params = Arrays.asList(new VarEntity("__this", type));
-		returnType = new IntType();
-		name = "length";
-		putBuiltInFunc(curScope, name, params, returnType);
+			// type = new StringType();
+			params = Arrays.asList(new VarEntity("__this", type), new VarEntity("left", new IntType()),
+					new VarEntity("right", new IntType()));
+			returnType = new StringType();
+			name = "substring";
+			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
-		// type = new StringType();
-		params = Arrays.asList(new VarEntity("__this", type), new VarEntity("left", new IntType()),
-				new VarEntity("right", new IntType()));
-		returnType = new StringType();
-		name = "substring";
-		putBuiltInFunc(curScope, name, params, returnType);
+			// type = new StringType();
+			params = Arrays.asList(new VarEntity("__this", type));
+			returnType = new IntType();
+			name = "parseInt";
+			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
-		// type = new StringType();
-		params = Arrays.asList(new VarEntity("__this", type));
-		returnType = new IntType();
-		name = "parseInt";
-		putBuiltInFunc(curScope, name, params, returnType);
+			// type = new StringType();
+			params = Arrays.asList(new VarEntity("__this", type), new VarEntity("pos", new IntType()));
 
-		// type = new StringType();
-		params = Arrays.asList(new VarEntity("__this", type), new VarEntity("pos", new IntType()));
-
-		// returnType = new IntType();
-		name = "ord";
-		putBuiltInFunc(curScope, name, params, returnType);
+			// returnType = new IntType();
+			name = "ord";
+			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
+		}
+		curClass = null;
 
 		// put into toplevelScope
 		try {
@@ -875,14 +904,17 @@ public class Resolver extends Visitor {
 		entity.params = parameters;
 		entity.isBuiltIn = true;
 
-		// FIX: why??
 		if (!curScope.isToplevel())
 			entity.isMember = true;
 
-		// FIX: maybe no use
-		// cause can not conflict
 		try {
-			curScope.put(name, entity);
+			if (curClass == null)
+				curScope.put(name, entity);
+			else {
+				entity.isMember = true;
+				entity.className = curClass.getName();
+				curScope.put(curClass.getDomain() + name, entity);
+			}
 		} catch (SemanticException e) {
 			throw new Error("Fuck idiot!");
 		}

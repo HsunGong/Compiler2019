@@ -1,0 +1,534 @@
+AST-Dump START
+<ASTNode> (1:0)
+declarations are below:
+	<ClassDeclNode> (1:0)
+	 name: Fibonacci
+	 varDecls:
+		<VarDeclNode> (2:5)
+		 name: x
+		 type:
+			<TypeNode> (2:1)
+			 type: int
+		 init: null
+		<VarDeclNode> (3:5)
+		 name: result
+		 type:
+			<TypeNode> (3:1)
+			 type: int
+		 init: null
+	 funcMember:
+		<FuncDeclNode> (5:1)
+		 name: reset
+		 hasReturn: true
+		 returnType:
+			<TypeNode> (5:1)
+			 type: void
+		 parameterList: null
+		 body:
+			<BlockStmtNode> (5:13)
+			 stmtsAnddecls: 
+				<ExprStmtNode> (6:2)
+				 expr:
+					<AssignExprNode> (6:2)
+					 lhs:
+						<IdentifierExprNode> (6:2)
+						identifier: x
+					 rhs:
+						<IntLiteralNode> (6:6)
+						 value: 0
+				<ExprStmtNode> (7:2)
+				 expr:
+					<AssignExprNode> (7:2)
+					 lhs:
+						<IdentifierExprNode> (7:2)
+						identifier: result
+					 rhs:
+						<IntLiteralNode> (7:11)
+						 value: 0
+		<FuncDeclNode> (10:1)
+		 name: set_problem
+		 hasReturn: true
+		 returnType:
+			<TypeNode> (10:1)
+			 type: void
+		 parameterList:
+			<VarDeclNode> (10:18)
+			 name: x_in
+			 type:
+				<TypeNode> (10:18)
+				 type: int
+			 init: null
+		 body:
+			<BlockStmtNode> (10:27)
+			 stmtsAnddecls: 
+				<ExprStmtNode> (11:2)
+				 expr:
+					<FuncallExprNode> (11:2)
+					 expr:
+						<IdentifierExprNode> (11:2)
+						identifier: reset
+					 args: null
+				<ExprStmtNode> (12:2)
+				 expr:
+					<AssignExprNode> (12:2)
+					 lhs:
+						<IdentifierExprNode> (12:2)
+						identifier: x
+					 rhs:
+						<IdentifierExprNode> (12:6)
+						identifier: x_in
+		<FuncDeclNode> (15:1)
+		 name: calc
+		 hasReturn: true
+		 returnType:
+			<TypeNode> (15:1)
+			 type: int
+		 parameterList:
+			<VarDeclNode> (15:10)
+			 name: cur_num
+			 type:
+				<TypeNode> (15:10)
+				 type: int
+			 init: null
+		 body:
+			<BlockStmtNode> (15:22)
+			 stmtsAnddecls: 
+				<IfStmtNode> (16:2)
+				 cond:
+					<BinaryOpExprNode> (16:6)
+					 op: EQUAL
+					 lhs:
+						<IdentifierExprNode> (16:6)
+						identifier: cur_num
+					 rhs:
+						<IntLiteralNode> (16:17)
+						 value: 0
+				 then:
+					<ReturnStmtNode> (17:3)
+					 value:
+						<IntLiteralNode> (17:10)
+						 value: 1
+				 else:
+					<ReturnStmtNode> (19:3)
+					 value:
+						<BinaryOpExprNode> (19:10)
+						 op: MUL
+						 lhs:
+							<IdentifierExprNode> (19:10)
+							identifier: cur_num
+						 rhs:
+							<FuncallExprNode> (19:20)
+							 expr:
+								<IdentifierExprNode> (19:20)
+								identifier: calc
+							 args:
+								<BinaryOpExprNode> (19:25)
+								 op: SUB
+								 lhs:
+									<IdentifierExprNode> (19:25)
+									identifier: cur_num
+								 rhs:
+									<IntLiteralNode> (19:33)
+									 value: 1
+		<FuncDeclNode> (22:1)
+		 name: get_result
+		 hasReturn: true
+		 returnType:
+			<TypeNode> (22:1)
+			 type: int
+		 parameterList: null
+		 body:
+			<BlockStmtNode> (22:17)
+			 stmtsAnddecls: 
+				<ExprStmtNode> (23:2)
+				 expr:
+					<AssignExprNode> (23:2)
+					 lhs:
+						<IdentifierExprNode> (23:2)
+						identifier: result
+					 rhs:
+						<FuncallExprNode> (23:11)
+						 expr:
+							<IdentifierExprNode> (23:11)
+							identifier: calc
+						 args:
+							<IdentifierExprNode> (23:16)
+							identifier: x
+				<ReturnStmtNode> (24:2)
+				 value:
+					<IdentifierExprNode> (24:9)
+					identifier: result
+	<FuncDeclNode> (28:0)
+	 name: main
+	 hasReturn: true
+	 returnType:
+		<TypeNode> (28:0)
+		 type: int
+	 parameterList: null
+	 body:
+		<BlockStmtNode> (28:10)
+		 stmtsAnddecls: 
+			<VarDeclNode> (29:11)
+			 name: teacher
+			 type:
+				<TypeNode> (29:1)
+				 type: class Fibonacci
+			 init: null
+			<ExprStmtNode> (30:1)
+			 expr:
+				<AssignExprNode> (30:1)
+				 lhs:
+					<IdentifierExprNode> (30:1)
+					identifier: teacher
+				 rhs:
+					<NewExprNode> (30:15)
+					 numDim: 0
+					 newType:
+						<TypeNode> (30:15)
+						 type: class Fibonacci
+					dims: null
+			<VarDeclNode> (31:5)
+			 name: x
+			 type:
+				<TypeNode> (31:1)
+				 type: int
+			 init: null
+			<ForStmtNode> (32:1)
+			 varDecl: null
+			 init:
+				<AssignExprNode> (32:6)
+				 lhs:
+					<IdentifierExprNode> (32:6)
+					identifier: x
+				 rhs:
+					<IntLiteralNode> (32:10)
+					 value: 0
+			 cond:
+				<BinaryOpExprNode> (32:13)
+				 op: LESS
+				 lhs:
+					<IdentifierExprNode> (32:13)
+					identifier: x
+				 rhs:
+					<IntLiteralNode> (32:17)
+					 value: 5
+			 incr:
+				<SuffixExprNode> (32:20)
+				 op: SUF_INC
+				 expr:
+					<IdentifierExprNode> (32:20)
+					identifier: x
+			 body:
+				<BlockStmtNode> (32:24)
+				 stmtsAnddecls: 
+					<ExprStmtNode> (33:2)
+					 expr:
+						<FuncallExprNode> (33:2)
+						 expr:
+							<MemberExprNode> (33:2)
+							 member: set_problem
+							 expr:
+								<IdentifierExprNode> (33:2)
+								identifier: teacher
+						 args:
+							<IdentifierExprNode> (33:22)
+							identifier: x
+					<ExprStmtNode> (34:2)
+					 expr:
+						<FuncallExprNode> (34:2)
+						 expr:
+							<IdentifierExprNode> (34:2)
+							identifier: println
+						 args:
+							<FuncallExprNode> (34:10)
+							 expr:
+								<IdentifierExprNode> (34:10)
+								identifier: toString
+							 args:
+								<FuncallExprNode> (34:19)
+								 expr:
+									<MemberExprNode> (34:19)
+									 member: get_result
+									 expr:
+										<IdentifierExprNode> (34:19)
+										identifier: teacher
+								 args: null
+			<ReturnStmtNode> (36:1)
+			 value:
+				<IntLiteralNode> (36:8)
+				 value: 0
+AST-Dump END
+
+
+
+Scope-Dump START
+Scope: isTop: true
+<Func Entity>:  name: print, Type: function print
+ returnType: void, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	<Var Entity>:  name: str, Type: string
+	 isMember: false, ClassName: null
+	 isGlobal: false
+<Func Entity>:  name: println, Type: function println
+ returnType: void, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	<Var Entity>:  name: str, Type: string
+	 isMember: false, ClassName: null
+	 isGlobal: false
+<Func Entity>:  name: getString, Type: function getString
+ returnType: string, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	null
+<Func Entity>:  name: getInt, Type: function getInt
+ returnType: int, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	null
+<Func Entity>:  name: toString, Type: function toString
+ returnType: string, isBuiltIn: true
+ isMember: false, ClassName: 
+ params:
+	<Var Entity>:  name: i, Type: int
+	 isMember: false, ClassName: null
+	 isGlobal: false
+<Class Entity>:  name: _array, Type: class _array
+	Scope: isTop: false
+	<Func Entity>:  name: size, Type: function size
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _array
+	 params:
+		<Var Entity>:  name: __this, Type: array
+		 isMember: false, ClassName: null
+		 isGlobal: false
+<Class Entity>:  name: _string, Type: class _string
+	Scope: isTop: false
+	<Func Entity>:  name: length, Type: function length
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: substring, Type: function substring
+	 returnType: string, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: left, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: right, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: parseInt, Type: function parseInt
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: ord, Type: function ord
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: pos, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+<Class Entity>:  name: Fibonacci, Type: class Fibonacci
+	Scope: isTop: false
+	<Var Entity>:  name: x, Type: int
+	 isMember: true, ClassName: Fibonacci
+	 isGlobal: false
+	<Var Entity>:  name: result, Type: int
+	 isMember: true, ClassName: Fibonacci
+	 isGlobal: false
+	<Func Entity>:  name: reset, Type: function reset
+	 returnType: void, isBuiltIn: false
+	 isMember: true, ClassName: reset
+	 params:
+		<Var Entity>:  name: __this, Type: class reset
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: set_problem, Type: function set_problem
+	 returnType: void, isBuiltIn: false
+	 isMember: true, ClassName: set_problem
+	 params:
+		<Var Entity>:  name: __this, Type: class set_problem
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: x_in, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: calc, Type: function calc
+	 returnType: int, isBuiltIn: false
+	 isMember: true, ClassName: calc
+	 params:
+		<Var Entity>:  name: __this, Type: class calc
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: cur_num, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: get_result, Type: function get_result
+	 returnType: int, isBuiltIn: false
+	 isMember: true, ClassName: get_result
+	 params:
+		<Var Entity>:  name: __this, Type: class get_result
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: x_in, Type: int
+		 isMember: true, ClassName: Fibonacci
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: cur_num, Type: int
+		 isMember: true, ClassName: Fibonacci
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+<Func Entity>:  name: main, Type: function main
+ returnType: int, isBuiltIn: false
+ isMember: false, ClassName: 
+ params:
+	null
+	>>>> child	Scope: isTop: false
+	<Func Entity>:  name: size, Type: function size
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _array
+	 params:
+		<Var Entity>:  name: __this, Type: array
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Func Entity>:  name: length, Type: function length
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: substring, Type: function substring
+	 returnType: string, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: left, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: right, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: parseInt, Type: function parseInt
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: ord, Type: function ord
+	 returnType: int, isBuiltIn: true
+	 isMember: true, ClassName: _string
+	 params:
+		<Var Entity>:  name: __this, Type: string
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: pos, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Var Entity>:  name: x, Type: int
+	 isMember: true, ClassName: Fibonacci
+	 isGlobal: false
+	<Var Entity>:  name: result, Type: int
+	 isMember: true, ClassName: Fibonacci
+	 isGlobal: false
+	<Func Entity>:  name: reset, Type: function reset
+	 returnType: void, isBuiltIn: false
+	 isMember: true, ClassName: reset
+	 params:
+		<Var Entity>:  name: __this, Type: class reset
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: set_problem, Type: function set_problem
+	 returnType: void, isBuiltIn: false
+	 isMember: true, ClassName: set_problem
+	 params:
+		<Var Entity>:  name: __this, Type: class set_problem
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: x_in, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: calc, Type: function calc
+	 returnType: int, isBuiltIn: false
+	 isMember: true, ClassName: calc
+	 params:
+		<Var Entity>:  name: __this, Type: class calc
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: cur_num, Type: int
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	<Func Entity>:  name: get_result, Type: function get_result
+	 returnType: int, isBuiltIn: false
+	 isMember: true, ClassName: get_result
+	 params:
+		<Var Entity>:  name: __this, Type: class get_result
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: x_in, Type: int
+		 isMember: true, ClassName: Fibonacci
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+		<Var Entity>:  name: cur_num, Type: int
+		 isMember: true, ClassName: Fibonacci
+		 isGlobal: false
+		>>>> child		Scope: isTop: false
+		<Var Entity>:  name: __this, Type: class Fibonacci
+		 isMember: false, ClassName: null
+		 isGlobal: false
+	>>>> child	Scope: isTop: false
+	<Var Entity>:  name: teacher, Type: class Fibonacci
+	 isMember: false, ClassName: null
+	 isGlobal: false
+	<Var Entity>:  name: x, Type: int
+	 isMember: false, ClassName: null
+	 isGlobal: false
+		>>>> child		Scope: isTop: false
+Scope-Dump END
+
+
+

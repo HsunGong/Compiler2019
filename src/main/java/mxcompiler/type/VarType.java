@@ -7,7 +7,7 @@ public class VarType extends Type {
 	public VarType(Type baseType) {
 		super(Type.InnerType.VARIABLE);
 		// NOTE
-		assert(!(baseType instanceof VarType));
+		// assert(!(baseType instanceof VarType));
 		this.baseType = baseType;
 	}
 	

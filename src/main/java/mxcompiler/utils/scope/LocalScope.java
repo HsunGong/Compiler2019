@@ -38,12 +38,22 @@ public class LocalScope extends Scope {
 		return v;
 	}
 
+	@Override
+	public Entity getVarFun(String k, String domain) throws SemanticException {
+		Entity v = (entities.get(k) != null) ? entities.get(k) : entities.get(domain + k);
+		if (v == null) { // cycle
+			return this.parent.getVarFun(k, domain);
+		}
+		return v;
+	}
+
 	/** may have same name in different scopes */
 	@Override
 	public void put(String k, Entity v) throws SemanticException {
 		Entity check = entities.get(k); // or getCur
-		// FIX: what if a class New var ? is vatType or ClassType?
-		if (check != null && (check.getType() == v.getType())) {
+		// FIX: what if a class New var ? is varType or ClassType?
+		// && (check.getType() == v.getType())
+		if (check != null) {
 			throw new SemanticException("already have " + k);
 		}
 		entities.put(k, v);

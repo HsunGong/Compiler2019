@@ -1,6 +1,7 @@
 package mxcompiler.utils.entity;
 
 import mxcompiler.ast.declaration.VarDeclNode;
+import mxcompiler.exception.CompileError;
 import mxcompiler.type.Type;
 import mxcompiler.type.VarType;
 import mxcompiler.utils.Dump;
@@ -18,13 +19,15 @@ public class VarEntity extends Entity {
 	public boolean isGlobal = false;
 
 	public VarEntity(String name, Type type) {
-		super(name,  type);
-		assert(!(type instanceof VarType));
+		super(name, type);
+		if ((type instanceof VarType))
+			throw new CompileError("VarType still alive");
 	}
 
 	public VarEntity(String name, Type type, String className) {
 		super(name, type);
-		assert(!(type instanceof VarType));
+		if ((type instanceof VarType))
+			throw new CompileError("VarType still alive");
 
 		isMember = true;
 		this.className = className;
@@ -48,7 +51,8 @@ public class VarEntity extends Entity {
 	}
 
 	public void setClassName(String className) {
-		if (this.className != null) throw new Error("repeat define ClassName");
+		if (this.className != null)
+			throw new Error("repeat define ClassName");
 		this.className = className;
 	}
 }
