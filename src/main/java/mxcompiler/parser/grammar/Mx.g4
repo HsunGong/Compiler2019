@@ -142,7 +142,7 @@ primaryExpression
 	: This
 	| literal
 	| Identifier
-	| '(' expression ')' // used for () operator
+	| '(' expression ')' // used for () operator as sub-expr
 	;
 
 literal

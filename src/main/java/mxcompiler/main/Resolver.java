@@ -48,7 +48,7 @@ public class Resolver extends Visitor {
 	 * global fun, add special id with class name
 	 */
 	protected void preResolve(ASTNode root) {
-		ToplevelScope toplevelScope; // FIX:??no need to add to member
+		ToplevelScope toplevelScope;
 		toplevelScope = new ToplevelScope();
 		scopeStack.add(toplevelScope);
 
@@ -59,12 +59,13 @@ public class Resolver extends Visitor {
 			for (DeclNode decl : root.getDecl()) {
 				try {
 					if (decl instanceof VarDeclNode)
-						continue; // FIX: what is this ? can add now!!
+						continue; // FIXED: can not add now!! add and check will be at same time
 					if (decl instanceof FuncDeclNode) {
 						Entity entity = new FuncEntity((FuncDeclNode) decl);
 						toplevelScope.put(decl.getName(), entity);
 					}
 					if (decl instanceof ClassDeclNode) {
+						// only add class.func
 						Entity entity = new ClassEntity((ClassDeclNode) decl, toplevelScope);
 						toplevelScope.put(decl.getName(), entity);
 					}
@@ -91,9 +92,17 @@ public class Resolver extends Visitor {
 	public void visit(ASTNode node) {
 		preResolve(node);
 
-		if (!node.getDecl().isEmpty())
+		if (!node.getDecl().isEmpty()) {
 			for (DeclNode decl : node.getDecl())
-				visit(decl);
+				if (decl instanceof VarDeclNode)
+					visit(decl);
+			for (DeclNode decl : node.getDecl())
+				if (decl instanceof ClassDeclNode)
+					visit(decl);
+			for (DeclNode decl : node.getDecl())
+				if (decl instanceof FuncDeclNode)
+					visit(decl);
+		}
 
 		node.setScope((ToplevelScope) getCurScope());
 
@@ -223,7 +232,7 @@ public class Resolver extends Visitor {
 				invalid = true;
 
 			if (invalid)
-				throw new Error("Invalid variable init value: expected" + node.getType().getType().toString()
+				throw new Error("Invalid variable init value: expected " + node.getType().getType().toString()
 						+ " but got " + node.getInit().getType().toString());
 		}
 	}
@@ -407,7 +416,7 @@ public class Resolver extends Visitor {
 		try {
 			ClassEntity classEntity = (ClassEntity) getCurScope().get(className);
 			try {
-				memEntity = classEntity.getScope().getCur(classEntity.getDomain() + node.getMember()); // NOTE: is
+				memEntity = classEntity.getScope().getCur(classEntity.getDomain() + node.getMember()); // NOTE: is //
 																										// getCur
 			} catch (Exception e) {
 				memEntity = classEntity.getScope().getCur(node.getMember()); // NOTE: is getCur
@@ -420,6 +429,7 @@ public class Resolver extends Visitor {
 		} catch (Exception e) {
 			throw new Error(e);
 		}
+
 		node.setType(memEntity.getType());
 		node.setIsLeftValue(true);
 	}

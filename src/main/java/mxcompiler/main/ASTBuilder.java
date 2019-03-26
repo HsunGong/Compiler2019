@@ -574,7 +574,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		// needed??
 		for (int i = 0; i < num; ++i)
 			newType.setType(new ArrayType(newType.getType()));
-		newType.setType(new ArrayType(newType.getType()));
+		// FIXED: newType.setType(new ArrayType(newType.getType()));
 
 		return new NewExprNode(newType, dims, num, new Location(ctx));
 	}

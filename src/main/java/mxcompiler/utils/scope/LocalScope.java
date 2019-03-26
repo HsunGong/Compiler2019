@@ -21,8 +21,12 @@ public class LocalScope extends Scope {
 	// a little different from entities
 	// rather say variables or declarations
 	/** get entity for current level */
-	public Entity getCur(String k) {
-		return entities.get(k);
+	public Entity getCur(String k) throws SemanticException {
+		Entity v = entities.get(k);
+		if (v == null) { // error
+			throw new SemanticException("not found " + k);
+		}
+		return v;
 	}
 
 	@Override
@@ -40,8 +44,8 @@ public class LocalScope extends Scope {
 		Entity check = entities.get(k); // or getCur
 		// FIX: what if a class New var ? is vatType or ClassType?
 		if (check != null && (check.getType() == v.getType())) {
-            throw new SemanticException("already have "+k);
-        }
+			throw new SemanticException("already have " + k);
+		}
 		entities.put(k, v);
 	}
 }

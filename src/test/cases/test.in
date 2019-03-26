@@ -1,58 +1,72 @@
-class A{
-    int a;
-    A ptr;
-    B alt;
-    B af(){
-        return alt.pf();
+
+class naive
+{
+    interesting[][] HongKong;
+    naive()
+    {
+        HongKong = new interesting[100][];
+        HongKong[1] = null;
+        int i = 0;
+        for(i = 1; i < 99; i ++)
+        {
+            HongKong[i] = new interesting[233];
+        }
+        HongKong[99] = new interesting[1];
+        return;
     }
-    A pf(){
-        return alt.af();
+
+    int Journalist(interesting news)
+    {
+        println(news.learnmore);
+        println("news.learnmore");
     }
+
+}
+
+class interesting
+{
+     string learnmore;
+     int second;
+
+     interesting()
+     {
+        second = 0;
+        learnmore = "+1s";
+        second = learnmore.length() + second;
+     }
 }
 
 int main()
 {
-    A ptr;
-    B alt;
-    //legal
-    // ptr.ptr.(ptr).alt.alt.a = alt.af().pf().af().pf().b;
-    alt.pf();
-    //illegal
-    ptr.(alt.ptr);
-    ptr.alt.(b+1);
-
-    return 1;
+  naive[] Shanghai = new naive[233];
+  interesting[][] Beijing = new interesting[12][34];
+  // ++Beijing[1][1].second = ((Beijing[0][0].second))*(((((((((((((((((((((23333)))))))))))))))))))));
+  // ++++++++--------++++++------++++++++Beijing[2][2].second ;
+  {}
+  {
+  {}
+  {
+    
+  }
+  }
+  return 0;
 }
 
-class B{
-    int b;
-    A alt;
-    B ptr;
-    A af(){
-        return alt.pf();
-    }
-    B pf(){
-        return alt.af();
-    }
-}
+
+
+
+
 
 
 /*!! metadata:
 === comment ===
-林耘丰 516021910226-test invalid member access operation
+class-testcase-515030910592-lijinning.txt
+Test class and construction function. And expression.
+=== assert ===
+success_compile
+=== phase ===
+semantic extended
 === is_public ===
 True
-=== assert ===
-failure_compile
-=== timeout ===
-0
-=== input ===
-
-=== phase ===
-semantic pretest
-=== output ===
-
-=== exitcode ===
-0
 
 !!*/

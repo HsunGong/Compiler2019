@@ -171,8 +171,11 @@ TypeResolve:
 	☐ FIX: funcEntity not have scope, but body have, how to connect them?
 	☐ FIX: What I thought Visitor of visitList might be wrong @critical 
 	☐ FIX: newExpr-node, dim and Expr<dim> is the same size? or dim is really dim, but Expr only store inited expr?
-	☐ FIXED: block body should have order (can not split stmt and decl from build AST)
-
+	✔ FIXED: block body should have order (can not split stmt and decl from build AST) @done(03-26 10)
+	☐ FIXED: allowed class to have their own as member
+		--> inter-reference --> check by redirect ASTNode-decl-order
+	☐ FIX: ptr.ptr.(ptr).alt.alt.a = alt.af().pf().af().pf().b;
+	✔ FIXED: array_init_[] --> arrayType cnt error @done(03-26 11)
 
 	☐ UGLY: change all invalid into valid
 	☐ UGLY: classify Error

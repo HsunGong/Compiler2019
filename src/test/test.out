@@ -1,1028 +1,287 @@
 AST-Dump START
-<ASTNode> (1:0)
+<ASTNode> (2:0)
 declarations are below:
-<VarDeclNode> (1:4)
- name: id
- type:
-	<TypeNode> (1:0)
-	 type: int
- init: null
-<ClassDeclNode> (3:0)
- name: Test
- varDecls: null
+<ClassDeclNode> (2:0)
+ name: naive
+ varDecls:
+	<VarDeclNode> (4:20)
+	 name: HongKong
+	 type:
+		<TypeNode> (4:4)
+		 type: array
+	 init: null
  funcMember:
-	<FuncDeclNode> (4:1)
-	 name: id
-	 isContruct: false
-	 returnType:
-		<TypeNode> (4:1)
-		 type: bool
-	 parameterList:
-		<VarDeclNode> (4:9)
-		 name: id_
-		 type:
-			<TypeNode> (4:9)
-			 type: bool
-		 init: null
-	 body:
-		<BlockStmtNode> (4:19)
-		 stmtsAnddecls: 
-			<VarDeclNode> (5:6)
-			 name: x
-			 type:
-				<TypeNode> (5:2)
-				 type: int
-			 init: null
-			<VarDeclNode> (5:9)
-			 name: y
-			 type:
-				<TypeNode> (5:2)
-				 type: int
-			 init: null
-			<ReturnStmtNode> (9:2)
-			 value:
-				<BinaryOpExprNode> (9:9)
-				 op: EQUAL
-				 lhs:
-					<IdentifierExprNode> (9:9)
-					identifier: id_
-				 rhs:
-					<BoolLiteralNode> (9:16)
-					 value: false
-	<FuncDeclNode> (12:1)
-	 name: Test
+	<FuncDeclNode> (5:4)
+	 name: naive
 	 isContruct: true
 	 returnType:
-		<TypeNode> (12:1)
+		<TypeNode> (5:4)
 		 type: 
 	 parameterList: null
 	 body:
-		<BlockStmtNode> (12:8)
+		<BlockStmtNode> (6:4)
 		 stmtsAnddecls: 
-	<FuncDeclNode> (14:1)
-	 name: test
+			<ExprStmtNode> (7:8)
+			 expr:
+				<AssignExprNode> (7:8)
+				 lhs:
+					<IdentifierExprNode> (7:8)
+					identifier: HongKong
+				 rhs:
+					<NewExprNode> (7:23)
+					 numDim: 2
+					 newType:
+						<TypeNode> (7:23)
+						 type: array
+					dims:
+						<IntLiteralNode> (7:35)
+						 value: 100
+			<ExprStmtNode> (8:8)
+			 expr:
+				<AssignExprNode> (8:8)
+				 lhs:
+					<ArrayrefExprNode> (8:8):
+					 arr:
+						<IdentifierExprNode> (8:8)
+						identifier: HongKong
+					 index:
+						<IntLiteralNode> (8:17)
+						 value: 1
+				 rhs:
+					<NullExprNode> (8:22)
+			<VarDeclNode> (9:12)
+			 name: i
+			 type:
+				<TypeNode> (9:8)
+				 type: int
+			 init:
+				<IntLiteralNode> (9:16)
+				 value: 0
+			<ForStmtNode> (10:8)
+			 varDecl: null
+			 init:
+				<AssignExprNode> (10:12)
+				 lhs:
+					<IdentifierExprNode> (10:12)
+					identifier: i
+				 rhs:
+					<IntLiteralNode> (10:16)
+					 value: 1
+			 cond:
+				<BinaryOpExprNode> (10:19)
+				 op: LESS
+				 lhs:
+					<IdentifierExprNode> (10:19)
+					identifier: i
+				 rhs:
+					<IntLiteralNode> (10:23)
+					 value: 99
+			 incr:
+				<SuffixExprNode> (10:27)
+				 op: SUF_INC
+				 expr:
+					<IdentifierExprNode> (10:27)
+					identifier: i
+			 body:
+				<BlockStmtNode> (11:8)
+				 stmtsAnddecls: 
+					<ExprStmtNode> (12:12)
+					 expr:
+						<AssignExprNode> (12:12)
+						 lhs:
+							<ArrayrefExprNode> (12:12):
+							 arr:
+								<IdentifierExprNode> (12:12)
+								identifier: HongKong
+							 index:
+								<IdentifierExprNode> (12:21)
+								identifier: i
+						 rhs:
+							<NewExprNode> (12:30)
+							 numDim: 1
+							 newType:
+								<TypeNode> (12:30)
+								 type: array
+							dims:
+								<IntLiteralNode> (12:42)
+								 value: 233
+			<ExprStmtNode> (14:8)
+			 expr:
+				<AssignExprNode> (14:8)
+				 lhs:
+					<ArrayrefExprNode> (14:8):
+					 arr:
+						<IdentifierExprNode> (14:8)
+						identifier: HongKong
+					 index:
+						<IntLiteralNode> (14:17)
+						 value: 99
+				 rhs:
+					<NewExprNode> (14:27)
+					 numDim: 1
+					 newType:
+						<TypeNode> (14:27)
+						 type: array
+					dims:
+						<IntLiteralNode> (14:39)
+						 value: 1
+			<ReturnStmtNode> (15:8)
+			 value: null
+	<FuncDeclNode> (18:4)
+	 name: Journalist
 	 isContruct: false
 	 returnType:
-		<TypeNode> (14:1)
-		 type: void
+		<TypeNode> (18:4)
+		 type: int
 	 parameterList:
-		<VarDeclNode> (14:11)
-		 name: id
+		<VarDeclNode> (18:19)
+		 name: news
 		 type:
-			<TypeNode> (14:11)
-			 type: string
+			<TypeNode> (18:19)
+			 type: class interesting
 		 init: null
 	 body:
-		<BlockStmtNode> (14:22)
+		<BlockStmtNode> (19:4)
 		 stmtsAnddecls: 
-			<ExprStmtNode> (15:2)
+			<ExprStmtNode> (20:8)
 			 expr:
-				<AssignExprNode> (15:2)
-				 lhs:
-					<IdentifierExprNode> (15:2)
-					identifier: id
-				 rhs:
-					<StringLiteralNode> (15:7)
-					 value: i am string
-			<IfStmtNode> (16:2)
-			 cond:
-				<FuncallExprNode> (16:6)
+				<FuncallExprNode> (20:8)
 				 expr:
-					<MemberExprNode> (16:6)
-					 member: id
-					 expr:
-						<ThisExprNode> (16:6)
+					<IdentifierExprNode> (20:8)
+					identifier: println
 				 args:
-					<BinaryOpExprNode> (16:14)
-					 op: LOGIC_OR
-					 lhs:
-						<BinaryOpExprNode> (16:15)
-						 op: INEQUAL
-						 lhs:
-							<ThisExprNode> (16:15)
-						 rhs:
-							<NullExprNode> (16:23)
-					 rhs:
-						<BinaryOpExprNode> (16:33)
-						 op: EQUAL
-						 lhs:
-							<NullExprNode> (16:33)
-						 rhs:
-							<ThisExprNode> (16:41)
-			 then:
-				<BlockStmtNode> (16:49)
-				 stmtsAnddecls: 
-					<VarDeclNode> (17:8)
-					 name: id
-					 type:
-						<TypeNode> (17:3)
-						 type: bool
-					 init:
-						<FuncallExprNode> (17:13)
-						 expr:
-							<MemberExprNode> (17:13)
-							 member: id
-							 expr:
-								<ThisExprNode> (17:13)
-						 args:
-							<BoolLiteralNode> (17:21)
-							 value: true
-					<BlockStmtNode> (18:3)
-					 stmtsAnddecls: 
-						<VarDeclNode> (19:8)
-						 name: id
-						 type:
-							<TypeNode> (19:4)
-							 type: int
-						 init: null
-						<ForStmtNode> (20:4)
-						 varDecl: null
-						 init:
-							<AssignExprNode> (20:9)
-							 lhs:
-								<IdentifierExprNode> (20:9)
-								identifier: id
-							 rhs:
-								<IntLiteralNode> (20:14)
-								 value: 0
-						 cond:
-							<FuncallExprNode> (20:17)
-							 expr:
-								<MemberExprNode> (20:17)
-								 member: id
-								 expr:
-									<ThisExprNode> (20:17)
-							 args:
-								<BinaryOpExprNode> (20:25)
-								 op: GREATER
-								 lhs:
-									<IdentifierExprNode> (20:25)
-									identifier: id
-								 rhs:
-									<IntLiteralNode> (20:30)
-									 value: 0
-						 incr:
-							<SuffixExprNode> (20:34)
-							 op: SUF_INC
-							 expr:
-								<IdentifierExprNode> (20:34)
-								identifier: id
-						 body:
-							<BlockStmtNode> (20:40)
-							 stmtsAnddecls: 
-								<IfStmtNode> (21:5)
-								 cond:
-									<FuncallExprNode> (21:9)
-									 expr:
-										<MemberExprNode> (21:9)
-										 member: id
-										 expr:
-											<ThisExprNode> (21:9)
-									 args:
-										<BinaryOpExprNode> (21:17)
-										 op: LESS_EQUAL
-										 lhs:
-											<BinaryOpExprNode> (21:18)
-											 op: BIT_OR
-											 lhs:
-												<IdentifierExprNode> (21:18)
-												identifier: id
-											 rhs:
-												<IdentifierExprNode> (21:23)
-												identifier: id
-										 rhs:
-											<IntLiteralNode> (21:30)
-											 value: 0
-								 then:
-									<BlockStmtNode> (21:34)
-									 stmtsAnddecls: 
-										<BreakStmtNode> (22:6)
-								 else: null
-					<ExprStmtNode> (26:3)
+					<MemberExprNode> (20:16)
+					 member: learnmore
 					 expr:
-						<AssignExprNode> (26:3)
-						 lhs:
-							<IdentifierExprNode> (26:3)
-							identifier: id
-						 rhs:
-							<BoolLiteralNode> (26:8)
-							 value: false
-			 else: null
-			<IfStmtNode> (28:2)
-			 cond:
-				<BinaryOpExprNode> (28:6)
-				 op: EQUAL
-				 lhs:
-					<IdentifierExprNode> (28:6)
-					identifier: id
-				 rhs:
-					<StringLiteralNode> (28:12)
-					 value: i am string
-			 then:
-				<BlockStmtNode> (28:27)
-				 stmtsAnddecls: 
-					<IfStmtNode> (29:3)
-					 cond:
-						<FuncallExprNode> (29:7)
-						 expr:
-							<MemberExprNode> (29:7)
-							 member: id
-							 expr:
-								<ThisExprNode> (29:7)
-						 args:
-							<BinaryOpExprNode> (29:15)
-							 op: GREATER
-							 lhs:
-								<IdentifierExprNode> (29:15)
-								identifier: id
-							 rhs:
-								<StringLiteralNode> (29:20)
-								 value: hello
-					 then:
-						<BlockStmtNode> (29:30)
-						 stmtsAnddecls: 
-							<ReturnStmtNode> (30:4)
-							 value: null
-					 else: null
-					<VarDeclNode> (32:8)
-					 name: id
-					 type:
-						<TypeNode> (32:3)
-						 type: class Test
-					 init:
-						<NewExprNode> (32:17)
-						 numDim: 0
-						 newType:
-							<TypeNode> (32:17)
-							 type: class Test
-						dims: null
-					<IfStmtNode> (33:3)
-					 cond:
-						<FuncallExprNode> (33:7)
-						 expr:
-							<MemberExprNode> (33:7)
-							 member: id
-							 expr:
-								<IdentifierExprNode> (33:7)
-								identifier: id
-						 args:
-							<FuncallExprNode> (33:13)
-							 expr:
-								<MemberExprNode> (33:13)
-								 member: id
-								 expr:
-									<IdentifierExprNode> (33:13)
-									identifier: id
-							 args:
-								<FuncallExprNode> (33:19)
-								 expr:
-									<MemberExprNode> (33:19)
-									 member: id
-									 expr:
-										<IdentifierExprNode> (33:19)
-										identifier: id
-								 args:
-									<BoolLiteralNode> (33:25)
-									 value: false
-					 then:
-						<BlockStmtNode> (33:35)
-						 stmtsAnddecls: 
-							<VarDeclNode> (34:8)
-							 name: id
-							 type:
-								<TypeNode> (34:4)
-								 type: int
-							 init:
-								<IntLiteralNode> (34:13)
-								 value: 233
-							<BlockStmtNode> (35:4)
-							 stmtsAnddecls: 
-								<VarDeclNode> (36:10)
-								 name: test
-								 type:
-									<TypeNode> (36:5)
-									 type: class Test
-								 init:
-									<NewExprNode> (36:21)
-									 numDim: 0
-									 newType:
-										<TypeNode> (36:21)
-										 type: class Test
-									dims: null
-								<IfStmtNode> (37:5)
-								 cond:
-									<FuncallExprNode> (37:9)
-									 expr:
-										<MemberExprNode> (37:9)
-										 member: id
-										 expr:
-											<IdentifierExprNode> (37:9)
-											identifier: test
-									 args:
-										<BinaryOpExprNode> (37:17)
-										 op: GREATER
-										 lhs:
-											<IdentifierExprNode> (37:17)
-											identifier: id
-										 rhs:
-											<IntLiteralNode> (37:22)
-											 value: 0
-								 then:
-									<BlockStmtNode> (37:26)
-									 stmtsAnddecls: 
-										<ExprStmtNode> (38:6)
-										 expr:
-											<SuffixExprNode> (38:6)
-											 op: SUF_DEC
-											 expr:
-												<IdentifierExprNode> (38:6)
-												identifier: id
-								 else: null
-								<ExprStmtNode> (40:5)
-								 expr:
-									<SuffixExprNode> (40:5)
-									 op: PRE_DEC
-									 expr:
-										<IdentifierExprNode> (40:7)
-										identifier: id
-							<ReturnStmtNode> (42:4)
-							 value: null
-					 else: null
-					<ExprStmtNode> (44:3)
-					 expr:
-						<AssignExprNode> (44:3)
-						 lhs:
-							<IdentifierExprNode> (44:3)
-							identifier: id
-						 rhs:
-							<NewExprNode> (44:12)
-							 numDim: 0
-							 newType:
-								<TypeNode> (44:12)
-								 type: class Test
-							dims: null
-			 else: null
-			<ExprStmtNode> (46:2)
+						<IdentifierExprNode> (20:16)
+						identifier: news
+			<ExprStmtNode> (21:8)
 			 expr:
-				<AssignExprNode> (46:2)
-				 lhs:
-					<IdentifierExprNode> (46:2)
-					identifier: id
-				 rhs:
-					<StringLiteralNode> (46:7)
-					 value: string
-<FuncDeclNode> (50:0)
- name: func
- isContruct: false
- returnType:
-	<TypeNode> (50:0)
-	 type: array
- parameterList:
-	<VarDeclNode> (50:12)
-	 name: t
+				<FuncallExprNode> (21:8)
+				 expr:
+					<IdentifierExprNode> (21:8)
+					identifier: println
+				 args:
+					<StringLiteralNode> (21:16)
+					 value: news.learnmore
+<ClassDeclNode> (26:0)
+ name: interesting
+ varDecls:
+	<VarDeclNode> (28:12)
+	 name: learnmore
 	 type:
-		<TypeNode> (50:12)
-		 type: array
+		<TypeNode> (28:5)
+		 type: string
 	 init: null
- body:
-	<BlockStmtNode> (50:24)
-	 stmtsAnddecls: 
-		<ReturnStmtNode> (51:1)
-		 value:
-			<ArrayrefExprNode> (51:8):
-			 arr:
-				<IdentifierExprNode> (51:8)
-				identifier: t
-			 index:
-				<IntLiteralNode> (51:10)
-				 value: 0
-<FuncDeclNode> (54:0)
+	<VarDeclNode> (29:9)
+	 name: second
+	 type:
+		<TypeNode> (29:5)
+		 type: int
+	 init: null
+ funcMember:
+	<FuncDeclNode> (31:5)
+	 name: interesting
+	 isContruct: true
+	 returnType:
+		<TypeNode> (31:5)
+		 type: 
+	 parameterList: null
+	 body:
+		<BlockStmtNode> (32:5)
+		 stmtsAnddecls: 
+			<ExprStmtNode> (33:8)
+			 expr:
+				<AssignExprNode> (33:8)
+				 lhs:
+					<IdentifierExprNode> (33:8)
+					identifier: second
+				 rhs:
+					<IntLiteralNode> (33:17)
+					 value: 0
+			<ExprStmtNode> (34:8)
+			 expr:
+				<AssignExprNode> (34:8)
+				 lhs:
+					<IdentifierExprNode> (34:8)
+					identifier: learnmore
+				 rhs:
+					<StringLiteralNode> (34:20)
+					 value: +1s
+			<ExprStmtNode> (35:8)
+			 expr:
+				<AssignExprNode> (35:8)
+				 lhs:
+					<IdentifierExprNode> (35:8)
+					identifier: second
+				 rhs:
+					<BinaryOpExprNode> (35:17)
+					 op: ADD
+					 lhs:
+						<FuncallExprNode> (35:17)
+						 expr:
+							<MemberExprNode> (35:17)
+							 member: length
+							 expr:
+								<IdentifierExprNode> (35:17)
+								identifier: learnmore
+						 args: null
+					 rhs:
+						<IdentifierExprNode> (35:38)
+						identifier: second
+<FuncDeclNode> (39:0)
  name: main
  isContruct: false
  returnType:
-	<TypeNode> (54:0)
+	<TypeNode> (39:0)
 	 type: int
  parameterList: null
  body:
-	<BlockStmtNode> (54:11)
+	<BlockStmtNode> (40:0)
 	 stmtsAnddecls: 
-		<VarDeclNode> (55:6)
-		 name: test
+		<VarDeclNode> (41:10)
+		 name: Shanghai
 		 type:
-			<TypeNode> (55:1)
-			 type: class Test
+			<TypeNode> (41:2)
+			 type: array
 		 init:
-			<NewExprNode> (55:17)
-			 numDim: 0
+			<NewExprNode> (41:25)
+			 numDim: 1
 			 newType:
-				<TypeNode> (55:17)
-				 type: class Test
-			dims: null
-		<ExprStmtNode> (56:1)
-		 expr:
-			<FuncallExprNode> (56:1)
-			 expr:
-				<MemberExprNode> (56:1)
-				 member: test
-				 expr:
-					<IdentifierExprNode> (56:1)
-					identifier: test
-			 args:
-				<StringLiteralNode> (56:11)
-				 value: hello world
-		<IfStmtNode> (57:1)
-		 cond:
-			<FuncallExprNode> (57:5)
-			 expr:
-				<MemberExprNode> (57:5)
-				 member: id
-				 expr:
-					<IdentifierExprNode> (57:5)
-					identifier: test
-			 args:
-				<BinaryOpExprNode> (57:13)
-				 op: GREATER
-				 lhs:
-					<IdentifierExprNode> (57:13)
-					identifier: id
-				 rhs:
-					<IntLiteralNode> (57:18)
-					 value: 0
-		 then:
-			<BlockStmtNode> (57:22)
+				<TypeNode> (41:25)
+				 type: array
+			dims:
+				<IntLiteralNode> (41:31)
+				 value: 233
+		<VarDeclNode> (42:18)
+		 name: Beijing
+		 type:
+			<TypeNode> (42:2)
+			 type: array
+		 init:
+			<NewExprNode> (42:32)
+			 numDim: 2
+			 newType:
+				<TypeNode> (42:32)
+				 type: array
+			dims:
+				<IntLiteralNode> (42:44)
+				 value: 12
+				<IntLiteralNode> (42:48)
+				 value: 34
+		<BlockStmtNode> (45:2)
+		 stmtsAnddecls: 
+		<BlockStmtNode> (46:2)
+		 stmtsAnddecls: 
+			<BlockStmtNode> (47:2)
 			 stmtsAnddecls: 
-				<VarDeclNode> (58:11)
-				 name: test
-				 type:
-					<TypeNode> (58:2)
-					 type: array
-				 init:
-					<NewExprNode> (58:22)
-					 numDim: 2
-					 newType:
-						<TypeNode> (58:22)
-						 type: array
-					dims:
-						<IntLiteralNode> (58:27)
-						 value: 10
-						<IntLiteralNode> (58:31)
-						 value: 10
-				<IfStmtNode> (59:2)
-				 cond:
-					<BinaryOpExprNode> (59:6)
-					 op: LOGIC_AND
-					 lhs:
-						<BinaryOpExprNode> (59:6)
-						 op: INEQUAL
-						 lhs:
-							<FuncallExprNode> (59:6)
-							 expr:
-								<IdentifierExprNode> (59:6)
-								identifier: func
-							 args:
-								<IdentifierExprNode> (59:11)
-								identifier: test
-						 rhs:
-							<NullExprNode> (59:20)
-					 rhs:
-						<BinaryOpExprNode> (59:28)
-						 op: INEQUAL
-						 lhs:
-							<ArrayrefExprNode> (59:28):
-							 arr:
-								<FuncallExprNode> (59:28)
-								 expr:
-									<IdentifierExprNode> (59:28)
-									identifier: func
-								 args:
-									<IdentifierExprNode> (59:33)
-									identifier: test
-							 index:
-								<IntLiteralNode> (59:39)
-								 value: 1
-						 rhs:
-							<NullExprNode> (59:45)
-				 then:
-					<BlockStmtNode> (59:51)
-					 stmtsAnddecls: 
-						<ExprStmtNode> (60:3)
-						 expr:
-							<AssignExprNode> (60:3)
-							 lhs:
-								<ArrayrefExprNode> (60:3):
-								 arr:
-									<ArrayrefExprNode> (60:3):
-									 arr:
-										<IdentifierExprNode> (60:3)
-										identifier: test
-									 index:
-										<IntLiteralNode> (60:8)
-										 value: 1
-								 index:
-									<IntLiteralNode> (60:11)
-									 value: 1
-							 rhs:
-								<ArrayrefExprNode> (60:16):
-								 arr:
-									<FuncallExprNode> (60:16)
-									 expr:
-										<IdentifierExprNode> (60:16)
-										identifier: func
-									 args:
-										<IdentifierExprNode> (60:21)
-										identifier: test
-								 index:
-									<IntLiteralNode> (60:27)
-									 value: 0
-				 else: null
-				<ReturnStmtNode> (62:2)
-				 value:
-					<SuffixExprNode> (62:9)
-					 op: PRE_DEC
-					 expr:
-						<IdentifierExprNode> (62:11)
-						identifier: id
-		 else: null
-		<ReturnStmtNode> (64:1)
+			<BlockStmtNode> (48:2)
+			 stmtsAnddecls: 
+		<ReturnStmtNode> (52:2)
 		 value:
-			<IntLiteralNode> (64:8)
+			<IntLiteralNode> (52:9)
 			 value: 0
-<VarDeclNode> (67:2)
- name: a
- type:
-	<TypeNode> (67:0)
-	 type: class A
- init:
-	<NewExprNode> (67:10)
-	 numDim: 0
-	 newType:
-		<TypeNode> (67:10)
-		 type: class A
-	dims: null
-<VarDeclNode> (68:2)
- name: b
- type:
-	<TypeNode> (68:0)
-	 type: class B
- init:
-	<FuncallExprNode> (68:6)
-	 expr:
-		<MemberExprNode> (68:6)
-		 member: method
-		 expr:
-			<IdentifierExprNode> (68:6)
-			identifier: a
-	 args: null
-<VarDeclNode> (69:2)
- name: aa
- type:
-	<TypeNode> (69:0)
-	 type: class A
- init:
-	<FuncallExprNode> (69:7)
-	 expr:
-		<MemberExprNode> (69:7)
-		 member: method
-		 expr:
-			<FuncallExprNode> (69:7)
-			 expr:
-				<MemberExprNode> (69:7)
-				 member: method
-				 expr:
-					<FuncallExprNode> (69:7)
-					 expr:
-						<MemberExprNode> (69:7)
-						 member: method
-						 expr:
-							<IdentifierExprNode> (69:7)
-							identifier: b
-					 args: null
-			 args: null
-	 args: null
-<ClassDeclNode> (71:0)
- name: A
- varDecls:
-	<VarDeclNode> (72:3)
-	 name: b
-	 type:
-		<TypeNode> (72:1)
-		 type: class B
-	 init: null
- funcMember:
-	<FuncDeclNode> (73:1)
-	 name: method
-	 isContruct: false
-	 returnType:
-		<TypeNode> (73:1)
-		 type: class B
-	 parameterList: null
-	 body:
-		<BlockStmtNode> (73:12)
-		 stmtsAnddecls: 
-<ClassDeclNode> (76:0)
- name: B
- varDecls:
-	<VarDeclNode> (77:3)
-	 name: a
-	 type:
-		<TypeNode> (77:1)
-		 type: class A
-	 init: null
- funcMember:
-	<FuncDeclNode> (78:1)
-	 name: method
-	 isContruct: false
-	 returnType:
-		<TypeNode> (78:1)
-		 type: class A
-	 parameterList: null
-	 body:
-		<BlockStmtNode> (78:12)
-		 stmtsAnddecls: 
 AST-Dump END
-
-
-
-Scope-Dump START
-Scope: isTop: true
-<Func Entity>:  name: print, Type: function print
- returnType: void, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	<Var Entity>:  name: str, Type: string
-	 isMember: false, ClassName: null
-	 isGlobal: false
-<Func Entity>:  name: println, Type: function println
- returnType: void, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	<Var Entity>:  name: str, Type: string
-	 isMember: false, ClassName: null
-	 isGlobal: false
-<Func Entity>:  name: getString, Type: function getString
- returnType: string, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	null
-<Func Entity>:  name: getInt, Type: function getInt
- returnType: int, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	null
-<Func Entity>:  name: toString, Type: function toString
- returnType: string, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	<Var Entity>:  name: i, Type: int
-	 isMember: false, ClassName: null
-	 isGlobal: false
-<Class Entity>:  name: _array, Type: class _array
-	Scope: isTop: false
-	<Func Entity>:  name: size, Type: function size
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: array
-		 isMember: false, ClassName: null
-		 isGlobal: false
-<Class Entity>:  name: _string, Type: class _string
-	Scope: isTop: false
-	<Func Entity>:  name: length, Type: function length
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: substring, Type: function substring
-	 returnType: string, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: left, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: right, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: parseInt, Type: function parseInt
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: ord, Type: function ord
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: pos, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-<Class Entity>:  name: Test, Type: class Test
-	Scope: isTop: false
-	<Func Entity>:  name: id, Type: function id
-	 returnType: bool, isBuiltIn: false
-	 isMember: true, ClassName: Test
-	 params:
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id_, Type: bool
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: Test, Type: function Test
-	 returnType: , isBuiltIn: false
-	 isMember: true, ClassName: Test
-	 params:
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: test, Type: function test
-	 returnType: void, isBuiltIn: false
-	 isMember: true, ClassName: Test
-	 params:
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id_, Type: bool
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: x, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: y, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-			>>>> child			Scope: isTop: false
-			<Var Entity>:  name: id, Type: bool
-			 isMember: false, ClassName: null
-			 isGlobal: false
-				>>>> child				Scope: isTop: false
-				<Var Entity>:  name: id, Type: int
-				 isMember: false, ClassName: null
-				 isGlobal: false
-					>>>> child					Scope: isTop: false
-						>>>> child						Scope: isTop: false
-			>>>> child			Scope: isTop: false
-			<Var Entity>:  name: id, Type: class Test
-			 isMember: false, ClassName: null
-			 isGlobal: false
-				>>>> child				Scope: isTop: false
-				>>>> child				Scope: isTop: false
-				<Var Entity>:  name: id, Type: int
-				 isMember: false, ClassName: null
-				 isGlobal: false
-					>>>> child					Scope: isTop: false
-					<Var Entity>:  name: test, Type: class Test
-					 isMember: false, ClassName: null
-					 isGlobal: false
-						>>>> child						Scope: isTop: false
-<Func Entity>:  name: func, Type: function func
- returnType: array, isBuiltIn: false
- isMember: false, ClassName: 
- params:
-	<Var Entity>:  name: t, Type: array
-	 isMember: false, ClassName: null
-	 isGlobal: false
-<Func Entity>:  name: main, Type: function main
- returnType: int, isBuiltIn: false
- isMember: false, ClassName: 
- params:
-	null
-<Class Entity>:  name: A, Type: class A
-	Scope: isTop: false
-	<Func Entity>:  name: method, Type: function method
-	 returnType: class B, isBuiltIn: false
-	 isMember: true, ClassName: A
-	 params:
-		<Var Entity>:  name: __this, Type: class A
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Var Entity>:  name: b, Type: class B
-	 isMember: true, ClassName: A
-	 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class A
-		 isMember: false, ClassName: null
-		 isGlobal: false
-<Class Entity>:  name: B, Type: class B
-	Scope: isTop: false
-	<Func Entity>:  name: method, Type: function method
-	 returnType: class A, isBuiltIn: false
-	 isMember: true, ClassName: B
-	 params:
-		<Var Entity>:  name: __this, Type: class B
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Var Entity>:  name: a, Type: class A
-	 isMember: true, ClassName: B
-	 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class B
-		 isMember: false, ClassName: null
-		 isGlobal: false
-<Var Entity>:  name: id, Type: int
- isMember: false, ClassName: null
- isGlobal: true
-<Var Entity>:  name: a, Type: class A
- isMember: false, ClassName: null
- isGlobal: true
-<Var Entity>:  name: b, Type: class B
- isMember: false, ClassName: null
- isGlobal: true
-<Var Entity>:  name: aa, Type: class A
- isMember: false, ClassName: null
- isGlobal: true
-	>>>> child	Scope: isTop: false
-	<Func Entity>:  name: length, Type: function length
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: substring, Type: function substring
-	 returnType: string, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: left, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: right, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: parseInt, Type: function parseInt
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: ord, Type: function ord
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: pos, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Func Entity>:  name: size, Type: function size
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: 
-	 params:
-		<Var Entity>:  name: __this, Type: array
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Func Entity>:  name: id, Type: function id
-	 returnType: bool, isBuiltIn: false
-	 isMember: true, ClassName: Test
-	 params:
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id_, Type: bool
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: Test, Type: function Test
-	 returnType: , isBuiltIn: false
-	 isMember: true, ClassName: Test
-	 params:
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: test, Type: function test
-	 returnType: void, isBuiltIn: false
-	 isMember: true, ClassName: Test
-	 params:
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id_, Type: bool
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: x, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: y, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Test
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: id, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-			>>>> child			Scope: isTop: false
-			<Var Entity>:  name: id, Type: bool
-			 isMember: false, ClassName: null
-			 isGlobal: false
-				>>>> child				Scope: isTop: false
-				<Var Entity>:  name: id, Type: int
-				 isMember: false, ClassName: null
-				 isGlobal: false
-					>>>> child					Scope: isTop: false
-						>>>> child						Scope: isTop: false
-			>>>> child			Scope: isTop: false
-			<Var Entity>:  name: id, Type: class Test
-			 isMember: false, ClassName: null
-			 isGlobal: false
-				>>>> child				Scope: isTop: false
-				>>>> child				Scope: isTop: false
-				<Var Entity>:  name: id, Type: int
-				 isMember: false, ClassName: null
-				 isGlobal: false
-					>>>> child					Scope: isTop: false
-					<Var Entity>:  name: test, Type: class Test
-					 isMember: false, ClassName: null
-					 isGlobal: false
-						>>>> child						Scope: isTop: false
-	>>>> child	Scope: isTop: false
-	<Func Entity>:  name: method, Type: function method
-	 returnType: class B, isBuiltIn: false
-	 isMember: true, ClassName: A
-	 params:
-		<Var Entity>:  name: __this, Type: class A
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Var Entity>:  name: b, Type: class B
-	 isMember: true, ClassName: A
-	 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class A
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Func Entity>:  name: method, Type: function method
-	 returnType: class A, isBuiltIn: false
-	 isMember: true, ClassName: B
-	 params:
-		<Var Entity>:  name: __this, Type: class B
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Var Entity>:  name: a, Type: class A
-	 isMember: true, ClassName: B
-	 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class B
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Var Entity>:  name: t, Type: array
-	 isMember: false, ClassName: null
-	 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Var Entity>:  name: test, Type: class Test
-	 isMember: false, ClassName: null
-	 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: test, Type: array
-		 isMember: false, ClassName: null
-		 isGlobal: false
-			>>>> child			Scope: isTop: false
-Scope-Dump END
 
 
 
