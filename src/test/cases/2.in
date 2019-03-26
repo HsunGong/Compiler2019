@@ -1,9 +1,9 @@
-int __print() {
+int s_print() {
 
 }
 int main() {
 int a = (new int[123])[31];
-__print();
+s_print();
 }
 
 

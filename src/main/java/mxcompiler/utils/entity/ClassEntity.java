@@ -14,28 +14,19 @@ public class ClassEntity extends Entity {
 
 	public ClassEntity(String name, Type type, Scope parentScope) {
 		super(name, type);
-		// FIX: to specifiy is class scope or not
+		assert (type instanceof ClassType);
+
 		this.scope = new LocalScope(parentScope);
-	}
-	public String getDomain() {
-		return this.name + Scope.BuiltIn.DOMAIN.toString();
 	}
 
 	public ClassEntity(ClassDeclNode node, Scope parentScope) {
 		super(node.getName(), new ClassType(node.getName()));
 
 		this.scope = new LocalScope(parentScope);
+	}
 
-		for (FuncDeclNode func : node.getFunc()) {
-			try {
-				scope.put(
-					getDomain()+func.getName(), 
-					new FuncEntity(func, node.getName())
-				);
-			} catch (SemanticException e) {
-				throw new Error("Symbol name" + func.getName() + "is already defined");
-			}
-		}
+	public String getDomain() {
+		return this.name + Scope.BuiltIn.DOMAIN.toString();
 	}
 
 	public LocalScope getScope() {

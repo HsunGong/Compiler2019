@@ -46,7 +46,7 @@ public class FuncEntity extends Entity {
 		// isConstruct = node.isConstruct();
 	}
 
-	FuncEntity(FuncDeclNode node, String className) {
+	public FuncEntity(FuncDeclNode node, String className) {
 		super(node.getName(), new FuncType(node.getName()));
 
 		// FIX: need to add here? may influence resolver-funcall-paramcheck
@@ -61,6 +61,7 @@ public class FuncEntity extends Entity {
 			throw new Error("set function error");
 		else
 			returnType = node.getReturnType().getType();
+			
 		// isConstruct = node.isConstruct();
 		isMember = true;
 		this.className = className;

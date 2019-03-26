@@ -17,7 +17,7 @@ public class FuncDeclNode extends DeclNode {
 	public void _dump(ASTDump d) {
 		d.printf("<FuncDeclNode> %s\n", location.toString());
 		d.printf(" name: %s\n", getName());
-		d.printf(" isContruct: %b\n", isConstruct());
+		d.printf(" hasReturn: %b\n", hasReturn());
 	}
 
 	// private boolean isConstruct;
@@ -58,8 +58,8 @@ public class FuncDeclNode extends DeclNode {
 		this.body = body;
 	}
 
-	public boolean isConstruct() {
-		return returnType.getType().getInnerType() == Type.InnerType.NULL;
+	public boolean hasReturn() {
+		return returnType.getType().getInnerType() != Type.InnerType.NULL;
 	}
 
 	public TypeNode getReturnType() {

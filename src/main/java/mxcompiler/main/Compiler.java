@@ -31,7 +31,8 @@ public final class Compiler {
 		try {
 			out = new PrintStream(new FileOutputStream("/home/xun/Documents/mxc/src/test/test.out", false));
 		} catch (Exception e) {
-			throw new Error(e);
+			// throw new Error(e);
+			// out = System.out;
 		}
 	}
 
@@ -58,7 +59,7 @@ public final class Compiler {
 	}
 
 	private void semanticAnalyze(CompilerMode mode) throws Exception {
-		System.out.println("Resolver begin");
+		// System.out.println("Resolver begin");
 		// GlobalScopePreScanner ClassVarMemberScanner
 		Resolver resolver = new Resolver();
 		resolver.visit(root);
@@ -75,7 +76,7 @@ public final class Compiler {
 	}
 
 	private void buildAST(CompilerMode mode) throws Exception {
-		System.out.println("AST Build begin");
+		// System.out.println("AST Build begin");
 		
 		// System.out.println(src.toString());
 		MxLexer lexer = new MxLexer(CharStreams.fromStream(in));

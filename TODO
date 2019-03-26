@@ -176,8 +176,12 @@ TypeResolve:
 		--> inter-reference --> check by redirect ASTNode-decl-order
 	☐ FIX: ptr.ptr.(ptr).alt.alt.a = alt.af().pf().af().pf().b;
 	✔ FIXED: array_init_[] --> arrayType cnt error @done(03-26 11)
+	✔ FIXED: allow resolve and checker to splite : AST, fun-para, class, block , for-decl @done(03-26 17)
+	☐ FIX: allowed class{class{{}}}
 
 	☐ UGLY: change all invalid into valid
 	☐ UGLY: classify Error
 	☐ UGLY: change Error into each node, no need to specify Error with invalid
 	☐ UGLY: change all isEqual to equals
+
+	✔ UGLY: NOTE: == or != means the memory-Location ->  (!node.getName().equals(curClass.getName())) @done(03-26 17)
