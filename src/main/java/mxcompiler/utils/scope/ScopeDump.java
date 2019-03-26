@@ -15,24 +15,30 @@ import mxcompiler.ast.expression.unary.*;
 
 public class ScopeDump implements Dump {
 	private PrintStream os;
-	private int tab; // tabSize
+	// private int tab; // tabSize
 	private String t = "\t";
+	private StringBuilder tab;
+
 
 	public ScopeDump(PrintStream x) {
 		os = x;
-		tab = 0;
+		// tab = 0;
+		tab = new StringBuilder();
 	}
 
 	public void addTab() {
-		++tab;
+		// ++tab;
+		tab.append(t);
 	}
 
 	public void delTab() {
-		--tab;
+		// --tab;
+		tab.delete(tab.length() - t.length(), tab.length());
 	}
 
 	public String getTab() {
-		return t.repeat(tab);
+		// return t.repeat(tab);
+		return tab.toString();
 	}
 
 	public void println(String x) {

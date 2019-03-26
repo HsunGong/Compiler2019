@@ -12,24 +12,29 @@ import mxcompiler.ast.expression.unary.*;
 
 public class ASTDump extends Visitor {
 	private PrintStream os;
-	private int tab; // tabSize
+	// private int tab; // tabSize
 	private final String t = "\t";
+	private StringBuilder tab;
 
 	public ASTDump(PrintStream x) {
 		os = x;
-		tab = 0;
+		// tab = 0;
+		tab = new StringBuilder();
 	}
 
 	private void addTab() {
-		++tab;
+		// ++tab;
+		tab.append(t);
 	}
 
 	private void delTab() {
-		--tab;
+		// --tab;
+		tab.delete(tab.length() - t.length(), tab.length());
 	}
 
 	private String getTab() {
-		return t.repeat(tab);
+		// return t.repeat(tab);
+		return tab.toString();
 	}
 
 	public void println(String x) {
@@ -56,13 +61,15 @@ public class ASTDump extends Visitor {
 		print("declarations are below:");
 		if (!node.getDecl().isEmpty()) {
 			print("\n");
-			delTab(); // too high
+			// delTab(); // too high
 			for (DeclNode decl : node.getDecl())
 				visit(decl);
-		} else
+		} else{
+			// delTab(); // too high
 			println(" null");
+		}
 
-		addTab();
+		// addTab();
 		println("AST-Dump END");
 		println("\n\n");
 	}
@@ -74,6 +81,7 @@ public class ASTDump extends Visitor {
 		delTab();
 	}
 
+	// UGLY: can not use repeat
 	@Override
 	public void visit(ClassDeclNode node) {
 		addTab();

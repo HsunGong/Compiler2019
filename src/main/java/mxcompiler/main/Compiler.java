@@ -11,6 +11,7 @@ import java.io.PrintStream;
 import mxcompiler.parser.*;
 import mxcompiler.utils.scope.ScopeDump;
 import mxcompiler.exception.*;
+import mxcompiler.main.CompilerMode.DumpMode;
 import mxcompiler.ast.*;
 
 public final class Compiler {
@@ -18,6 +19,7 @@ public final class Compiler {
 	static final public String Version = "1.0.0";
 
 	private final ExceptionHandler errHandler;
+	private Option opts;
 
 	public static void main(String[] args) throws Exception {
 		Compiler c = new Compiler(ProgName);
@@ -26,59 +28,55 @@ public final class Compiler {
 
 	private Compiler(String name) {
 		this.errHandler = new ExceptionHandler(name);
-		in = System.in;
 
-		try {
-			out = new PrintStream(new FileOutputStream("/home/xun/Documents/mxc/src/test/test.out", false));
-		} catch (Exception e) {
-			// throw new Error(e);
-			// out = System.out;
-		}
 	}
 
 	private void execute(String[] args) throws Exception {
 		// parse options
-		Option opts = new Option(args);
+		opts = new Option(args);
+
 		this.in = opts.sourceFile();
+		this.dump = new PrintStream(new FileOutputStream("./src/test/test.out", false));
+		try {
+			out = new PrintStream(new FileOutputStream(opts.outputFile(), false));
+		} catch (Exception e) {
+			// throw new Error(e);
+			out = System.out;
+		}
 
-		compile(opts);
-
+		compile();
 	}
 
 	private InputStream in;
 	private PrintStream out;
+	private PrintStream dump;
 	private ASTNode root;
 
 	// file compiler with errorHandler
-	private void compile(Option opts) throws Exception {
-		buildAST(opts.mode());
-
-		// semanticAnalyze
-		semanticAnalyze(opts.mode());
+	private void compile() throws Exception {
+		buildAST();
+		semanticAnalyze();
 
 	}
 
-	private void semanticAnalyze(CompilerMode mode) throws Exception {
-		// System.out.println("Resolver begin");
-		// GlobalScopePreScanner ClassVarMemberScanner
+	private void semanticAnalyze() throws Exception {
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println("Resolver begin");
+
 		Resolver resolver = new Resolver();
 		resolver.visit(root);
-		
-		// FunctionScopeScanner StaticUsagePreScanner
-		// Checker checker = new Checker();
-		// checker.visit(root);
 
-		if (mode == CompilerMode.Dump) {
-			new ScopeDump(out).visit(root);
+		if (opts.dumpMode().contains(DumpMode.ScopeDump) || opts.dumpMode().contains(DumpMode.AllDump)) {
+			new ScopeDump(dump).visit(root);
 		}
-
-		
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println(">>> Resolver end");
 	}
 
-	private void buildAST(CompilerMode mode) throws Exception {
-		// System.out.println("AST Build begin");
-		
-		// System.out.println(src.toString());
+	private void buildAST() throws Exception {
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println("AST Build begin");
+
 		MxLexer lexer = new MxLexer(CharStreams.fromStream(in));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		MxParser parser = new MxParser(tokens);
@@ -90,8 +88,11 @@ public final class Compiler {
 		ASTBuilder astBuilder = new ASTBuilder();
 		root = (ASTNode) astBuilder.visit(tree);
 
-		if (mode == CompilerMode.Dump) {
-			new ASTDump(out).visit(root);
+		if (opts.dumpMode().contains(DumpMode.ASTDump) || opts.dumpMode().contains(DumpMode.AllDump)) {
+			new ASTDump(dump).visit(root);
 		}
+
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println(">>> AST Build end");
 	}
 }
