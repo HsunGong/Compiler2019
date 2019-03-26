@@ -143,8 +143,10 @@ abstract public class Visitor implements ASTVisitor {
 	}
 
 	public void visit(BlockStmtNode node) {
-		visitDeclList(node.getVar());
-		visitStmtList(node.getStmts());
+		if (node != null && !node.getAll().isEmpty())
+			for (Node n : node.getAll()) {
+				visit(n);
+			}
 	}
 
 	public void visit(BreakStmtNode node) {

@@ -29,8 +29,6 @@ public class Resolver extends Visitor {
 	private FuncEntity curFuncEntity;
 
 	public Resolver() {
-		System.out.print("Resolver begin");
-
 		scopeStack = new LinkedList<Scope>();
 		curClass = null;
 		curReturnType = null;
@@ -267,8 +265,11 @@ public class Resolver extends Visitor {
 			node.setScope(new LocalScope(getCurScope())); // temportory scope
 		pushScope(node.getScope());
 
-		visitDeclList(node.getVar());
-		visitStmtList(node.getStmts());
+		if (!node.getAll().isEmpty())
+			for (Node n : node.getAll()) {
+				visit(n);
+			}
+
 		popScope();
 	}
 
@@ -458,8 +459,9 @@ public class Resolver extends Visitor {
 				invalid = !(defParam.getType().isEqual(curParam.getType()));
 
 			if (invalid) {
-				throw new Error(curParam.getLocation().toString() + "Function call has inconsistent type of arguments, expected "
-						+ defParam.getType().toString() + " but got " + curParam.getType().toString());
+				throw new Error(curParam.getLocation().toString()
+						+ "Function call has inconsistent type of arguments, expected " + defParam.getType().toString()
+						+ " but got " + curParam.getType().toString());
 			}
 		}
 
@@ -559,8 +561,8 @@ public class Resolver extends Visitor {
 		case GREATER_EQUAL:
 		case LESS_EQUAL:
 			if (!(lhsType.isEqual(rhsType)))
-				throw new Error(node.getLocation().toString()+"Operator " + node.getOp().toString() + " cannot be applied to different types "
-						+ rhsType.toString() + " and " + lhsType.toString());
+				throw new Error(node.getLocation().toString() + "Operator " + node.getOp().toString()
+						+ " cannot be applied to different types " + rhsType.toString() + " and " + lhsType.toString());
 			if (!(lhsType instanceof IntType || lhsType instanceof StringType))
 				throw new Error(
 						"Operator " + node.getOp().toString() + " cannot be applied to type " + lhsType.toString());

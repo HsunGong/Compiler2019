@@ -13,7 +13,6 @@ import mxcompiler.utils.scope.ToplevelScope;
 public class ASTNode extends Node {
 	@Override
 	public void _dump(ASTDump d) {
-		d.println("Program Start");
 		d.printf("<ASTNode> %s\n", location.toString());
 	}
 

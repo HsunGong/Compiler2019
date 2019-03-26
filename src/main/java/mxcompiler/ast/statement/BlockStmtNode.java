@@ -15,21 +15,17 @@ public class BlockStmtNode extends StmtNode {
 	}
 
 	private List<StmtNode> stmts;
-	private List<VarDeclNode> varList;
+	private List<Node> stmtsAndDecls;
 	private LocalScope scope;
 
-	public BlockStmtNode(List<StmtNode> stmts, List<VarDeclNode> varList, Location location) {
+	public BlockStmtNode(List<StmtNode> stmts, List<Node> all, Location location) {
 		super(location);
 		
 		this.stmts = (stmts != null) ? stmts : new ArrayList<StmtNode>();
 
-		this.varList = (varList != null) ? varList : new ArrayList<VarDeclNode>();
+		this.stmtsAndDecls = (all != null) ? all : new ArrayList<Node>();
 
 		scope = null;
-	}
-
-	public BlockStmtNode(List<StmtNode> stmts, VarDeclListNode varList, Location location) {
-		this(stmts, varList.getList(), location);
 	}
 
 	public void setScope(LocalScope scope) {
@@ -48,8 +44,8 @@ public class BlockStmtNode extends StmtNode {
 		return stmts;
 	}
 
-	public List<VarDeclNode> getVar() {
-		return varList;
+	public List<Node> getAll() {
+		return stmtsAndDecls;
 	}
 
 	// public List<Node> getVars() { return vars; }

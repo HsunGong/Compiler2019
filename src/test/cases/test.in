@@ -3,9 +3,9 @@ int id;
 class Test {
 	bool id(bool id_) {
 		int x, y;
-		x = 10;
-		y = 11;
-		x = y + 1;
+		//x = 10;
+		//y = 11;
+		//x = y + 1;
 		return id_ == false;
 	}
 	
@@ -26,9 +26,9 @@ class Test {
 			id = false;
 		}
 		if (id == "i am string") {
-			//if (this.id(id > "hello")) {
-			//	return;
-			//}
+			if (this.id(id > "hello")) {
+				return;
+			}
 			Test id = new Test();
 			if (id.id(id.id(id.id(false)))) {
 				int id = 233;

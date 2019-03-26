@@ -311,20 +311,22 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Override
 	public Node visitBlock(MxParser.BlockContext ctx) {
 		List<StmtNode> stmts = new ArrayList<>();
-		List<VarDeclNode> varList = new ArrayList<>();
+		List<Node> stmtsAndDecls = new ArrayList<>();
 
 		if (ctx.blockBody() != null)
 			for (ParserRuleContext body : ctx.blockBody()) {
 				Node stmt = visit(body);
 				if (stmt instanceof VarDeclListNode)
-					varList.addAll(((VarDeclListNode) stmt).getList());
+					stmtsAndDecls.addAll(((VarDeclListNode) stmt).getList());
 				else if (stmt instanceof VarDeclNode)
-					varList.add((VarDeclNode) stmt);
-				else if (stmt instanceof StmtNode)
+					stmtsAndDecls.add((VarDeclNode) stmt);
+				else if (stmt instanceof StmtNode){
 					stmts.add((StmtNode) stmt);
+					stmtsAndDecls.add(stmt);
+				}
 			}
 
-		return new BlockStmtNode(stmts, varList, new Location(ctx));
+		return new BlockStmtNode(stmts, stmtsAndDecls, new Location(ctx));
 	}
 
 	/**

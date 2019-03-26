@@ -35,6 +35,7 @@ public class ASTDump extends Visitor {
 	public void println(String x) {
 		os.println(getTab() + x);
 	}
+
 	public void printplainln(String x) {
 		os.println(x);
 	}
@@ -49,6 +50,7 @@ public class ASTDump extends Visitor {
 
 	@Override
 	public void visit(ASTNode node) {
+		println("AST-Dump START");
 		node._dump(this);
 
 		print("declarations are below:");
@@ -59,6 +61,10 @@ public class ASTDump extends Visitor {
 				visit(decl);
 		} else
 			println(" null");
+
+		addTab();
+		println("AST-Dump END");
+		println("\n\n");
 	}
 
 	@Override
@@ -85,11 +91,7 @@ public class ASTDump extends Visitor {
 		node._dump(this);
 
 		println(" returnType:");
-		// if (getReturnType() != null) {
-		// d.print("\n");
 		visit(node.getReturnType());
-		// } else
-		// d.println(" null");
 
 		printDeclList(" parameterList:", node.getVar());
 		println(" body:");
@@ -112,6 +114,7 @@ public class ASTDump extends Visitor {
 	@Override
 	public void visit(VarDeclListNode node) {
 		node._dump(this);
+		visitDeclList(node.getList());
 	}
 
 	@Override
@@ -233,8 +236,14 @@ public class ASTDump extends Visitor {
 	public void visit(BlockStmtNode node) {
 		addTab();
 		node._dump(this);
-		printStmtList(" stmts:", node.getStmts());
-		printDeclList(" varDecls:", node.getVar());
+
+		println(" stmtsAnddecls: ");
+		if (node != null && !node.getAll().isEmpty())
+			for (Node n : node.getAll()) {
+				visit(n);
+			}
+
+		// printStmtList(" stmts:", node.getStmts());
 
 		delTab();
 	}
@@ -305,7 +314,7 @@ public class ASTDump extends Visitor {
 
 	private void printDeclList(String s, List<? extends DeclNode> list) {
 		print(s);
-		if (!list.isEmpty()) {
+		if (list != null && !list.isEmpty()) {
 			printplainln("");
 			for (DeclNode param : list) {
 				visit(param);
@@ -316,7 +325,7 @@ public class ASTDump extends Visitor {
 
 	private void printStmtList(String s, List<StmtNode> list) {
 		print(s);
-		if (!list.isEmpty()) {
+		if (list != null && !list.isEmpty()) {
 			printplainln("");
 			for (StmtNode param : list) {
 				visit(param);
@@ -327,7 +336,7 @@ public class ASTDump extends Visitor {
 
 	private void printExprList(String s, List<ExprNode> list) {
 		print(s);
-		if (!list.isEmpty()) {
+		if (list != null && !list.isEmpty()) {
 			printplainln("");
 			for (ExprNode param : list) {
 				visit(param);

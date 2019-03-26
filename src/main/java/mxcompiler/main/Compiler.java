@@ -58,6 +58,7 @@ public final class Compiler {
 	}
 
 	private void semanticAnalyze(CompilerMode mode) throws Exception {
+		System.out.println("Resolver begin");
 		// GlobalScopePreScanner ClassVarMemberScanner
 		Resolver resolver = new Resolver();
 		resolver.visit(root);
@@ -74,6 +75,8 @@ public final class Compiler {
 	}
 
 	private void buildAST(CompilerMode mode) throws Exception {
+		System.out.println("AST Build begin");
+		
 		// System.out.println(src.toString());
 		MxLexer lexer = new MxLexer(CharStreams.fromStream(in));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -87,7 +90,7 @@ public final class Compiler {
 		root = (ASTNode) astBuilder.visit(tree);
 
 		if (mode == CompilerMode.Dump) {
-			// new ASTDump(out).visit(root);
+			new ASTDump(out).visit(root);
 		}
 	}
 }

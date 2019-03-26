@@ -48,7 +48,10 @@ public class ScopeDump implements Dump {
 	}
 
 	public void visit(ASTNode node) {
-		node.getScope()._dump(this);;
+		println("Scope-Dump START");
+		node.getScope()._dump(this);
+		println("Scope-Dump END");
+		println("\n\n");
 	}
 
 }
