@@ -28,7 +28,6 @@ public class Resolver extends Visitor {
 	private int loop;
 	private Type curReturnType;
 	private FuncEntity curFuncEntity;
-	private boolean hasReturn;
 	// if no-return -> change to true;
 	// if need return, change to false; and when has
 	// return change to true
@@ -39,7 +38,6 @@ public class Resolver extends Visitor {
 		curReturnType = null;
 		curFuncEntity = null;
 		loop = 0;
-		hasReturn = true;
 	}
 
 	/**
@@ -62,8 +60,11 @@ public class Resolver extends Visitor {
 
 		// add class and g-func
 		if (!root.getDecl().isEmpty())
-			for (DeclNode decl : root.getDecl())
+			for (DeclNode decl : root.getDecl()) {
+				if (decl instanceof VarDeclNode)
+					continue;
 				resolve(decl);
+			}
 
 		// TODO: move to checker: checkMainFunc((FuncEntity) toplevelScope.get("main"));
 		try {
@@ -81,10 +82,10 @@ public class Resolver extends Visitor {
 
 	public void resolve(DeclNode node) {
 		if (node instanceof VarDeclNode)
-			resolve((VarDeclNode) node);
-		if (node instanceof FuncDeclNode)
+			resolve((VarDeclNode) node);// resolve((VarDeclNode) node);
+		else if (node instanceof FuncDeclNode)
 			resolve((FuncDeclNode) node);
-		if (node instanceof ClassDeclNode)
+		else if (node instanceof ClassDeclNode)
 			resolve((ClassDeclNode) node);
 	}
 
@@ -172,8 +173,11 @@ public class Resolver extends Visitor {
 		resolve(node);
 
 		if (!node.getDecl().isEmpty()) {
-			for (DeclNode decl : node.getDecl())
+			for (DeclNode decl : node.getDecl()) {
 				visit(decl);
+				if (decl instanceof VarDeclNode)
+					resolve(decl);
+			}
 		}
 
 		node.setScope((ToplevelScope) getCurScope());
@@ -248,8 +252,6 @@ public class Resolver extends Visitor {
 				}
 
 			}
-			if (node.hasReturn() && !(curReturnType instanceof VoidType))
-				hasReturn = false;
 
 			// to add scope first
 			pushScope();
@@ -264,8 +266,8 @@ public class Resolver extends Visitor {
 			}
 			// Other-Parameters
 			for (VarDeclNode var : node.getVar()) {
-				resolve(var); // add
 				visit(var); // check
+				resolve(var); // add
 			}
 
 			// body
@@ -273,13 +275,23 @@ public class Resolver extends Visitor {
 			popScope();
 
 			visit(node.getBody());
-			if (hasReturn == false && !entity.getName().equals("main"))
-				throw new Error("dont get return");
-			else
-				hasReturn = true;
 			curReturnType = null;
 		} catch (SemanticException e) {
 			throw new Error("Func Entity check " + e);
+		}
+	}
+
+	// check type
+	@Override
+	public void visit(TypeNode node) {
+		try {
+			if (node.getType() instanceof ClassType) {
+				String typeName = ((ClassType) node.getType()).getName();
+				if (!(getCurScope().get(typeName) instanceof ClassEntity))
+					throw new CompileError("no such class");
+			}
+		} catch (Exception e) {
+			throw new Error(e);
 		}
 	}
 
@@ -290,13 +302,8 @@ public class Resolver extends Visitor {
 	 */
 	@Override
 	public void visit(VarDeclNode node) {
-		try {
-			// check type
-			if (node.getType().getType() instanceof ClassType) {
-				String typeName = ((ClassType) node.getType().getType()).getName();
-				if (!(getCurScope().get(typeName) instanceof ClassEntity))
-					throw new CompileError("no such class");
-			}
+		// try {
+			visit(node.getType());
 
 			// check init
 			if (node.getInit() != null) {
@@ -317,9 +324,9 @@ public class Resolver extends Visitor {
 					throw new Error("Invalid variable init value: expected " + node.getType().getType().toString()
 							+ " but got " + node.getInit().getType().toString());
 			}
-		} catch (SemanticException e) {
-			throw new Error("VarEntity Check " + e);
-		}
+		// } catch (SemanticException e) {
+		// 	throw new Error("VarEntity Check " + e);
+		// }
 	}
 
 	/**
@@ -436,8 +443,6 @@ public class Resolver extends Visitor {
 				throw new Error("Return statement should have return value of type " + curReturnType.toString());
 		}
 
-		if (!hasReturn)
-			hasReturn = true;
 	}
 
 	@Override
@@ -592,6 +597,8 @@ public class Resolver extends Visitor {
 
 	@Override
 	public void visit(NewExprNode node) {
+		visit(node.getNewType());
+
 		if (node.getDims() != null) {
 			for (ExprNode dim : node.getDims()) {
 				visit(dim);
