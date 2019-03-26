@@ -16,7 +16,7 @@ import mxcompiler.ast.expression.unary.*;
 public class ScopeDump implements Dump {
 	private PrintStream os;
 	private int tab; // tabSize
-	private final String t = "\t";
+	private String t = "\t";
 
 	public ScopeDump(PrintStream x) {
 		os = x;
