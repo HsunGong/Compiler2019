@@ -273,7 +273,7 @@ public class Resolver extends Visitor {
 			popScope();
 
 			visit(node.getBody());
-			if (hasReturn == false)
+			if (hasReturn == false && !entity.getName().equals("main"))
 				throw new Error("dont get return");
 			else
 				hasReturn = true;

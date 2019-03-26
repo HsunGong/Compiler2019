@@ -80,8 +80,8 @@ public final class Compiler {
 		MxLexer lexer = new MxLexer(CharStreams.fromStream(in));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		MxParser parser = new MxParser(tokens);
-		// parser.removeErrorListeners();
-		// parser.addErrorListener(new SyntaxErrorListener());
+		parser.removeErrorListeners();
+		parser.addErrorListener(new ErrorHandler());
 
 		ParseTree tree = parser.compilationUnit(); // the begin root of my g4 file
 

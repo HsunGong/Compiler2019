@@ -1,534 +1,633 @@
 AST-Dump START
 <ASTNode> (1:0)
 declarations are below:
-	<ClassDeclNode> (1:0)
-	 name: Fibonacci
-	 varDecls:
-		<VarDeclNode> (2:5)
-		 name: x
-		 type:
-			<TypeNode> (2:1)
-			 type: int
-		 init: null
-		<VarDeclNode> (3:5)
-		 name: result
-		 type:
-			<TypeNode> (3:1)
-			 type: int
-		 init: null
+	<VarDeclNode> (1:4)
+	 name: id
+	 type:
+		<TypeNode> (1:0)
+		 type: int
+	 init: null
+	<ClassDeclNode> (3:0)
+	 name: Test
+	 varDecls: null
 	 funcMember:
-		<FuncDeclNode> (5:1)
-		 name: reset
+		<FuncDeclNode> (4:1)
+		 name: id
 		 hasReturn: true
 		 returnType:
-			<TypeNode> (5:1)
-			 type: void
+			<TypeNode> (4:1)
+			 type: bool
+		 parameterList:
+			<VarDeclNode> (4:9)
+			 name: id_
+			 type:
+				<TypeNode> (4:9)
+				 type: bool
+			 init: null
+		 body:
+			<BlockStmtNode> (4:19)
+			 stmtsAnddecls: 
+				<ReturnStmtNode> (5:2)
+				 value:
+					<BinaryOpExprNode> (5:9)
+					 op: EQUAL
+					 lhs:
+						<IdentifierExprNode> (5:9)
+						identifier: id_
+					 rhs:
+						<BoolLiteralNode> (5:16)
+						 value: false
+		<FuncDeclNode> (8:1)
+		 name: Test
+		 hasReturn: false
+		 returnType:
+			<TypeNode> (8:1)
+			 type: 
 		 parameterList: null
 		 body:
-			<BlockStmtNode> (5:13)
+			<BlockStmtNode> (8:8)
 			 stmtsAnddecls: 
-				<ExprStmtNode> (6:2)
-				 expr:
-					<AssignExprNode> (6:2)
-					 lhs:
-						<IdentifierExprNode> (6:2)
-						identifier: x
-					 rhs:
-						<IntLiteralNode> (6:6)
-						 value: 0
-				<ExprStmtNode> (7:2)
-				 expr:
-					<AssignExprNode> (7:2)
-					 lhs:
-						<IdentifierExprNode> (7:2)
-						identifier: result
-					 rhs:
-						<IntLiteralNode> (7:11)
-						 value: 0
 		<FuncDeclNode> (10:1)
-		 name: set_problem
+		 name: test
 		 hasReturn: true
 		 returnType:
 			<TypeNode> (10:1)
 			 type: void
 		 parameterList:
-			<VarDeclNode> (10:18)
-			 name: x_in
+			<VarDeclNode> (10:11)
+			 name: id
 			 type:
-				<TypeNode> (10:18)
-				 type: int
+				<TypeNode> (10:11)
+				 type: string
 			 init: null
 		 body:
-			<BlockStmtNode> (10:27)
+			<BlockStmtNode> (10:22)
 			 stmtsAnddecls: 
 				<ExprStmtNode> (11:2)
 				 expr:
-					<FuncallExprNode> (11:2)
-					 expr:
-						<IdentifierExprNode> (11:2)
-						identifier: reset
-					 args: null
-				<ExprStmtNode> (12:2)
-				 expr:
-					<AssignExprNode> (12:2)
+					<AssignExprNode> (11:2)
 					 lhs:
-						<IdentifierExprNode> (12:2)
-						identifier: x
+						<IdentifierExprNode> (11:2)
+						identifier: id
 					 rhs:
-						<IdentifierExprNode> (12:6)
-						identifier: x_in
-		<FuncDeclNode> (15:1)
-		 name: calc
-		 hasReturn: true
-		 returnType:
-			<TypeNode> (15:1)
-			 type: int
-		 parameterList:
-			<VarDeclNode> (15:10)
-			 name: cur_num
-			 type:
-				<TypeNode> (15:10)
-				 type: int
-			 init: null
-		 body:
-			<BlockStmtNode> (15:22)
-			 stmtsAnddecls: 
-				<IfStmtNode> (16:2)
+						<StringLiteralNode> (11:7)
+						 value: i am string
+				<IfStmtNode> (12:2)
 				 cond:
-					<BinaryOpExprNode> (16:6)
+					<FuncallExprNode> (12:6)
+					 expr:
+						<MemberExprNode> (12:6)
+						 member: id
+						 expr:
+							<ThisExprNode> (12:6)
+					 args:
+						<BinaryOpExprNode> (12:14)
+						 op: LOGIC_OR
+						 lhs:
+							<BinaryOpExprNode> (12:15)
+							 op: INEQUAL
+							 lhs:
+								<ThisExprNode> (12:15)
+							 rhs:
+								<NullExprNode> (12:23)
+						 rhs:
+							<BinaryOpExprNode> (12:33)
+							 op: EQUAL
+							 lhs:
+								<NullExprNode> (12:33)
+							 rhs:
+								<ThisExprNode> (12:41)
+				 then:
+					<BlockStmtNode> (12:49)
+					 stmtsAnddecls: 
+						<VarDeclNode> (13:8)
+						 name: id
+						 type:
+							<TypeNode> (13:3)
+							 type: bool
+						 init:
+							<FuncallExprNode> (13:13)
+							 expr:
+								<MemberExprNode> (13:13)
+								 member: id
+								 expr:
+									<ThisExprNode> (13:13)
+							 args:
+								<BoolLiteralNode> (13:21)
+								 value: true
+						<BlockStmtNode> (14:3)
+						 stmtsAnddecls: 
+							<VarDeclNode> (15:8)
+							 name: id
+							 type:
+								<TypeNode> (15:4)
+								 type: int
+							 init: null
+							<ForStmtNode> (16:4)
+							 varDecl: null
+							 init:
+								<AssignExprNode> (16:9)
+								 lhs:
+									<IdentifierExprNode> (16:9)
+									identifier: id
+								 rhs:
+									<IntLiteralNode> (16:14)
+									 value: 0
+							 cond:
+								<FuncallExprNode> (16:17)
+								 expr:
+									<MemberExprNode> (16:17)
+									 member: id
+									 expr:
+										<ThisExprNode> (16:17)
+								 args:
+									<BinaryOpExprNode> (16:25)
+									 op: GREATER
+									 lhs:
+										<IdentifierExprNode> (16:25)
+										identifier: id
+									 rhs:
+										<IntLiteralNode> (16:30)
+										 value: 0
+							 incr:
+								<SuffixExprNode> (16:34)
+								 op: SUF_INC
+								 expr:
+									<IdentifierExprNode> (16:34)
+									identifier: id
+							 body:
+								<BlockStmtNode> (16:40)
+								 stmtsAnddecls: 
+									<IfStmtNode> (17:5)
+									 cond:
+										<FuncallExprNode> (17:9)
+										 expr:
+											<MemberExprNode> (17:9)
+											 member: id
+											 expr:
+												<ThisExprNode> (17:9)
+										 args:
+											<BinaryOpExprNode> (17:17)
+											 op: LESS_EQUAL
+											 lhs:
+												<BinaryOpExprNode> (17:18)
+												 op: BIT_OR
+												 lhs:
+													<IdentifierExprNode> (17:18)
+													identifier: id
+												 rhs:
+													<IdentifierExprNode> (17:23)
+													identifier: id
+											 rhs:
+												<IntLiteralNode> (17:30)
+												 value: 0
+									 then:
+										<BlockStmtNode> (17:34)
+										 stmtsAnddecls: 
+											<BreakStmtNode> (18:6)
+									 else: null
+						<ExprStmtNode> (22:3)
+						 expr:
+							<AssignExprNode> (22:3)
+							 lhs:
+								<IdentifierExprNode> (22:3)
+								identifier: id
+							 rhs:
+								<BoolLiteralNode> (22:8)
+								 value: false
+				 else: null
+				<IfStmtNode> (24:2)
+				 cond:
+					<BinaryOpExprNode> (24:6)
 					 op: EQUAL
 					 lhs:
-						<IdentifierExprNode> (16:6)
-						identifier: cur_num
+						<IdentifierExprNode> (24:6)
+						identifier: id
 					 rhs:
-						<IntLiteralNode> (16:17)
-						 value: 0
+						<StringLiteralNode> (24:12)
+						 value: i am string
 				 then:
-					<ReturnStmtNode> (17:3)
-					 value:
-						<IntLiteralNode> (17:10)
-						 value: 1
-				 else:
-					<ReturnStmtNode> (19:3)
-					 value:
-						<BinaryOpExprNode> (19:10)
-						 op: MUL
-						 lhs:
-							<IdentifierExprNode> (19:10)
-							identifier: cur_num
-						 rhs:
-							<FuncallExprNode> (19:20)
+					<BlockStmtNode> (24:27)
+					 stmtsAnddecls: 
+						<IfStmtNode> (25:3)
+						 cond:
+							<FuncallExprNode> (25:7)
 							 expr:
-								<IdentifierExprNode> (19:20)
-								identifier: calc
+								<MemberExprNode> (25:7)
+								 member: id
+								 expr:
+									<ThisExprNode> (25:7)
 							 args:
-								<BinaryOpExprNode> (19:25)
-								 op: SUB
+								<BinaryOpExprNode> (25:15)
+								 op: GREATER
 								 lhs:
-									<IdentifierExprNode> (19:25)
-									identifier: cur_num
+									<IdentifierExprNode> (25:15)
+									identifier: id
 								 rhs:
-									<IntLiteralNode> (19:33)
-									 value: 1
-		<FuncDeclNode> (22:1)
-		 name: get_result
-		 hasReturn: true
-		 returnType:
-			<TypeNode> (22:1)
-			 type: int
-		 parameterList: null
-		 body:
-			<BlockStmtNode> (22:17)
-			 stmtsAnddecls: 
-				<ExprStmtNode> (23:2)
-				 expr:
-					<AssignExprNode> (23:2)
-					 lhs:
-						<IdentifierExprNode> (23:2)
-						identifier: result
-					 rhs:
-						<FuncallExprNode> (23:11)
+									<StringLiteralNode> (25:20)
+									 value: hello
+						 then:
+							<BlockStmtNode> (25:30)
+							 stmtsAnddecls: 
+								<ReturnStmtNode> (26:4)
+								 value: null
+						 else: null
+						<VarDeclNode> (28:8)
+						 name: id
+						 type:
+							<TypeNode> (28:3)
+							 type: class Test
+						 init:
+							<NewExprNode> (28:17)
+							 numDim: 0
+							 newType:
+								<TypeNode> (28:17)
+								 type: class Test
+							dims: null
+						<IfStmtNode> (29:3)
+						 cond:
+							<FuncallExprNode> (29:7)
+							 expr:
+								<MemberExprNode> (29:7)
+								 member: id
+								 expr:
+									<IdentifierExprNode> (29:7)
+									identifier: id
+							 args:
+								<FuncallExprNode> (29:13)
+								 expr:
+									<MemberExprNode> (29:13)
+									 member: id
+									 expr:
+										<IdentifierExprNode> (29:13)
+										identifier: id
+								 args:
+									<FuncallExprNode> (29:19)
+									 expr:
+										<MemberExprNode> (29:19)
+										 member: id
+										 expr:
+											<IdentifierExprNode> (29:19)
+											identifier: id
+									 args:
+										<BoolLiteralNode> (29:25)
+										 value: false
+						 then:
+							<BlockStmtNode> (29:35)
+							 stmtsAnddecls: 
+								<VarDeclNode> (30:8)
+								 name: id
+								 type:
+									<TypeNode> (30:4)
+									 type: int
+								 init:
+									<IntLiteralNode> (30:13)
+									 value: 233
+								<BlockStmtNode> (31:4)
+								 stmtsAnddecls: 
+									<VarDeclNode> (32:10)
+									 name: test
+									 type:
+										<TypeNode> (32:5)
+										 type: class Test
+									 init:
+										<NewExprNode> (32:21)
+										 numDim: 0
+										 newType:
+											<TypeNode> (32:21)
+											 type: class Test
+										dims: null
+									<IfStmtNode> (33:5)
+									 cond:
+										<FuncallExprNode> (33:9)
+										 expr:
+											<MemberExprNode> (33:9)
+											 member: id
+											 expr:
+												<IdentifierExprNode> (33:9)
+												identifier: test
+										 args:
+											<BinaryOpExprNode> (33:17)
+											 op: GREATER
+											 lhs:
+												<IdentifierExprNode> (33:17)
+												identifier: id
+											 rhs:
+												<IntLiteralNode> (33:22)
+												 value: 0
+									 then:
+										<BlockStmtNode> (33:26)
+										 stmtsAnddecls: 
+											<ExprStmtNode> (34:6)
+											 expr:
+												<SuffixExprNode> (34:6)
+												 op: SUF_DEC
+												 expr:
+													<IdentifierExprNode> (34:6)
+													identifier: id
+									 else: null
+									<ExprStmtNode> (36:5)
+									 expr:
+										<SuffixExprNode> (36:5)
+										 op: PRE_DEC
+										 expr:
+											<IdentifierExprNode> (36:7)
+											identifier: id
+								<ReturnStmtNode> (38:4)
+								 value: null
+						 else: null
+						<ExprStmtNode> (40:3)
 						 expr:
-							<IdentifierExprNode> (23:11)
-							identifier: calc
-						 args:
-							<IdentifierExprNode> (23:16)
-							identifier: x
-				<ReturnStmtNode> (24:2)
-				 value:
-					<IdentifierExprNode> (24:9)
-					identifier: result
-	<FuncDeclNode> (28:0)
+							<AssignExprNode> (40:3)
+							 lhs:
+								<IdentifierExprNode> (40:3)
+								identifier: id
+							 rhs:
+								<NewExprNode> (40:12)
+								 numDim: 0
+								 newType:
+									<TypeNode> (40:12)
+									 type: class Test
+								dims: null
+				 else: null
+				<ExprStmtNode> (42:2)
+				 expr:
+					<AssignExprNode> (42:2)
+					 lhs:
+						<IdentifierExprNode> (42:2)
+						identifier: id
+					 rhs:
+						<StringLiteralNode> (42:7)
+						 value: string
+	<FuncDeclNode> (46:0)
+	 name: func
+	 hasReturn: true
+	 returnType:
+		<TypeNode> (46:0)
+		 type: array
+	 parameterList:
+		<VarDeclNode> (46:12)
+		 name: t
+		 type:
+			<TypeNode> (46:12)
+			 type: array
+		 init: null
+	 body:
+		<BlockStmtNode> (46:24)
+		 stmtsAnddecls: 
+			<ReturnStmtNode> (47:1)
+			 value:
+				<ArrayrefExprNode> (47:8):
+				 arr:
+					<IdentifierExprNode> (47:8)
+					identifier: t
+				 index:
+					<IntLiteralNode> (47:10)
+					 value: 0
+	<FuncDeclNode> (50:0)
 	 name: main
 	 hasReturn: true
 	 returnType:
-		<TypeNode> (28:0)
+		<TypeNode> (50:0)
 		 type: int
 	 parameterList: null
 	 body:
-		<BlockStmtNode> (28:10)
+		<BlockStmtNode> (50:11)
 		 stmtsAnddecls: 
-			<VarDeclNode> (29:11)
-			 name: teacher
+			<VarDeclNode> (51:6)
+			 name: test
 			 type:
-				<TypeNode> (29:1)
-				 type: class Fibonacci
-			 init: null
-			<ExprStmtNode> (30:1)
-			 expr:
-				<AssignExprNode> (30:1)
-				 lhs:
-					<IdentifierExprNode> (30:1)
-					identifier: teacher
-				 rhs:
-					<NewExprNode> (30:15)
-					 numDim: 0
-					 newType:
-						<TypeNode> (30:15)
-						 type: class Fibonacci
-					dims: null
-			<VarDeclNode> (31:5)
-			 name: x
-			 type:
-				<TypeNode> (31:1)
-				 type: int
-			 init: null
-			<ForStmtNode> (32:1)
-			 varDecl: null
+				<TypeNode> (51:1)
+				 type: class Test
 			 init:
-				<AssignExprNode> (32:6)
-				 lhs:
-					<IdentifierExprNode> (32:6)
-					identifier: x
-				 rhs:
-					<IntLiteralNode> (32:10)
-					 value: 0
-			 cond:
-				<BinaryOpExprNode> (32:13)
-				 op: LESS
-				 lhs:
-					<IdentifierExprNode> (32:13)
-					identifier: x
-				 rhs:
-					<IntLiteralNode> (32:17)
-					 value: 5
-			 incr:
-				<SuffixExprNode> (32:20)
-				 op: SUF_INC
+				<NewExprNode> (51:17)
+				 numDim: 0
+				 newType:
+					<TypeNode> (51:17)
+					 type: class Test
+				dims: null
+			<ExprStmtNode> (52:1)
+			 expr:
+				<FuncallExprNode> (52:1)
 				 expr:
-					<IdentifierExprNode> (32:20)
-					identifier: x
-			 body:
-				<BlockStmtNode> (32:24)
+					<MemberExprNode> (52:1)
+					 member: test
+					 expr:
+						<IdentifierExprNode> (52:1)
+						identifier: test
+				 args:
+					<StringLiteralNode> (52:11)
+					 value: hello world
+			<IfStmtNode> (53:1)
+			 cond:
+				<FuncallExprNode> (53:5)
+				 expr:
+					<MemberExprNode> (53:5)
+					 member: id
+					 expr:
+						<IdentifierExprNode> (53:5)
+						identifier: test
+				 args:
+					<BinaryOpExprNode> (53:13)
+					 op: GREATER
+					 lhs:
+						<IdentifierExprNode> (53:13)
+						identifier: id
+					 rhs:
+						<IntLiteralNode> (53:18)
+						 value: 0
+			 then:
+				<BlockStmtNode> (53:22)
 				 stmtsAnddecls: 
-					<ExprStmtNode> (33:2)
-					 expr:
-						<FuncallExprNode> (33:2)
-						 expr:
-							<MemberExprNode> (33:2)
-							 member: set_problem
-							 expr:
-								<IdentifierExprNode> (33:2)
-								identifier: teacher
-						 args:
-							<IdentifierExprNode> (33:22)
-							identifier: x
-					<ExprStmtNode> (34:2)
-					 expr:
-						<FuncallExprNode> (34:2)
-						 expr:
-							<IdentifierExprNode> (34:2)
-							identifier: println
-						 args:
-							<FuncallExprNode> (34:10)
-							 expr:
-								<IdentifierExprNode> (34:10)
-								identifier: toString
-							 args:
-								<FuncallExprNode> (34:19)
+					<VarDeclNode> (54:11)
+					 name: test
+					 type:
+						<TypeNode> (54:2)
+						 type: array
+					 init:
+						<NewExprNode> (54:22)
+						 numDim: 2
+						 newType:
+							<TypeNode> (54:22)
+							 type: array
+						dims:
+							<IntLiteralNode> (54:27)
+							 value: 10
+							<IntLiteralNode> (54:31)
+							 value: 10
+					<IfStmtNode> (55:2)
+					 cond:
+						<BinaryOpExprNode> (55:6)
+						 op: LOGIC_AND
+						 lhs:
+							<BinaryOpExprNode> (55:6)
+							 op: INEQUAL
+							 lhs:
+								<FuncallExprNode> (55:6)
 								 expr:
-									<MemberExprNode> (34:19)
-									 member: get_result
+									<IdentifierExprNode> (55:6)
+									identifier: func
+								 args:
+									<IdentifierExprNode> (55:11)
+									identifier: test
+							 rhs:
+								<NullExprNode> (55:20)
+						 rhs:
+							<BinaryOpExprNode> (55:28)
+							 op: INEQUAL
+							 lhs:
+								<ArrayrefExprNode> (55:28):
+								 arr:
+									<FuncallExprNode> (55:28)
 									 expr:
-										<IdentifierExprNode> (34:19)
-										identifier: teacher
-								 args: null
-			<ReturnStmtNode> (36:1)
+										<IdentifierExprNode> (55:28)
+										identifier: func
+									 args:
+										<IdentifierExprNode> (55:33)
+										identifier: test
+								 index:
+									<IntLiteralNode> (55:39)
+									 value: 1
+							 rhs:
+								<NullExprNode> (55:45)
+					 then:
+						<BlockStmtNode> (55:51)
+						 stmtsAnddecls: 
+							<ExprStmtNode> (56:3)
+							 expr:
+								<AssignExprNode> (56:3)
+								 lhs:
+									<ArrayrefExprNode> (56:3):
+									 arr:
+										<ArrayrefExprNode> (56:3):
+										 arr:
+											<IdentifierExprNode> (56:3)
+											identifier: test
+										 index:
+											<IntLiteralNode> (56:8)
+											 value: 1
+									 index:
+										<IntLiteralNode> (56:11)
+										 value: 1
+								 rhs:
+									<ArrayrefExprNode> (56:16):
+									 arr:
+										<FuncallExprNode> (56:16)
+										 expr:
+											<IdentifierExprNode> (56:16)
+											identifier: func
+										 args:
+											<IdentifierExprNode> (56:21)
+											identifier: test
+									 index:
+										<IntLiteralNode> (56:27)
+										 value: 0
+					 else: null
+					<ReturnStmtNode> (58:2)
+					 value:
+						<SuffixExprNode> (58:9)
+						 op: PRE_DEC
+						 expr:
+							<IdentifierExprNode> (58:11)
+							identifier: id
+			 else: null
+			<ReturnStmtNode> (60:1)
 			 value:
-				<IntLiteralNode> (36:8)
+				<IntLiteralNode> (60:8)
 				 value: 0
+	<VarDeclNode> (63:2)
+	 name: a
+	 type:
+		<TypeNode> (63:0)
+		 type: class A
+	 init:
+		<NewExprNode> (63:10)
+		 numDim: 0
+		 newType:
+			<TypeNode> (63:10)
+			 type: class A
+		dims: null
+	<VarDeclNode> (64:2)
+	 name: b
+	 type:
+		<TypeNode> (64:0)
+		 type: class B
+	 init:
+		<FuncallExprNode> (64:6)
+		 expr:
+			<MemberExprNode> (64:6)
+			 member: method
+			 expr:
+				<IdentifierExprNode> (64:6)
+				identifier: a
+		 args: null
+	<VarDeclNode> (65:2)
+	 name: aa
+	 type:
+		<TypeNode> (65:0)
+		 type: class A
+	 init:
+		<FuncallExprNode> (65:7)
+		 expr:
+			<MemberExprNode> (65:7)
+			 member: method
+			 expr:
+				<FuncallExprNode> (65:7)
+				 expr:
+					<MemberExprNode> (65:7)
+					 member: method
+					 expr:
+						<FuncallExprNode> (65:7)
+						 expr:
+							<MemberExprNode> (65:7)
+							 member: method
+							 expr:
+								<IdentifierExprNode> (65:7)
+								identifier: b
+						 args: null
+				 args: null
+		 args: null
+	<ClassDeclNode> (67:0)
+	 name: A
+	 varDecls:
+		<VarDeclNode> (68:3)
+		 name: b
+		 type:
+			<TypeNode> (68:1)
+			 type: class B
+		 init: null
+	 funcMember:
+		<FuncDeclNode> (69:1)
+		 name: method
+		 hasReturn: true
+		 returnType:
+			<TypeNode> (69:1)
+			 type: class B
+		 parameterList: null
+		 body:
+			<BlockStmtNode> (69:12)
+			 stmtsAnddecls: 
+	<ClassDeclNode> (72:0)
+	 name: B
+	 varDecls:
+		<VarDeclNode> (73:3)
+		 name: a
+		 type:
+			<TypeNode> (73:1)
+			 type: class A
+		 init: null
+	 funcMember:
+		<FuncDeclNode> (74:1)
+		 name: method
+		 hasReturn: true
+		 returnType:
+			<TypeNode> (74:1)
+			 type: class A
+		 parameterList: null
+		 body:
+			<BlockStmtNode> (74:12)
+			 stmtsAnddecls: 
 AST-Dump END
-
-
-
-Scope-Dump START
-Scope: isTop: true
-<Func Entity>:  name: print, Type: function print
- returnType: void, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	<Var Entity>:  name: str, Type: string
-	 isMember: false, ClassName: null
-	 isGlobal: false
-<Func Entity>:  name: println, Type: function println
- returnType: void, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	<Var Entity>:  name: str, Type: string
-	 isMember: false, ClassName: null
-	 isGlobal: false
-<Func Entity>:  name: getString, Type: function getString
- returnType: string, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	null
-<Func Entity>:  name: getInt, Type: function getInt
- returnType: int, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	null
-<Func Entity>:  name: toString, Type: function toString
- returnType: string, isBuiltIn: true
- isMember: false, ClassName: 
- params:
-	<Var Entity>:  name: i, Type: int
-	 isMember: false, ClassName: null
-	 isGlobal: false
-<Class Entity>:  name: _array, Type: class _array
-	Scope: isTop: false
-	<Func Entity>:  name: size, Type: function size
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _array
-	 params:
-		<Var Entity>:  name: __this, Type: array
-		 isMember: false, ClassName: null
-		 isGlobal: false
-<Class Entity>:  name: _string, Type: class _string
-	Scope: isTop: false
-	<Func Entity>:  name: length, Type: function length
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: substring, Type: function substring
-	 returnType: string, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: left, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: right, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: parseInt, Type: function parseInt
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: ord, Type: function ord
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: pos, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-<Class Entity>:  name: Fibonacci, Type: class Fibonacci
-	Scope: isTop: false
-	<Var Entity>:  name: x, Type: int
-	 isMember: true, ClassName: Fibonacci
-	 isGlobal: false
-	<Var Entity>:  name: result, Type: int
-	 isMember: true, ClassName: Fibonacci
-	 isGlobal: false
-	<Func Entity>:  name: reset, Type: function reset
-	 returnType: void, isBuiltIn: false
-	 isMember: true, ClassName: reset
-	 params:
-		<Var Entity>:  name: __this, Type: class reset
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: set_problem, Type: function set_problem
-	 returnType: void, isBuiltIn: false
-	 isMember: true, ClassName: set_problem
-	 params:
-		<Var Entity>:  name: __this, Type: class set_problem
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: x_in, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: calc, Type: function calc
-	 returnType: int, isBuiltIn: false
-	 isMember: true, ClassName: calc
-	 params:
-		<Var Entity>:  name: __this, Type: class calc
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: cur_num, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: get_result, Type: function get_result
-	 returnType: int, isBuiltIn: false
-	 isMember: true, ClassName: get_result
-	 params:
-		<Var Entity>:  name: __this, Type: class get_result
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: x_in, Type: int
-		 isMember: true, ClassName: Fibonacci
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: cur_num, Type: int
-		 isMember: true, ClassName: Fibonacci
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-<Func Entity>:  name: main, Type: function main
- returnType: int, isBuiltIn: false
- isMember: false, ClassName: 
- params:
-	null
-	>>>> child	Scope: isTop: false
-	<Func Entity>:  name: size, Type: function size
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _array
-	 params:
-		<Var Entity>:  name: __this, Type: array
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Func Entity>:  name: length, Type: function length
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: substring, Type: function substring
-	 returnType: string, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: left, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: right, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: parseInt, Type: function parseInt
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: ord, Type: function ord
-	 returnType: int, isBuiltIn: true
-	 isMember: true, ClassName: _string
-	 params:
-		<Var Entity>:  name: __this, Type: string
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: pos, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Var Entity>:  name: x, Type: int
-	 isMember: true, ClassName: Fibonacci
-	 isGlobal: false
-	<Var Entity>:  name: result, Type: int
-	 isMember: true, ClassName: Fibonacci
-	 isGlobal: false
-	<Func Entity>:  name: reset, Type: function reset
-	 returnType: void, isBuiltIn: false
-	 isMember: true, ClassName: reset
-	 params:
-		<Var Entity>:  name: __this, Type: class reset
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: set_problem, Type: function set_problem
-	 returnType: void, isBuiltIn: false
-	 isMember: true, ClassName: set_problem
-	 params:
-		<Var Entity>:  name: __this, Type: class set_problem
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: x_in, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: calc, Type: function calc
-	 returnType: int, isBuiltIn: false
-	 isMember: true, ClassName: calc
-	 params:
-		<Var Entity>:  name: __this, Type: class calc
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: cur_num, Type: int
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	<Func Entity>:  name: get_result, Type: function get_result
-	 returnType: int, isBuiltIn: false
-	 isMember: true, ClassName: get_result
-	 params:
-		<Var Entity>:  name: __this, Type: class get_result
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: x_in, Type: int
-		 isMember: true, ClassName: Fibonacci
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-		<Var Entity>:  name: cur_num, Type: int
-		 isMember: true, ClassName: Fibonacci
-		 isGlobal: false
-		>>>> child		Scope: isTop: false
-		<Var Entity>:  name: __this, Type: class Fibonacci
-		 isMember: false, ClassName: null
-		 isGlobal: false
-	>>>> child	Scope: isTop: false
-	<Var Entity>:  name: teacher, Type: class Fibonacci
-	 isMember: false, ClassName: null
-	 isGlobal: false
-	<Var Entity>:  name: x, Type: int
-	 isMember: false, ClassName: null
-	 isGlobal: false
-		>>>> child		Scope: isTop: false
-Scope-Dump END
 
 
 
