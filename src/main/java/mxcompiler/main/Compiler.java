@@ -64,8 +64,8 @@ public final class Compiler {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("Resolver begin");
 
-		Resolver resolver = new Resolver();
-		resolver.visit(root);
+		ResolverAndChecker RCer = new ResolverAndChecker();
+		RCer.visit(root);
 
 		if (opts.dumpMode().contains(DumpMode.ScopeDump) || opts.dumpMode().contains(DumpMode.AllDump)) {
 			new ScopeDump(dumpOut).visit(root);
