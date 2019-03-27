@@ -305,18 +305,17 @@ public class ResolverAndChecker extends Visitor {
 			if (node.getInit() != null) {
 				visit(node.getInit());
 
-				boolean invalid; // init // UGLY: no need to check init-voidtype, cause never happen then
+				boolean invalid = true; // init // UGLY: no need to check init-voidtype, cause never happen then
+				boolean valid = false;
 				if (node.getType().getType() instanceof VoidType || node.getInit().getType() instanceof VoidType)
-					invalid = true;
+					valid = false;
 				else if (node.getType().getType().isEqual(node.getInit().getType()))
-					invalid = false;
+					valid = true;
 				else if (node.getInit().getType() instanceof MNullType) // UGLY: can not use var without init
-					invalid = !(node.getType().getType() instanceof ClassType
+					valid = (node.getType().getType() instanceof ClassType
 							|| node.getType().getType() instanceof ArrayType);
-				else
-					invalid = true;
 
-				if (invalid)
+				if (!valid)
 					throw new SemanticError("Invalid variable init value: expected "
 							+ node.getType().getType().toString() + " but got " + node.getInit().getType().toString());
 			}
