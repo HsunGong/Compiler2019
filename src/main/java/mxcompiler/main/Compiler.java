@@ -21,7 +21,7 @@ public final class Compiler {
 	private final ErrorHandler errHandler;
 	private Option opts;
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Error {
 		Compiler c = new Compiler(ProgName);
 		c.execute(args);
 	}
@@ -31,13 +31,13 @@ public final class Compiler {
 
 	}
 
-	private void execute(String[] args) throws Exception {
+	private void execute(String[] args) throws Error {
 		// parse options
 		opts = new Option(args);
 
 		this.fileIn = opts.sourceFile();
-		this.dumpOut = new PrintStream(new FileOutputStream("./src/test/test.out", false));
 		try {
+			this.dumpOut = new PrintStream(new FileOutputStream("./src/test/test.out", false));
 			fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
 		} catch (Exception e) {
 			// throw new Error(e);
@@ -54,13 +54,16 @@ public final class Compiler {
 	private ASTNode root;
 
 	// file compiler with errorHandler
-	private void compile() throws Exception {
-		buildAST();
-		semanticAnalyze();
-
+	private void compile() throws Error {
+		try {
+			buildAST();
+			semanticAnalyze();
+		} catch(Exception e) {
+			throw new Error(e);
+		}
 	}
 
-	private void semanticAnalyze() throws Exception {
+	private void semanticAnalyze() throws Error {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("Resolver begin");
 
@@ -74,7 +77,7 @@ public final class Compiler {
 			System.out.println(">>> Resolver end");
 	}
 
-	private void buildAST() throws Exception {
+	private void buildAST() throws Error, Exception {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("AST Build begin");
 

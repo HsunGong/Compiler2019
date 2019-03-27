@@ -1,49 +1,26 @@
+int main() {
+	A tmp;
+    return tmp.a.b.s.substring(0,1).length();
+}
 class A{
-    int a;
-    A ptr;
-    B alt;
-    B af(){
-        return alt.pf();
-    }
-    A pf(){
-        return alt.af();
-    }
+	B a;
 }
-
-int main()
-{
-    A ptr;
-    B alt;
-    //legal
-    ptr.ptr.(ptr).alt.alt.a = alt.af().pf().af().pf().b;
-    alt.pf();
-    //illegal
-    ptr.(alt.ptr);
-    ptr.alt.(b+1);
-
-    return 1;
-}
-
 class B{
-    int b;
-    A alt;
-    B ptr;
-    A af(){
-        return alt.pf();
-    }
-    B pf(){
-        return alt.af();
-    }
+	C b;
 }
+class C{
+	string s;
+}
+
 
 
 /*!! metadata:
 === comment ===
-林耘丰 516021910226-test invalid member access operation
+王天哲 Class.Class.Class.substring.length:)
 === is_public ===
 True
 === assert ===
-failure_compile
+success_compile
 === timeout ===
 0
 === input ===
@@ -54,21 +31,5 @@ semantic pretest
 
 === exitcode ===
 0
-
-!!*/
-
-
-
-
-/*!! metadata:
-=== comment ===
-naivetest-515030910633-xianzangyueyang.txt
-naive test(maybe can modify this since 'a' is a reference)
-=== assert ===
-success_compile
-=== phase ===
-semantic extended
-=== is_public ===
-True
 
 !!*/

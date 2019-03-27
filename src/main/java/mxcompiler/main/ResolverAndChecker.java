@@ -93,6 +93,7 @@ public class ResolverAndChecker extends Visitor {
 				throw new CompileError("toplevel");
 
 			getCurScope().put(node.getName(), entity);
+			// getCurScope().get(node.getName());
 
 			pushScope(entity.getScope());
 			curClass = entity;
@@ -286,7 +287,7 @@ public class ResolverAndChecker extends Visitor {
 				if (!(getCurScope().get(typeName) instanceof ClassEntity))
 					throw new CompileError("no such class");
 			}
-		} catch (Exception e) {
+		} catch (Error e) {
 			throw new SemanticError("Type check " + e);
 		}
 	}
@@ -305,7 +306,6 @@ public class ResolverAndChecker extends Visitor {
 			if (node.getInit() != null) {
 				visit(node.getInit());
 
-				boolean invalid = true; // init // UGLY: no need to check init-voidtype, cause never happen then
 				boolean valid = false;
 				if (node.getType().getType() instanceof VoidType || node.getInit().getType() instanceof VoidType)
 					valid = false;
@@ -415,23 +415,25 @@ public class ResolverAndChecker extends Visitor {
 
 	@Override
 	public void visit(ReturnStmtNode node) {
-		// UGLY: change all invalid into valid
+
 		boolean invalid = false;
+		boolean valid = true;
+
 		visit(node.getExpr());
 
 		if (node.getExpr() == null) {
 			if (!(curReturnType instanceof NullType || curReturnType instanceof VoidType))
-				invalid = true;
+				valid = false;
 		} else {
 			if (node.getExpr().getType() instanceof NullType || node.getExpr().getType() instanceof VoidType)
-				invalid = true;
+				valid = false;
 			else if (node.getExpr().getType() instanceof MNullType)
-				invalid = !(curReturnType instanceof ClassType || curReturnType instanceof ArrayType);
+				valid = (curReturnType instanceof ClassType || curReturnType instanceof ArrayType);
 			else if (!(node.getExpr().getType().isEqual(curReturnType)))
-				invalid = true;
+				valid = false;
 		}
 
-		if (invalid) {
+		if (!valid) {
 			if (curReturnType instanceof NullType || curReturnType instanceof VoidType)
 				throw new SemanticError("Return statement should have no return value");
 			else
@@ -491,7 +493,7 @@ public class ResolverAndChecker extends Visitor {
 			try {
 				memEntity = classEntity.getScope().getCur(classEntity.getDomain() + node.getMember()); // NOTE: is //
 																										// getCur
-			} catch (Exception e) {
+			} catch (Error e) {
 				memEntity = classEntity.getScope().getCur(node.getMember()); // NOTE: is getCur
 				if (!(memEntity instanceof VarEntity))
 					throw new SemanticError("not varEntity of member");
@@ -500,8 +502,8 @@ public class ResolverAndChecker extends Visitor {
 			// contain a funcall expr from before
 			if (memEntity instanceof FuncEntity)
 				curFuncEntity = (FuncEntity) memEntity;
-		} catch (Exception e) {
-			throw new Error(e);
+		} catch (Error e) {
+			throw new SemanticError(e.getMessage());
 		}
 
 		node.setType(memEntity.getType());
@@ -510,10 +512,11 @@ public class ResolverAndChecker extends Visitor {
 
 	@Override
 	public void visit(FuncallExprNode node) {
+		visit(node.getExpr());
+		if (!(node.getExpr().getType() instanceof FuncType))
+			throw new SemanticError(node.getExpr().getType().toString() + " is not funcall expr");
+
 		try {
-			visit(node.getExpr());
-			if (!(node.getExpr().getType() instanceof FuncType))
-				throw new SemanticError(node.getExpr().getType().toString() + " is not funcall expr");
 
 			// FIX: get funcEntity
 			FuncEntity funcallEntity = curFuncEntity;
@@ -531,19 +534,19 @@ public class ResolverAndChecker extends Visitor {
 								+ paraNum + " but got " + node.getParam().size());
 
 			// check param type
-			boolean invalid; // invalid of param type
+			boolean valid;
 			for (int i = 0; i < paraNum - firstParaIdx; ++i) {
 				ExprNode curParam = node.getParam().get(i);
 				VarEntity defParam = funcallEntity.params.get(i + firstParaIdx); // define in fun-decl
 				visit(curParam);
 				if (curParam.getType() instanceof VoidType) // UGLY: cause funcall-void
-					invalid = true;
+					valid = false;
 				else if (curParam.getType() instanceof MNullType)
-					invalid = !(defParam.getType() instanceof ClassType || defParam.getType() instanceof ArrayType);
+					valid = (defParam.getType() instanceof ClassType || defParam.getType() instanceof ArrayType);
 				else
-					invalid = !(defParam.getType().isEqual(curParam.getType()));
+					valid = (defParam.getType().isEqual(curParam.getType()));
 
-				if (invalid) {
+				if (!valid) {
 					throw new SemanticError(curParam.getLocation().toString()
 							+ "Function call has inconsistent type of arguments, expected "
 							+ defParam.getType().toString() + " but got " + curParam.getType().toString());
@@ -672,19 +675,18 @@ public class ResolverAndChecker extends Visitor {
 			break;
 		case EQUAL:
 		case INEQUAL:
-			boolean invalid;
+			boolean invalid = true;
+			boolean valid = false;
 			if (lhsType instanceof VoidType || rhsType instanceof VoidType)
-				invalid = true;
+				valid = false;
 			else if (lhsType.isEqual(rhsType))
-				invalid = false;
+				valid = true;
 			else if (lhsType instanceof MNullType)
-				invalid = !(rhsType instanceof ClassType || rhsType instanceof ArrayType);
+				valid = (rhsType instanceof ClassType || rhsType instanceof ArrayType);
 			else if (rhsType instanceof MNullType)
-				invalid = !(lhsType instanceof ClassType || lhsType instanceof ArrayType);
-			else
-				invalid = true;
+				valid = (lhsType instanceof ClassType || lhsType instanceof ArrayType);
 
-			if (invalid)
+			if (!valid)
 				throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to different types"
 						+ lhsType.toString() + " and " + rhsType.toString());
 
@@ -718,7 +720,7 @@ public class ResolverAndChecker extends Visitor {
 		if (!(node.getLhs().isLeftValue()))
 			throw new SemanticError("Lhs of assignment statement should be left value");
 
-		boolean invalid;
+		boolean invalid = true;
 		if (lhsType instanceof VoidType || rhsType instanceof VoidType)
 			invalid = true;
 		else if (lhsType.isEqual(rhsType))
@@ -742,12 +744,8 @@ public class ResolverAndChecker extends Visitor {
 		String name = node.getIdentifier();
 		Entity entity;
 
-		try {
-			// toplevel or class-level
-			entity = getCurScope().getVarFun(name, (curClass == null) ? "" : curClass.getDomain());
-		} catch (Exception e) {
-			throw new SemanticError(e.getMessage());
-		}
+		// toplevel or class-level
+		entity = getCurScope().getVarFun(name, (curClass == null) ? "" : curClass.getDomain());
 
 		if (entity instanceof ClassEntity)
 			throw new SemanticError("get Idenfier as class");
@@ -766,18 +764,14 @@ public class ResolverAndChecker extends Visitor {
 
 	@Override
 	public void visit(ThisExprNode node) {
-		try {
-			// UGLY: how about add __this in class-scope not function-scope??
-			Entity entity = getCurScope().get("__this");
+		// UGLY: how about add __this in class-scope not function-scope??
+		Entity entity = getCurScope().get("__this");
 
-			if (!(entity instanceof VarEntity))
-				throw new SemanticError("Invalid entity type for \"this\"");
+		if (!(entity instanceof VarEntity))
+			throw new SemanticError("Invalid entity type for \"this\"");
 
-			node.setIsLeftValue(false);
-			node.setType(entity.getType());
-		} catch (Exception e) {
-			throw new Error(e);
-		}
+		node.setIsLeftValue(false);
+		node.setType(entity.getType());
 
 	}
 
