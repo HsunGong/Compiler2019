@@ -11,7 +11,7 @@ import mxcompiler.utils.entity.*;
 import mxcompiler.type.*;
 
 import mxcompiler.ast.statement.*;
-import mxcompiler.exception.SemanticException;
+import mxcompiler.error.SemanticError;
 import mxcompiler.ast.declaration.*;
 import mxcompiler.ast.expression.*;
 import mxcompiler.ast.expression.literal.*;

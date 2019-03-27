@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import mxcompiler.exception.OptionException;
+import mxcompiler.error.OptionError;
 import mxcompiler.main.CompilerMode.DumpMode;
 
 public class Option {
@@ -19,18 +19,18 @@ public class Option {
 	private int level = 0;
 	private boolean debug = false;
 
-	public Option(String[] args) throws OptionException {
+	public Option(String[] args) throws OptionError {
 		parseArgs(args);
 	}
 
-	void parseArgs(String[] Args) throws OptionException {
+	void parseArgs(String[] Args) throws OptionError {
 		ListIterator<String> args = Arrays.asList(Args).listIterator();
 		while (args.hasNext()) {
 			String arg = args.next();
 			if (arg.startsWith("-")) {
 				if (CompilerMode.isModeOption(arg)) {
 					if (mode != null) {
-						throw new OptionException(mode.getOption() + " option and " + arg + " option is exclusive");
+						throw new OptionError(mode.getOption() + " option and " + arg + " option is exclusive");
 					}
 					mode = CompilerMode.fromOption(arg);
 				} else if (DumpMode.isModeOption(arg)) {
@@ -46,7 +46,7 @@ public class Option {
 				} else if (arg.startsWith("-O")) {
 					String type = arg.substring(2);
 					if (!type.matches("^([0123s]|)$")) {
-						throw new OptionException("unknown optimization switch: " + arg);
+						throw new OptionError("unknown optimization switch: " + arg);
 					}
 					level = (type.equals("0") ? 0 : 1);
 				} else if (arg.equals("--version") || arg.equals("-v")) {
@@ -56,16 +56,16 @@ public class Option {
 					printUsage();
 					System.exit(0);
 				} else {
-					throw new OptionException("unknown option: " + arg);
+					throw new OptionError("unknown option: " + arg);
 				}
 			} else if (src == null) {
 				try {
 					src = new FileInputStream(arg);
 				} catch (FileNotFoundException e) {
-					throw new OptionException(e.getMessage());
+					throw new OptionError(e.getMessage());
 				}
 			} else {
-				throw new OptionException("too many srcs");
+				throw new OptionError("too many srcs");
 			}
 		}
 

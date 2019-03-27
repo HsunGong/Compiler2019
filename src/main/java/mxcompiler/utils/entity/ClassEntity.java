@@ -1,8 +1,8 @@
 package mxcompiler.utils.entity;
 
 import mxcompiler.ast.declaration.*;
-import mxcompiler.exception.CompileError;
-import mxcompiler.exception.SemanticException;
+import mxcompiler.error.CompileError;
+import mxcompiler.error.SemanticError;
 import mxcompiler.type.ClassType;
 import mxcompiler.type.Type;
 import mxcompiler.utils.Dump;

@@ -41,7 +41,7 @@ mxcompiler/parser/MxParser$BinaryExprContext.class
 mxcompiler/parser/MxParser$ParamDeclarationContext.class
 mxcompiler/parser/LMxLexer.class
 mxcompiler/parser/MxParser$ForInitStmtContext.class
-mxcompiler/exception/OptionException.class
+mxcompiler/exception/OptionError.class
 mxcompiler/parser/MxParser$ForNoneStmtContext.class
 mxcompiler/parser/MxParser$ClassBodyContext.class
 mxcompiler/parser/MxParser$WhileStmtContext.class
@@ -89,7 +89,7 @@ mxcompiler/parser/MxParser$TypeNameContext.class
 mxcompiler/ast/expression/literal/IntLiteralExprNode.class
 mxcompiler/parser/MxParser$BlankStmtContext.class
 mxcompiler/parser/MxParser$PrefixExprContext.class
-mxcompiler/exception/SemanticException.class
+mxcompiler/exception/SemanticError.class
 mxcompiler/parser/MxListener.class
 mxcompiler/type/IntType.class
 mxcompiler/ast/Node.class

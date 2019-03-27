@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import mxcompiler.utils.entity.Entity;
-import mxcompiler.exception.SemanticException;
+import mxcompiler.error.SemanticError;
 
 public class ToplevelScope extends Scope {
 	public ToplevelScope() {
@@ -18,31 +18,31 @@ public class ToplevelScope extends Scope {
 	}
 
 	@Override
-	public Entity get(String k) throws SemanticException {
+	public Entity get(String k) throws SemanticError {
 		Entity v = entities.get(k);
 		if (v == null) { // error
-			throw new SemanticException("not found " + k);
+			throw new SemanticError("not found " + k);
 		}
 		return v;
 	}
 
 	@Override
-	public Entity getVarFun(String k, String domain) throws SemanticException {
+	public Entity getVarFun(String k, String domain) throws SemanticError {
 		Entity v = entities.get(k);
 		if (v == null) { // error
-			throw new SemanticException("not found " + k);
+			throw new SemanticError("not found " + k);
 		}
 		return v;
 	}
 
 	// better say define nor declare
 	@Override
-	public void put(String k, Entity v) throws SemanticException {
+	public void put(String k, Entity v) throws SemanticError {
 		Entity check = entities.get(k);
 		// FIX: is it work ??
 		// .getType() == left error
 		if (check != null) {
-			throw new SemanticException("already have " + k);
+			throw new SemanticError("already have " + k);
 		}
 		entities.put(k, v);
 	}

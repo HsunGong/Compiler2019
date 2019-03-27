@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import mxcompiler.utils.Dump;
 import mxcompiler.utils.entity.Entity;
-import mxcompiler.exception.*;
+import mxcompiler.error.*;
 
 abstract public class Scope {
 	/**
@@ -67,11 +67,11 @@ abstract public class Scope {
 	// key is maybe : var, func, class;
 	protected Map<String, Entity> entities;
 
-	abstract public void put(String k, Entity v) throws SemanticException;
+	abstract public void put(String k, Entity v) throws SemanticError;
 
-	abstract public Entity get(String k) throws SemanticException; // DeclNode or called Entity
+	abstract public Entity get(String k) throws SemanticError; // DeclNode or called Entity
 
-	abstract public Entity getVarFun(String k, String domain) throws SemanticException;
+	abstract public Entity getVarFun(String k, String domain) throws SemanticError;
 	// FIX: update ??
 	// FIX: assert have key
 	// FIX: check - get/put/contain

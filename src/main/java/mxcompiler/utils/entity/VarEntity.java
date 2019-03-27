@@ -1,7 +1,7 @@
 package mxcompiler.utils.entity;
 
 import mxcompiler.ast.declaration.VarDeclNode;
-import mxcompiler.exception.CompileError;
+import mxcompiler.error.CompileError;
 import mxcompiler.type.Type;
 import mxcompiler.type.VarType;
 import mxcompiler.utils.Dump;

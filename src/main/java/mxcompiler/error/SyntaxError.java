@@ -1,4 +1,4 @@
-package mxcompiler.exception;
+package mxcompiler.error;
 
 public class SyntaxError extends Error {
 

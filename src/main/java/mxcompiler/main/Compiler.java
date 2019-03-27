@@ -10,7 +10,7 @@ import java.io.PrintStream;
 
 import mxcompiler.parser.*;
 import mxcompiler.utils.scope.ScopeDump;
-import mxcompiler.exception.*;
+import mxcompiler.error.*;
 import mxcompiler.main.CompilerMode.DumpMode;
 import mxcompiler.ast.*;
 
@@ -18,7 +18,7 @@ public final class Compiler {
 	static final public String ProgName = "mxc";
 	static final public String Version = "1.0.0";
 
-	private final ExceptionHandler errHandler;
+	private final ErrorHandler errHandler;
 	private Option opts;
 
 	public static void main(String[] args) throws Exception {
@@ -27,7 +27,7 @@ public final class Compiler {
 	}
 
 	private Compiler(String name) {
-		this.errHandler = new ExceptionHandler(name);
+		this.errHandler = new ErrorHandler(errOut);
 
 	}
 
@@ -35,21 +35,22 @@ public final class Compiler {
 		// parse options
 		opts = new Option(args);
 
-		this.in = opts.sourceFile();
-		this.dump = new PrintStream(new FileOutputStream("./src/test/test.out", false));
+		this.fileIn = opts.sourceFile();
+		this.dumpOut = new PrintStream(new FileOutputStream("./src/test/test.out", false));
 		try {
-			out = new PrintStream(new FileOutputStream(opts.outputFile(), false));
+			fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
 		} catch (Exception e) {
 			// throw new Error(e);
-			out = System.out;
+			fileOut = System.out;
 		}
 
 		compile();
 	}
 
-	private InputStream in;
-	private PrintStream out;
-	private PrintStream dump;
+	private InputStream fileIn;
+	private PrintStream fileOut;
+	private PrintStream errOut = System.out;
+	private PrintStream dumpOut;
 	private ASTNode root;
 
 	// file compiler with errorHandler
@@ -67,7 +68,7 @@ public final class Compiler {
 		resolver.visit(root);
 
 		if (opts.dumpMode().contains(DumpMode.ScopeDump) || opts.dumpMode().contains(DumpMode.AllDump)) {
-			new ScopeDump(dump).visit(root);
+			new ScopeDump(dumpOut).visit(root);
 		}
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> Resolver end");
@@ -77,11 +78,11 @@ public final class Compiler {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("AST Build begin");
 
-		MxLexer lexer = new MxLexer(CharStreams.fromStream(in));
+		MxLexer lexer = new MxLexer(CharStreams.fromStream(fileIn));
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		MxParser parser = new MxParser(tokens);
 		parser.removeErrorListeners();
-		parser.addErrorListener(new ErrorHandler());
+		parser.addErrorListener(errHandler);
 
 		ParseTree tree = parser.compilationUnit(); // the begin root of my g4 file
 
@@ -89,7 +90,7 @@ public final class Compiler {
 		root = (ASTNode) astBuilder.visit(tree);
 
 		if (opts.dumpMode().contains(DumpMode.ASTDump) || opts.dumpMode().contains(DumpMode.AllDump)) {
-			new ASTDump(dump).visit(root);
+			new ASTDump(dumpOut).visit(root);
 		}
 
 		if (opts.mode().equals(CompilerMode.Debug))

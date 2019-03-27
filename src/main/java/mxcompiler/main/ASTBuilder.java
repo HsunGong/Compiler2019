@@ -18,7 +18,7 @@ import mxcompiler.ast.expression.literal.*;
 import mxcompiler.ast.expression.lhs.*;
 import mxcompiler.ast.expression.unary.*;
 
-import mxcompiler.exception.*;
+import mxcompiler.error.*;
 
 /**
  * used for generate AST to prepare for Semantic Check

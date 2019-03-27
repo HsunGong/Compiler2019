@@ -21,13 +21,13 @@
 /home/xun/Documents/mxc/src/main/java/mxcompiler/type/BoolType.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/ast/declaration/ClassDeclNode.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/main/IRGenerator.java
-/home/xun/Documents/mxc/src/main/java/mxcompiler/exception/OptionException.java
+/home/xun/Documents/mxc/src/main/java/mxcompiler/exception/OptionError.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/parser/MxLexer.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/main/Option.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/main/CompilerMode.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/asm/package-info.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/parser/MxBaseListener.java
-/home/xun/Documents/mxc/src/main/java/mxcompiler/exception/SemanticException.java
+/home/xun/Documents/mxc/src/main/java/mxcompiler/exception/SemanticError.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/parser/LMxLexer.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/ast/expression/FuncallExprNode.java
 /home/xun/Documents/mxc/src/main/java/mxcompiler/parser/MxVisitor.java

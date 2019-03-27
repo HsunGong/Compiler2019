@@ -10,8 +10,8 @@ import mxcompiler.utils.entity.*;
 import mxcompiler.type.*;
 
 import mxcompiler.ast.statement.*;
-import mxcompiler.exception.CompileError;
-import mxcompiler.exception.SemanticException;
+import mxcompiler.error.CompileError;
+import mxcompiler.error.SemanticError;
 import mxcompiler.ast.declaration.*;
 import mxcompiler.ast.expression.*;
 import mxcompiler.ast.expression.literal.*;
@@ -75,7 +75,7 @@ public class Resolver extends Visitor {
 				throw new Error("\"main\" function's return type should be \"int\"");
 			if (!mainFunc.params.isEmpty())
 				throw new Error("\"main\" function should have no parameter");
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("No main funcion");
 		}
 	}
@@ -115,7 +115,7 @@ public class Resolver extends Visitor {
 
 			curClass = null;
 			popScope();
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("class Resolve " + e);
 		}
 	}
@@ -137,7 +137,7 @@ public class Resolver extends Visitor {
 			 */
 
 			getCurScope().put(node.getName(), entity);
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("var Resolve " + e);
 		}
 	}
@@ -159,7 +159,7 @@ public class Resolver extends Visitor {
 
 				getCurScope().put(key, entity);
 			}
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("func Resolve " + e);
 		}
 	}
@@ -212,7 +212,7 @@ public class Resolver extends Visitor {
 			// entity.setMemorySize(currentOffset);
 			curClass = null;
 			popScope();
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("classEntity Check " + e);
 		}
 	}
@@ -276,7 +276,7 @@ public class Resolver extends Visitor {
 
 			visit(node.getBody());
 			curReturnType = null;
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("Func Entity check " + e);
 		}
 	}
@@ -324,7 +324,7 @@ public class Resolver extends Visitor {
 					throw new Error("Invalid variable init value: expected " + node.getType().getType().toString()
 							+ " but got " + node.getInit().getType().toString());
 			}
-		// } catch (SemanticException e) {
+		// } catch (SemanticError e) {
 		// 	throw new Error("VarEntity Check " + e);
 		// }
 	}
@@ -892,7 +892,7 @@ public class Resolver extends Visitor {
 			toplevelScope.put(name, arrayEntity);
 			name = Scope.BuiltIn.STRING.toString();
 			toplevelScope.put(name, stringEntity);
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("Class name" + name + "is already defined");
 		}
 	}
@@ -922,7 +922,7 @@ public class Resolver extends Visitor {
 				entity.className = curClass.getName();
 				curScope.put(curClass.getDomain() + name, entity);
 			}
-		} catch (SemanticException e) {
+		} catch (SemanticError e) {
 			throw new Error("Fuck idiot!");
 		}
 	}
