@@ -491,7 +491,7 @@ public class Resolver extends Visitor {
 					node.getExpr().getType().toString() + ", No such Type can be used in member access expression");
 
 		try {
-			ClassEntity classEntity = (ClassEntity) getCurScope().get(className);
+			ClassEntity classEntity = (ClassEntity) scopeStack.getFirst().get(className);
 			try {
 				memEntity = classEntity.getScope().getCur(classEntity.getDomain() + node.getMember()); // NOTE: is //
 																										// getCur

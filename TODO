@@ -190,3 +190,5 @@ TypeResolve:
 	✔ FIXED: @done(03-26 22)
 		equals remain: others
 		isEqual remain: compare with type-> Type.baseType or Type.InnerType 
+		✔ 	Can not find right class		ClassEntity classEntity = (ClassEntity) scopeStack.getFirst().get(className); @done(03-27 09)
+
