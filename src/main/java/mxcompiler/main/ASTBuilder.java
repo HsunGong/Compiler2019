@@ -9,7 +9,6 @@ import mxcompiler.parser.MxBaseVisitor;
 import mxcompiler.parser.MxParser;
 
 import mxcompiler.type.*;
-
 import mxcompiler.ast.*;
 import mxcompiler.ast.statement.*;
 import mxcompiler.ast.declaration.*;
@@ -46,7 +45,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 				else if (decl instanceof DeclNode)
 					decls.add((DeclNode) decl);
 				else
-					throw new Error("not found decl from compilation unit");
+					throw new SemanticError("not found decl from compilation unit");
 			}
 		return new ASTNode(decls, new Location(ctx));
 	}
@@ -68,8 +67,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		if (ctx.variableDeclaration() != null)
 			return visit(ctx.variableDeclaration());
 
-		// UGLY: redo my own error type
-		throw new Error("No translation part found");
+		throw new SemanticError("No translation part found");
 	}
 
 	/**
@@ -171,7 +169,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		if (ctx.Identifier() != null)
 			return new ClassType(ctx.Identifier().getText());
 
-		throw new Error("Invalid Type");
+		throw new SemanticError("Invalid Type");
 	}
 
 	/**
@@ -344,7 +342,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		if (ctx.variableDeclaration() != null)
 			return visit(ctx.variableDeclaration());
 
-		throw new Error("no such block-body-stmt");
+		throw new SemanticError("no such block-body-stmt");
 	}
 
 	/**
@@ -519,7 +517,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	@Deprecated // cause cannot transfer vardecl into expr
 	@Override
 	public Node visitParamList(MxParser.ParamListContext ctx) {
-		throw new Error("What happened ??");
+		throw new CompileError("What happened ??");
 		// return visitChildren(ctx);
 	}
 
@@ -546,7 +544,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 */
 	@Override
 	public Node visitErrorCreator(MxParser.ErrorCreatorContext ctx) {
-		throw new Error("can not create this");
+		throw new SemanticError("can not create this");
 	}
 
 	/**
@@ -710,7 +708,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		if (ctx.expression() != null)
 			return visit(ctx.expression());
 
-		throw new Error("not found primary expr");
+		throw new SemanticError("not found primary expr");
 	}
 
 	/**
@@ -728,7 +726,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			try {
 				v = Integer.parseInt(ctx.getText());
 			} catch (Exception e) {
-				throw new Error("not found int literal" + e);
+				throw new SyntaxError("not found int literal" + e);
 			}
 			return new IntLiteralExprNode(v, new Location(ctx));
 		}
@@ -743,7 +741,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			return new BoolLiteralExprNode(ctx.True() != null, new Location(ctx));
 		}
 
-		throw new Error("not found literal type");
+		throw new SemanticError("not found literal type");
 	}
 
 }
