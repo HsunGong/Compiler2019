@@ -203,7 +203,7 @@ public class ASTDump extends Visitor {
 	public void visit(FuncallExprNode node) {
 		addTab();
 		node._dump(this);
-		printExpr(" expr:", node.getExpr()); // FIX: getFunc
+		printExpr(" expr:", node.getExpr());
 		printExprList(" args:", node.getParam());
 		delTab();
 	}

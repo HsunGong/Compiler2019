@@ -24,7 +24,7 @@ public class ResolverAndChecker extends Visitor {
 	/** means can not change LinkedList's type */
 	private final LinkedList<Scope> scopeStack;
 	// private int isInLoop = 0;
-	private ClassEntity curClass; // UGLY: can also use a stack
+	private ClassEntity curClass; // NOTE: can also use a stack-to support class{class}
 	private int loop;
 	private Type curReturnType;
 	private FuncEntity curFuncEntity;
@@ -311,7 +311,7 @@ public class ResolverAndChecker extends Visitor {
 					valid = false;
 				else if (node.getType().getType().isEqual(node.getInit().getType()))
 					valid = true;
-				else if (node.getInit().getType() instanceof MNullType) // UGLY: can not use var without init
+				else if (node.getInit().getType() instanceof MNullType)
 					valid = (node.getType().getType() instanceof ClassType
 							|| node.getType().getType() instanceof ArrayType);
 
@@ -466,7 +466,7 @@ public class ResolverAndChecker extends Visitor {
 		if (!(node.getIndex().getType() instanceof IntType))
 			throw new SemanticError("ArrayIndexType should have Int but got " + node.getExpr().getType().toString());
 
-		// FIX: double domian arrayType
+		// BUG: double domian arrayType - set dim seems not get dims
 		node.setType(((ArrayType) node.getExpr().getType()).getBaseType());
 		node.setIsLeftValue(true);
 	}
@@ -518,8 +518,8 @@ public class ResolverAndChecker extends Visitor {
 
 		try {
 
-			// FIX: get funcEntity
-			FuncEntity funcallEntity = curFuncEntity;
+			// get funcEntity
+			FuncEntity funcallEntity = curFuncEntity; // IT can change ??
 			node.funcEntity = funcallEntity;
 			if (node.funcEntity == null) {
 				throw new CompileError("May be never happen, but no cur func can be found");
@@ -539,7 +539,7 @@ public class ResolverAndChecker extends Visitor {
 				ExprNode curParam = node.getParam().get(i);
 				VarEntity defParam = funcallEntity.params.get(i + firstParaIdx); // define in fun-decl
 				visit(curParam);
-				if (curParam.getType() instanceof VoidType) // UGLY: cause funcall-void
+				if (curParam.getType() instanceof VoidType) // cause funcall-void
 					valid = false;
 				else if (curParam.getType() instanceof MNullType)
 					valid = (defParam.getType() instanceof ClassType || defParam.getType() instanceof ArrayType);
@@ -665,7 +665,6 @@ public class ResolverAndChecker extends Visitor {
 			if (!(lhsType instanceof IntType || lhsType instanceof StringType))
 				throw new SemanticError(
 						"Operator " + node.getOp().toString() + " cannot be applied to type " + lhsType.toString());
-			// UGLY: can del this
 			if (!(rhsType instanceof IntType || rhsType instanceof StringType))
 				throw new SemanticError(
 						"Operator " + node.getOp().toString() + " cannot be applied to type " + lhsType.toString());
@@ -734,7 +733,7 @@ public class ResolverAndChecker extends Visitor {
 			throw new SemanticError("Assignment operator cannot be applied to different types " + lhsType.toString()
 					+ " and " + rhsType.toString());
 
-		// FIX: support for a = b = c
+		// NOTE: support for a = b = c
 		node.setType(lhsType);
 		node.setIsLeftValue(false);
 	}

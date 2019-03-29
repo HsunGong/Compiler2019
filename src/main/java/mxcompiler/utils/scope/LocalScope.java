@@ -6,7 +6,6 @@ import mxcompiler.utils.entity.Entity;
 import mxcompiler.error.SemanticError;
 
 public class LocalScope extends Scope {
-	// FIX: what if Scope of class??
 	public LocalScope(Scope parent) {
 		super(parent);
 		parent.addChild(this);
@@ -48,10 +47,10 @@ public class LocalScope extends Scope {
 	}
 
 	/** may have same name in different scopes */
+	// NOTE: what if a class New var ? is varType or ClassType?
 	@Override
 	public void put(String k, Entity v) throws SemanticError {
 		Entity check = entities.get(k); // or getCur
-		// FIX: what if a class New var ? is varType or ClassType?
 		// && (check.getType() == v.getType())
 		if (check != null) {
 			throw new SemanticError("already have " + k);

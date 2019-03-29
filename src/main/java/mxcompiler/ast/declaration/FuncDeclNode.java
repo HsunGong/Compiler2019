@@ -30,7 +30,7 @@ public class FuncDeclNode extends DeclNode {
 
 	public FuncDeclNode(String name, TypeNode returnType, VarDeclListNode varList, BlockStmtNode body,
 			Location location) {
-		// REVIEW: varList is null, fixed outside
+		// NOTE: varList is null, fixed outside
 		// this(name, returnType,(varList != null) ? varList.getList(): null, body,
 		// location);
 		this(name, returnType, varList.getList(), body, location);

@@ -42,7 +42,6 @@ public class BinaryOpExprNode extends ExprNode {
 	public BinaryOpExprNode(ExprNode lhs, String op, ExprNode rhs, Location location) {
 		super(location);
 		// this.type = type;
-		// UGLY: will throw IllegalArgumentException
 		this.op = Op.get(op);
 		this.lhs = lhs;
 		this.rhs = rhs;

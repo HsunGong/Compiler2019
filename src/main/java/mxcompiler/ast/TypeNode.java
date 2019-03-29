@@ -14,7 +14,6 @@ public class TypeNode extends Node {
 	}
 
 	protected Type type;
-	// protected dim; // UGLY:
 
 	public TypeNode(Type type, Location location) {
 		super(location);

@@ -49,7 +49,6 @@ public class FuncEntity extends Entity {
 	public FuncEntity(FuncDeclNode node, String className) {
 		super(node.getName(), new FuncType(node.getName()));
 
-		// FIX: need to add here? may influence resolver-funcall-paramcheck
 		// attentino: the order matters, __this should be first
 		params.add(new VarEntity(Scope.BuiltIn.THIS.toString(), new ClassType(className)));
 
@@ -86,7 +85,6 @@ public class FuncEntity extends Entity {
 				e._dump(d);
 		else
 			d.println("null");
-		// scope._dump(d);// FIX: ???
 		d.delTab();
 	}
 }

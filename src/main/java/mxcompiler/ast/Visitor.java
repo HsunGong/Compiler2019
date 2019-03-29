@@ -21,7 +21,7 @@ import mxcompiler.ast.expression.unary.*;
  * use this class, so that dont need to implement all visit func in ASTVisitor
  */
 abstract public class Visitor implements ASTVisitor {
-	// UGLY: FIX: visit DeclNode but can not change into detail instance
+	// NOTE: Wrong! visit DeclNode but can not change into detail instance
 	// 2, accept function to fix
 	public void visit(Node node) {
 		if (node == null)

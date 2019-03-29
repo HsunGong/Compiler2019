@@ -39,8 +39,6 @@ public class ToplevelScope extends Scope {
 	@Override
 	public void put(String k, Entity v) throws SemanticError {
 		Entity check = entities.get(k);
-		// FIX: is it work ??
-		// .getType() == left error
 		if (check != null) {
 			throw new SemanticError("already have " + k);
 		}

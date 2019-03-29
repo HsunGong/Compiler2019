@@ -50,7 +50,7 @@ abstract public class Type {
 	// }
 
 	// ATTENTION:
-	// FIX: UGLY:NOTE: this can not be rewrite, cause, ifso new Bool Type != new
+	// NOTE: this can not be rewrite, cause, ifso new Bool Type != new
 	// Bool Type
 	// have to compare with innerType
 	public boolean isEqual(Type rhs) {

@@ -222,7 +222,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		if (ctx.paramDeclaration() != null)
 			for (ParserRuleContext param : ctx.paramDeclaration()) {
 				paramList.add((VarDeclNode) visit(param));
-			} // BUG: can be null
+			}
 		return new VarDeclListNode(paramList, new Location(ctx));
 	}
 
@@ -498,7 +498,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		// UGLY: try to change vardecllist into listnode but failed
 		List<ExprNode> params = new ArrayList<ExprNode>();
 
-		if (ctx.paramList() != null) // REVIEW: not parmList.expression
+		if (ctx.paramList() != null) // NOTE: not parmList.expression
 			for (ParserRuleContext param : ctx.paramList().expression()) {
 				params.add((ExprNode) visit(param));
 			}
@@ -567,7 +567,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 		int num = ctx.LeftBracket().size();
 		// int num = (ctx.getChildCount() - 1 - dims.size()) / 2;
 
-		// FIX: UGLY: NOTE: current is no array plain type how to figure how many dims
+		// BUG: current is no array plain type how to figure how many dims
 		// is
 		// needed??
 		for (int i = 0; i < num; ++i)
@@ -731,7 +731,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 			return new IntLiteralExprNode(v, new Location(ctx));
 		}
 		if (ctx.StringLiteral() != null) {
-			String v = ctx.getText(); // BUG: escape-sequence??
+			String v = ctx.getText();
 			return new StringLiteralExprNode(v, new Location(ctx));
 		}
 		if (ctx.Null() != null) {

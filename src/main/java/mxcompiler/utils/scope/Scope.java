@@ -72,10 +72,7 @@ abstract public class Scope {
 	abstract public Entity get(String k) throws SemanticError; // DeclNode or called Entity
 
 	abstract public Entity getVarFun(String k, String domain) throws SemanticError;
-	// FIX: update ??
-	// FIX: assert have key
-	// FIX: check - get/put/contain
-
+	
 	public final void _dump(Dump d) {
 		d.printf("Scope: isTop: %b\n", isToplevel());
 		for (Entry<String, Entity> e : entities.entrySet()) {

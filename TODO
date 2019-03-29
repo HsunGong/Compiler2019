@@ -192,3 +192,4 @@ TypeResolve:
 		isEqual remain: compare with type-> Type.baseType or Type.InnerType 
 		✔ 	Can not find right class		ClassEntity classEntity = (ClassEntity) scopeStack.getFirst().get(className); @done(03-27 09)
 
+☐ What if change Mnull into null?

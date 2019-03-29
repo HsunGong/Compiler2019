@@ -10,9 +10,8 @@ public class VarEntity extends Entity {
 	// private IRRegister irRegister;
 	// private boolean unUsed = false;
 
-	// FIX: what is offset for?
-	// FIX: what is member for?
-	// FIX: why private, I change into public
+	// TODO: what is offset for?
+	// TODO: what is member for?
 	// public int offset;
 	private boolean isMember = false;
 	private String className;

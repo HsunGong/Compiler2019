@@ -10,7 +10,7 @@ import mxcompiler.utils.scope.*;
 
 public class ClassEntity extends Entity {
 	private LocalScope scope;
-	// FIX: what is this ? seems no use(after searching)
+	// TODO: what is this ? seems no use(after searching)
 	// public int memorySize;
 
 	public ClassEntity(String name, Type type, Scope parentScope) {
