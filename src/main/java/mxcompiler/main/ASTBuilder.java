@@ -122,12 +122,13 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 	 * <p>
 	 * The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.
-	 * </p>
+	 * 
+	 * <p>
+	 * Use recurrence to replace dim
 	 */
 	@Override
 	public Node visitArrayType(MxParser.ArrayTypeContext ctx) {
 		TypeNode type = (TypeNode) visit(ctx.type());
-		// TODO: can get dims ?? - get support from type.arraytype and conflict with
 		// array-creator
 		return new TypeNode(new ArrayType(type.getType()), new Location(ctx));
 	}

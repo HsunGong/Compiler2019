@@ -28,7 +28,7 @@
 			<groupId>org.antlr.v4</groupId>
 			<artifactId>antlr</artifactId>
 			<version>4.7.2</version>
-			<scope>system</scope> <!--  ${project.basedir} -->
+			<scope>system</scope>			<!--  ${project.basedir} -->
 			<systemPath>${pom.basedir}/lib/antlr-4.7.2-complete.jar</systemPath>
 		</dependency>
 	</dependencies>
@@ -53,6 +53,10 @@
 				</plugin>
 				<plugin>
 					<artifactId>maven-surefire-plugin</artifactId>
+						<!-- skip test -->
+						<!-- <skip>true</skip>  -->
+						<!-- ignore test -->
+						<!--<testFailureIgnore>true</testFailureIgnore> -->
 					<version>2.22.1</version>
 				</plugin>
 				<plugin>

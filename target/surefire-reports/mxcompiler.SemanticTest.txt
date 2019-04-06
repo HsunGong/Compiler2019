@@ -1,0 +1,116 @@
+-------------------------------------------------------------------------------
+Test set: mxcompiler.SemanticTest
+-------------------------------------------------------------------------------
+Tests run: 69, Failures: 28, Errors: 0, Skipped: 0, Time elapsed: 0.441 s <<< FAILURE! - in mxcompiler.SemanticTest
+testPass[0](mxcompiler.SemanticTest)  Time elapsed: 0.168 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[1](mxcompiler.SemanticTest)  Time elapsed: 0 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[2](mxcompiler.SemanticTest)  Time elapsed: 0.007 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[3](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[4](mxcompiler.SemanticTest)  Time elapsed: 0 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[5](mxcompiler.SemanticTest)  Time elapsed: 0 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[6](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[7](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[8](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[9](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[10](mxcompiler.SemanticTest)  Time elapsed: 0.003 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[11](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[12](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[13](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[14](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[15](mxcompiler.SemanticTest)  Time elapsed: 0.003 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[16](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[17](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[18](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[19](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[20](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[21](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[22](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[23](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[24](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[25](mxcompiler.SemanticTest)  Time elapsed: 0.026 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[26](mxcompiler.SemanticTest)  Time elapsed: 0.001 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+
+testPass[27](mxcompiler.SemanticTest)  Time elapsed: 0.002 s  <<< FAILURE!
+junit.framework.AssertionFailedError: this case should succeed, but you got: mxcompiler.error.SyntaxError: [Syntax Error] at (2:9)mismatched input 'this' expecting Identifier
+	at mxcompiler.SemanticTest.testPass(SemanticTest.java:45)
+

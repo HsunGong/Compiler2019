@@ -10,9 +10,7 @@ public class VarEntity extends Entity {
 	// private IRRegister irRegister;
 	// private boolean unUsed = false;
 
-	// TODO: what is offset for?
-	// TODO: what is member for?
-	// public int offset;
+	public int offset; // for Class-mem
 	private boolean isMember = false;
 	private String className;
 	public boolean isGlobal = false;

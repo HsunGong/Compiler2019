@@ -66,7 +66,6 @@ public class ResolverAndChecker extends Visitor {
 				resolve(decl);
 			}
 
-		// TODO: move to checker: checkMainFunc((FuncEntity) toplevelScope.get("main"));
 		FuncEntity mainFunc = (FuncEntity) toplevelScope.get("main");
 		if (mainFunc == null)
 			throw new SemanticError("\"main\" function not found");
@@ -98,13 +97,10 @@ public class ResolverAndChecker extends Visitor {
 			pushScope(entity.getScope());
 			curClass = entity;
 
-			// currentClassScope = entity.getScope();
-			// currentClassName = entity.getName();
-			// currentOffset = 0;
+			// currentOffset = curClass.memSize
 			if (!node.getVar().isEmpty())
 				for (VarDeclNode var : node.getVar())
 					resolve(var);
-			// entity.setMemorySize(currentOffset);
 
 			if (!node.getFunc().isEmpty())
 				for (FuncDeclNode fun : node.getFunc())
@@ -127,11 +123,10 @@ public class ResolverAndChecker extends Visitor {
 
 			entity.isGlobal = (getCurScope() instanceof ToplevelScope);
 
-			/**
-			 * TODO : get memorySize - for memory if (curClass != null)
-			 * {entity.setAddrOffset(currentOffset); currentOffset +=
-			 * node.getType().getType().getVarSize();}
-			 */
+			if (curClass != null) {
+				entity.offset = curClass.memSize;
+				curClass.memSize += node.getType().getType().getSize();
+			}
 
 			getCurScope().put(node.getName(), entity);
 		} catch (SemanticError e) {
@@ -204,9 +199,6 @@ public class ResolverAndChecker extends Visitor {
 			// round 2 - check functions
 			visitDeclList(node.getFunc());
 
-			// TODO: after resolve member, set Size
-			// currentOffset = 0;
-			// entity.setMemorySize(currentOffset);
 			curClass = null;
 			popScope();
 		} catch (SemanticError e) {

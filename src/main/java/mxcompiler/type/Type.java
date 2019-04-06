@@ -34,6 +34,12 @@ abstract public class Type {
 	}
 
 	public InnerType innerType;
+	private int size = -1;
+
+	/** return default type's memory-size */
+	public int getSize(){
+		return size; // TODO: return REG_SIZE in configuration
+	}
 
 	public InnerType getInnerType() {
 		return innerType;

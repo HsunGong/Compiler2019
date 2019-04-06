@@ -3,7 +3,6 @@ package mxcompiler.main;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -26,25 +25,32 @@ public final class Compiler {
 		c.execute(args);
 	}
 
-	private Compiler(String name) {
+	public Compiler(String name) {
 		this.errHandler = new ErrorHandler(errOut);
 
 	}
 
-	private void execute(String[] args) throws Error {
+	public void execute(String[] args) throws Error {
 		// parse options
 		opts = new Option(args);
-
-		this.fileIn = opts.sourceFile();
+		
 		try {
-			this.dumpOut = new PrintStream(new FileOutputStream("./src/test/test.out", false));
-			fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
-		} catch (Exception e) {
-			// throw new Error(e);
-			fileOut = System.out;
+			this.fileIn = opts.sourceFile();
+			try {
+				this.dumpOut = new PrintStream(new FileOutputStream("./src/test/test.out", false));
+				fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
+			} catch (Exception e) {
+				// throw new Error(e);
+				fileOut = System.out;
+			}
+
+			compile();
+
+		} catch (Error e) {
+			if (opts.mode().equals(CompilerMode.Default)) System.out.println(e.getMessage());
+			else throw new Error(e);
 		}
 
-		compile();
 	}
 
 	private InputStream fileIn;
@@ -58,9 +64,16 @@ public final class Compiler {
 		try {
 			buildAST();
 			semanticAnalyze();
+
+			buildIR();
 		} catch(Exception e) {
 			throw new Error(e);
 		}
+	}
+
+	private void buildIR() throws Error {
+		IRBuilder irBuilder = new IRBuilder();
+
 	}
 
 	private void semanticAnalyze() throws Error {

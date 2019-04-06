@@ -25,7 +25,7 @@ IR向量化\
 ### **Study VS-Code --> JAVA, Marven, Antlr extensions.**
 
 **change antlr4-vscode-extension**
-
+*hwalllll*
 <details>
 <summary>Change antlr-extension</summary>
 <p> newest version</p>
@@ -173,6 +173,8 @@ PPS: TODO: Using Lianmin Zheng's arch to run test by own!!!!!
 
 ## **TODO: CodeGen**
 
+
+# -DTest=
 
 [C.g4]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/C.g4
 [1]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/java.g4
