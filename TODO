@@ -192,4 +192,25 @@ TypeResolve:
 		isEqual remain: compare with type-> Type.baseType or Type.InnerType 
 		✔ 	Can not find right class		ClassEntity classEntity = (ClassEntity) scopeStack.getFirst().get(className); @done(03-27 09)
 
-☐ What if change Mnull into null?
+✔ What if change Mnull into null? @done(04-06 10)
+
+
+        GlobalScopePreScanner globalScopePreScanner = new GlobalScopePreScanner();
+        globalScopePreScanner.visit(ast);
+        Scope globalScope = globalScopePreScanner.getScope();
+        new ClassVarMemberScanner(globalScope).visit(ast);
+        new FunctionScopeScanner(globalScope).visit(ast);
+        ✘ new StaticUsagePreScanner(globalScope).visit(ast); @cancelled(04-06 10)
+        IRBuilder irBuilder = new IRBuilder(globalScope);
+        irBuilder.visit(ast);
+        IRRoot ir = irBuilder.getIR();
+        ✘ new TwoRegOpTransformer(ir).run(); @cancelled(04-06 10)
+        ✘ if (Configuration.isEnableFunctionInline()) new FunctionInlineProcessor(ir).run(); @cancelled(04-06 10)
+        ✘ if (irOutS != null) new IRPrinter(irOutS).visit(ir); @cancelled(04-06 10)
+        new StaticDataProcessor(ir).run();
+        new RegisterPreprocessor(ir).run();
+        new RegLivelinessAnalysis(ir).run();
+        new RegisterAllocator(ir).run();
+        new NASMTransformer(ir).run();
+        new ExtraInstructionOptimizer(ir).run();
+        new NASMPrinter(nasmOutS).visit(ir);

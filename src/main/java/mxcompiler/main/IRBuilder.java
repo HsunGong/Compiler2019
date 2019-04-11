@@ -4,5 +4,5 @@ package mxcompiler.main;
  * Considered no SSA, no tree
  */
 public class IRBuilder {
-
+    
 }
