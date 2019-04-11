@@ -1,8 +1,8 @@
 package mxcompiler.ast.expression;
 
 import mxcompiler.ast.Node;
-import mxcompiler.type.Type;
-// import mxcompiler.type.VarType;
+import mxcompiler.utils.type.Type;
+// import mxcompiler.utils.type.VarType;
 import mxcompiler.ast.Location;
 
 abstract public class ExprNode extends Node {

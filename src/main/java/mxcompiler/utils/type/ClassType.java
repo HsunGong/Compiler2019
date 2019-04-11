@@ -1,11 +1,11 @@
-package mxcompiler.type;
+package mxcompiler.utils.type;
 
-public class FuncType extends Type {
+public class ClassType extends Type {
     // private int length, pointersize, undefined; // from configuration
     private String name;
     
-    public FuncType(String name) {
-        super(InnerType.FUNCTION);
+    public ClassType(String name) {
+		super(InnerType.CLASS);
         this.name = name;
     }
 

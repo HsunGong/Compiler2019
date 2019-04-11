@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mxcompiler.ast.statement.BlockStmtNode;
-import mxcompiler.type.NullType;
-import mxcompiler.type.Type;
+import mxcompiler.utils.type.NullType;
+import mxcompiler.utils.type.Type;
 import mxcompiler.ast.*;
 
 /** no need to judge if return type is null

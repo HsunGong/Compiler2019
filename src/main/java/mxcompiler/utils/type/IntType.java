@@ -1,4 +1,4 @@
-package mxcompiler.type;
+package mxcompiler.utils.type;
 
 public class IntType extends Type {
     // name, size

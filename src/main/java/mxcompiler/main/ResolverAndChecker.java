@@ -7,7 +7,7 @@ import java.util.List;
 
 import mxcompiler.utils.scope.*;
 import mxcompiler.utils.entity.*;
-import mxcompiler.type.*;
+import mxcompiler.utils.type.*;
 
 import mxcompiler.ast.statement.*;
 import mxcompiler.error.CompileError;

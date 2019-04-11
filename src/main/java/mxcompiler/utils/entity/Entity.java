@@ -1,7 +1,7 @@
 package mxcompiler.utils.entity;
 
-import mxcompiler.type.Type;
-// import mxcompiler.type.VarType;
+import mxcompiler.utils.type.Type;
+// import mxcompiler.utils.type.VarType;
 import mxcompiler.utils.Dump;
 
 /**

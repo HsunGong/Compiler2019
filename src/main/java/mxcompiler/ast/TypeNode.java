@@ -1,10 +1,10 @@
 package mxcompiler.ast;
 
-import mxcompiler.type.Type;
+import mxcompiler.utils.type.Type;
 
 /**
  * This class {@code TypeNode} is important cause, it connect astNodes with
- * inbuild types which details are in {@linkplain mxcompiler.type.Type }
+ * inbuild types which details are in {@linkplain mxcompiler.utils.type.Type }
  */
 public class TypeNode extends Node {
 	@Override

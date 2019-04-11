@@ -2,8 +2,8 @@ package mxcompiler.utils.entity;
 
 import mxcompiler.ast.declaration.*;
 import mxcompiler.error.CompileError;
-import mxcompiler.type.ClassType;
-import mxcompiler.type.Type;
+import mxcompiler.utils.type.ClassType;
+import mxcompiler.utils.type.Type;
 import mxcompiler.utils.Dump;
 import mxcompiler.utils.scope.*;
 

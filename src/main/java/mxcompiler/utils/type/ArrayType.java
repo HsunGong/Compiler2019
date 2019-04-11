@@ -1,4 +1,4 @@
-package mxcompiler.type;
+package mxcompiler.utils.type;
 
 public class ArrayType extends Type {
     // private int length, pointersize, undefined; // from configuration

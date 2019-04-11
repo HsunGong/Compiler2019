@@ -3,10 +3,10 @@ package mxcompiler.utils.entity;
 import mxcompiler.ast.declaration.FuncDeclNode;
 import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.ast.statement.BlockStmtNode;
-import mxcompiler.type.ClassType;
-import mxcompiler.type.FuncType;
-import mxcompiler.type.NullType;
-import mxcompiler.type.Type;
+import mxcompiler.utils.type.ClassType;
+import mxcompiler.utils.type.FuncType;
+import mxcompiler.utils.type.NullType;
+import mxcompiler.utils.type.Type;
 import mxcompiler.utils.Dump;
 import mxcompiler.utils.scope.Scope;
 

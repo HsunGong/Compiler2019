@@ -1,4 +1,4 @@
-package mxcompiler.type;
+package mxcompiler.utils.type;
 
 /**
  * UGLY: MNullType to specify from NullType(which may be returnType) MNull means

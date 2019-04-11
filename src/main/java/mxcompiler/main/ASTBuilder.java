@@ -8,7 +8,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import mxcompiler.parser.MxBaseVisitor;
 import mxcompiler.parser.MxParser;
 
-import mxcompiler.type.*;
+import mxcompiler.utils.type.*;
 import mxcompiler.ast.*;
 import mxcompiler.ast.statement.*;
 import mxcompiler.ast.declaration.*;

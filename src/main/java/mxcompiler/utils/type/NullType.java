@@ -1,4 +1,4 @@
-package mxcompiler.type;
+package mxcompiler.utils.type;
 
 /** UGLY: may change in {@link mxcompiler.main.ASTBuilder} visitLiteral
  * Specailly for class construct function 

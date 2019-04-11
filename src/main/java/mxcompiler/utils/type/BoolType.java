@@ -1,4 +1,4 @@
-package mxcompiler.type;
+package mxcompiler.utils.type;
 
 public class BoolType extends Type {
     // name, size
