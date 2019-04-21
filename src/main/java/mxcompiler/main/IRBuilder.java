@@ -25,6 +25,7 @@ import mxcompiler.ir.register.*;
  * The whole IR is built under Control Flow Graph Considered no SSA, no tree
  */
 public class IRBuilder implements ASTVisitor {
+
     private Root root = new Root();
 
     private ToplevelScope toplevelScope;
@@ -33,7 +34,7 @@ public class IRBuilder implements ASTVisitor {
     private ClassEntity curClass = null;
     private Function curFunc = null;
     private BasicBlock curBB = null;
-    private BasicBlock LoopStepBB, LoopAfterBB; // cur
+    private BasicBlock curLoopIncrBB, curLoopAfterBB; // cur
     private Scope curScope;
 
     private boolean isFuncArgDecl = false;
@@ -68,29 +69,23 @@ public class IRBuilder implements ASTVisitor {
                 }
                 curClass = null;
                 curScope = curScope.getParent();
-            } else if (decl instanceof VarDeclNode)
-                visit(decl);
-
+            }
         }
 
+        // add global init list
+        for (DeclNode decl : node.getDecl())
+            if (decl instanceof VarDeclNode)
+                visit(decl);
         // FIX: add global init in resolver
         visit(makeGlobalVarInit()); // has order, have to do at first
 
-        for (DeclNode decl : node.getDecl()) {
-            if (decl instanceof VarDeclNode) {
-                // no actions to take
-            } else if (decl instanceof ClassDeclNode) {
-                decl.accept(this);
-            } else if (decl instanceof FuncDeclNode) {
-                decl.accept(this);
-            } else {
-                throw new CompilerError(decl.location(), "Invalid declaration node type");
-            }
-        }
-        for (IRFunction irFunction : ir.getFuncs().values()) {
-            irFunction.updateCalleeSet();
-        }
-        // ir.updateCalleeSet();
+        for (DeclNode decl : node.getDecl())
+            if (!(decl instanceof VarDeclNode))
+                visit(decl);
+
+        // for (Function irFunction : root.getFunc().values())
+        // irFunction.updateCalleeSet();
+        // root.updateCalleeSet();
     }
 
     public void visit(VarDeclNode node) {
@@ -131,9 +126,98 @@ public class IRBuilder implements ASTVisitor {
         }
     }
 
-    
+    public void visit(ClassDeclNode node) {
+        if (curScope == toplevelScope)
+            throw new CompileError("ClassDecl Have to be toplevelScope in IRBuilder");
+        curClass = (ClassEntity) toplevelScope.get(node.getName());
+
+        for (FuncDeclNode decl : node.getFunc())
+            visit(decl);
+
+        curClass = null;
+    }
+
+    public void visit(FuncDeclNode node) {
+        String name = (curClass == null) ? node.getName() : curClass.getDomain() + node.getName();
+        curFunc = root.getFunc(name);
+        if (curFunc == null)
+            throw new CompileError("Can not find funcdecl in ir:" + name);
+        curBB = curFunc.initStart();
+
+        Scope tmp = curScope;
+        curScope = node.getBody().getScope(); // func-block-scope
+        // region params
+
+        if (curClass != null) { // deal this
+            VarEntity entity = (VarEntity) curScope.get(Scope.BuiltIn.THIS.toString());
+
+            VirtualRegister vreg = new VirtualRegister(Scope.BuiltIn.THIS.toString());
+            entity.register = vreg;
+            curFunc.argVReg.add(vreg);
+        }
+        isFuncArgDecl = true; // deal other param
+        for (VarDeclNode argDecl : node.getVar())
+            visit(argDecl);
+        isFuncArgDecl = false;
+        // endregion
+        curScope = tmp;
+
+        // region add inst
+        // global init func
+        if (node.getName().equals("main"))
+            curBB.addInst(new Funcall(curBB, root.getFunc(INIT_FUNC_NAME), new ArrayList<>(), null));
+
+        visit(node.getBody());
+
+        // final-return (may have other return in other blocks)
+        if (!curBB.hasJump()) { // return type
+            if (node.getReturnType().getType() instanceof NullType
+                    || node.getReturnType().getType() instanceof VoidType)
+                curBB.setJump(new Return(curBB, null));
+            else // has return value fix: todo: why need intImm ??
+                curBB.setJump(new Return(curBB, new IntImm(0)));
+        }
+
+        // merge multiple return instructions to a single end basic block
+        if (curFunc.returns.size() > 1) {
+            BasicBlock mergeEnd = new BasicBlock(curFunc, curFunc.getName() + "_end");
+
+            // set return value
+            VirtualRegister retReg;
+            if (node.getReturnType().getType() instanceof NullType
+                    || node.getReturnType().getType() instanceof VoidType)
+                retReg = null;
+            else
+                retReg = new VirtualRegister("return_value");
+
+            // transfer return block to jump block
+            List<Return> retList = new ArrayList<>(curFunc.returns);
+            for (Return ret : retList) {
+                BasicBlock beforeRet = ret.getParent();
+                beforeRet.delInst(ret);
+
+                if (ret.getReturnVal() != null) { // add move to reg
+                    Move tmpInst = new Move(beforeRet, retReg, ret.getReturnVal());
+                    beforeRet.addInst(tmpInst);
+                }
+
+                beforeRet.setJump(new Jump(beforeRet, mergeEnd));
+            }
+
+            mergeEnd.setJump(new Return(mergeEnd, retReg));
+            curFunc.end = mergeEnd;
+        } else
+            curFunc.end = curFunc.returns.get(0).getParent();
+        // endregion
+
+        curBB = null;
+        curFunc = null;
+    }
+
+    // region ----------------- global var func-init ------------------
     // NOTE: make global var init as a function
     private final String INIT_FUNC_NAME = "_init_func";
+
     private FuncDeclNode makeGlobalVarInit() {
         if (toplevelScope != curScope)
             throw new CompileError("Error when global var init");
@@ -163,14 +247,96 @@ public class IRBuilder implements ASTVisitor {
         root.putFunc(newIRFunc);
         return funcNode;
     }
+    // endregion
 
-    public void visit(ClassDeclNode node) {
+    /**
+     * set basicblock inside the stmt not block-stmt 
+     * set new block outside block not
+     * the block-stmt
+     */
+    public void visit(BlockStmtNode node) {
+        curScope = node.getScope();
+
+        for (Node stmt : node.getAll()) {
+            visit(stmt); // vardecl or stmt
+            if (curBB.hasJump())
+                break;
+        }
+
+        curScope = curScope.getParent();
     }
 
-    public void visit(FuncDeclNode node) {
+    public void visit(BreakStmtNode node) {
+        curBB.setJump(new Jump(curBB, curLoopAfterBB));
     }
 
-    public void visit(VarDeclListNode node) {
+    public void visit(ContinueStmtNode node) {
+        curBB.setJump(new Jump(curBB, curLoopIncrBB));
+    }
+
+    public void visit(ForStmtNode node) {
+        BasicBlock condBB, incrBB, bodyBB, afterBB;
+        ExprNode cond = node.getCond(), incr = node.getIncr();
+
+        bodyBB = new BasicBlock(curFunc, "for_body");
+        condBB = (cond != null) ? new BasicBlock(curFunc, "for_cond") : bodyBB;
+        // FIX::?? why and why not bodyBB?
+        incrBB = (incr != null) ? new BasicBlock(curFunc, "for_incr") : condBB;
+        afterBB = new BasicBlock(curFunc, "for_after");
+        condBB.forNode = incrBB.forNode = bodyBB.forNode = afterBB.forNode = node;
+
+        root.forRecMap.put(node, new Root.ForRecord(condBB, incrBB, bodyBB, afterBB));
+
+        // TODO: change into stack
+        BasicBlock tmpLoopIncrBB = curLoopIncrBB;
+        BasicBlock tmpLoopAfterBB = curLoopAfterBB;
+        curLoopIncrBB = incrBB;
+        curLoopAfterBB = afterBB;
+        // region deal loop
+
+        if (node.getInit() != null) // can not put in body-BB
+            visit(node.getInit());
+
+        curBB.setJump(new Jump(curBB, condBB));
+
+        if (cond != null) {
+            curBB = condBB;
+            cond.setThen(bodyBB);
+            cond.setElse(afterBB);
+            visit(cond);
+
+            if (cond instanceof BoolLiteralExprNode)
+                curBB.setJump(new CJump(curBB, cond.regValue, cond.getThen(), cond.getElse()));
+            else
+                throw new CompileError("For condition without bool");
+        }
+
+        if (incr != null) { // can not put in body-BB
+            curBB = incrBB;
+            visit(incr);
+            curBB.setJump(new Jump(curBB, condBB));
+        }
+
+        curBB = bodyBB;
+        if (node.getBody() != null)
+            visit(node.getBody());
+        if (!curBB.hasJump())
+            curBB.setJump(new Jump(curBB, incrBB));
+        curBB = afterBB;
+
+        // endregion
+        curLoopIncrBB = tmpLoopIncrBB;
+        curLoopAfterBB = tmpLoopAfterBB;
+
+    }
+
+    public void visit(IfStmtNode node) {
+    }
+
+    public void visit(ReturnStmtNode node) {
+    }
+
+    public void visit(WhileStmtNode node) {
     }
 
     public void visit(LhsExprNode node) {
@@ -218,30 +384,6 @@ public class IRBuilder implements ASTVisitor {
     public void visit(ThisExprNode node) {
     }
 
-    public void visit(BlockStmtNode node) {
-    }
-
-    public void visit(BreakStmtNode node) {
-    }
-
-    public void visit(ContinueStmtNode node) {
-    }
-
-    public void visit(ExprStmtNode node) {
-    }
-
-    public void visit(ForStmtNode node) {
-    }
-
-    public void visit(IfStmtNode node) {
-    }
-
-    public void visit(ReturnStmtNode node) {
-    }
-
-    public void visit(WhileStmtNode node) {
-    }
-
     public void visit(Node node) {
         node.accept(this);
     }
@@ -260,6 +402,14 @@ public class IRBuilder implements ASTVisitor {
 
     public void visit(StmtNode node) {
         node.accept(this);
+    }
+
+    public void visit(VarDeclListNode node) {
+        throw new CompileError("IR error with vardecl list");
+    }
+
+    public void visit(ExprStmtNode node) {
+        visit(node.getExpr());
     }
     // endregion
 

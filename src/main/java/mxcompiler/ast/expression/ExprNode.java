@@ -2,6 +2,7 @@ package mxcompiler.ast.expression;
 
 import mxcompiler.ast.Node;
 import mxcompiler.ir.instruction.BasicBlock;
+import mxcompiler.ir.register.RegValue;
 import mxcompiler.utils.type.Type;
 // import mxcompiler.utils.type.VarType;
 import mxcompiler.ast.Location;
@@ -57,4 +58,8 @@ abstract public class ExprNode extends Node {
 	public BasicBlock getElse() {
 		return elseBB;
 	}
+
+	public RegValue regValue, addValue;
+	public RegValue offsetValue;
+	
 }

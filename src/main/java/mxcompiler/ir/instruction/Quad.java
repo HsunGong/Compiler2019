@@ -20,6 +20,9 @@ abstract public class Quad {
     // TODO: public abstract IRInstruction copyRename(Map<Object, Object>
     // renameMap);
 
+    // prepend: pre -> new -> this -> next
+    // append: pre -> this -> new -> next
+
     public void remove() {
         if (removed) {
             throw new CompileError("an instruction already removed");

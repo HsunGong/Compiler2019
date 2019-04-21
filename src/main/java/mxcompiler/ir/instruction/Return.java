@@ -4,6 +4,7 @@ import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
 import mxcompiler.utils.Dump;
 
+/** return have to be the last of each basicblock */
 public class Return extends JumpQuad {
     private RegValue val;
 
@@ -13,21 +14,23 @@ public class Return extends JumpQuad {
         // reloadUsedRegistersRegValues
     }
 
-    public RegValue getReturnVal() { return val;}
-
+    public RegValue getReturnVal() {
+        return val;
+    }
 
     // @Override
     // public IRReturn copyRename(Map<Object, Object> renameMap) {
-    //     return new IRReturn(
-    //             (BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
-    //             (RegValue) renameMap.getOrDefault(retValue, retValue)
-    //     );
+    // return new IRReturn(
+    // (BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
+    // (RegValue) renameMap.getOrDefault(retValue, retValue)
+    // );
     // }
-
-
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);
     }
-    public void _dump(Dump d) { d.println("return");}
+
+    public void _dump(Dump d) {
+        d.println("return");
+    }
 }

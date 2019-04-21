@@ -112,12 +112,12 @@ public class Root {
     public Map<StmtNode, ForRecord> forRecMap = new HashMap<>();
 
     public static class ForRecord {
-        public BasicBlock cond, step, body, after;
+        public BasicBlock cond, incr, body, after;
         public boolean proccessed = false;
 
-        public ForRecord(BasicBlock cond, BasicBlock step, BasicBlock body, BasicBlock after) {
+        public ForRecord(BasicBlock cond, BasicBlock incr, BasicBlock body, BasicBlock after) {
             this.cond = cond;
-            this.step = step;
+            this.incr = incr;
             this.body = body;
             this.after = after;
         }

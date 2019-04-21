@@ -8,6 +8,7 @@ import java.util.*;
 import mxcompiler.ast.statement.ForStmtNode;
 import mxcompiler.error.CompileError;
 
+
 public class BasicBlock {
     // private IRInstruction firstInst = null, lastInst = null;
     private LinkedList<Quad> insts = new LinkedList<>();
@@ -25,8 +26,8 @@ public class BasicBlock {
 
     private boolean hasJump = false; // hasJumpInst
 
-    public BasicBlock(Function f, String name) {
-        this.func = f;
+    public BasicBlock(Function func, String name) {
+        this.func = func;
         this.name = name;
     }
 
@@ -42,6 +43,12 @@ public class BasicBlock {
         return insts;
     }
 
+    private void replaceInst(Quad before, Quad after) {
+        int index = insts.indexOf(before);
+        insts.remove(before);
+        insts.add(index, after);
+    }
+
     public void addInst(Quad inst) {
         if (hasJump)
             throw new CompileError("Block is finished");
@@ -52,8 +59,10 @@ public class BasicBlock {
     public void delInst(Quad inst) {
         if (hasJump && inst == insts.getLast())
             delJump();
-
-        insts.add(inst);
+        else if (inst instanceof JumpQuad) // FIX: Fine
+            throw new CompileError("Error when del Jump quad");
+        else
+            insts.remove(inst);
     }
 
     public void clearInsts() { // reInit
@@ -111,7 +120,10 @@ public class BasicBlock {
         return this.hasJump;
     }
 
+    // have mutli jumps
     public void setJump(JumpQuad inst) {
+        if (hasJump)
+            throw new CompileError("Already has jump");
         addInst(inst);
         hasJump = true;
 
@@ -134,6 +146,9 @@ public class BasicBlock {
         if (!(last instanceof JumpQuad))
             throw new CompileError("invalid type of Remove Jump");
 
+        insts.remove(last);
+
+        // del block or returns
         if (last instanceof CJump) {
             CJump x = (CJump) last;
             delNext(x.getThen());
