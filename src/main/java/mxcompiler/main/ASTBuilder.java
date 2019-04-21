@@ -325,7 +325,7 @@ public class ASTBuilder extends MxBaseVisitor<Node> {
 				}
 			}
 
-		return new BlockStmtNode(stmts, stmtsAndDecls, new Location(ctx));
+		return new BlockStmtNode(stmtsAndDecls, new Location(ctx));
 	}
 
 	/**

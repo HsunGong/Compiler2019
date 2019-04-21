@@ -18,6 +18,7 @@ public class PrefixExprNode extends ExprNode {
 	}
 
 	public static enum Op {
+		//   SELF_INC, SELF_DEC, POSI, NEGE, LOGIC_NOT, BIT_NOT
 		PRE_INC("++"), PRE_DEC("--"), POSI("+"), NEGA("-"), LOGIC_NOT("!"), BIT_NOT("~");
 
 		private String label;

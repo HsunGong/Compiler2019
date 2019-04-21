@@ -213,4 +213,8 @@ TypeResolve:
         new RegisterAllocator(ir).run();
         new NASMTransformer(ir).run();
         new ExtraInstructionOptimizer(ir).run();
-        new NASMPrinter(nasmOutS).visit(ir);
+		new NASMPrinter(nasmOutS).visit(ir);
+		
+
+	
+ReturnInst.java	Pass Simple Function Call	11 months ago

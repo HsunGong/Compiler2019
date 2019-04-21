@@ -19,6 +19,7 @@ import mxcompiler.ast.expression.lhs.*;
 import mxcompiler.ast.expression.unary.*;
 import mxcompiler.ast.*;
 
+
 public class ResolverAndChecker extends Visitor {
 
 	/** means can not change LinkedList's type */
@@ -40,6 +41,7 @@ public class ResolverAndChecker extends Visitor {
 		loop = 0;
 	}
 
+	// region resolve
 	/**
 	 * start localresolver not main (cause use {@code this.visit(ASTNode node)}) or
 	 * so called pre-scanner But just this top-level
@@ -156,6 +158,9 @@ public class ResolverAndChecker extends Visitor {
 		}
 	}
 
+	// endregion
+
+	// region visit
 	@Override
 	public void visit(ASTNode node) {
 		ToplevelScope toplevelScope;
@@ -251,7 +256,7 @@ public class ResolverAndChecker extends Visitor {
 			 * func-entity-body to have __this is enough
 			 */
 			if (curClass != null) {
-				getCurScope().put("__this", new VarEntity("__this", curClass.getType()));
+				getCurScope().put(Scope.BuiltIn.THIS.toString(), new VarEntity(Scope.BuiltIn.THIS.toString(), curClass.getType()));
 			}
 			// Other-Parameters
 			for (VarDeclNode var : node.getVar()) {
@@ -519,7 +524,7 @@ public class ResolverAndChecker extends Visitor {
 
 			// check param size
 			int paraNum = funcallEntity.params.size();
-			int firstParaIdx = node.funcEntity.isMember ? 1 : 0;
+			int firstParaIdx = node.funcEntity.isMember() ? 1 : 0;
 			if (paraNum - firstParaIdx != node.getParam().size())
 				throw new SemanticError(
 						node.getLocation().toString() + "Function call has inconsistent number of arguments, expected "
@@ -755,8 +760,7 @@ public class ResolverAndChecker extends Visitor {
 
 	@Override
 	public void visit(ThisExprNode node) {
-		// UGLY: how about add __this in class-scope not function-scope??
-		Entity entity = getCurScope().get("__this");
+		Entity entity = getCurScope().get(Scope.BuiltIn.THIS.toString());
 
 		if (!(entity instanceof VarEntity))
 			throw new SemanticError("Invalid entity type for \"this\"");
@@ -790,7 +794,9 @@ public class ResolverAndChecker extends Visitor {
 		node.setIsLeftValue(false);
 	}
 
-	// ------------- build-in classes and functions ---------------
+	// endregion
+
+	// region ------------- build-in classes and functions ---------------
 	/** add BuiltIn func and BuiltIn class */
 	private void putBuiltIn(ToplevelScope toplevelScope) {
 		String name;
@@ -837,7 +843,7 @@ public class ResolverAndChecker extends Visitor {
 		curClass = arrayEntity;
 		{
 			type = new ArrayType(new NullType());
-			params = Arrays.asList(new VarEntity("__this", type));
+			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type));
 			returnType = new IntType();
 			name = "size";
 			putBuiltInFunc(arrayEntity.getScope(), name, params, returnType);
@@ -851,26 +857,26 @@ public class ResolverAndChecker extends Visitor {
 		curClass = stringEntity;
 		{
 			type = new StringType();
-			params = Arrays.asList(new VarEntity("__this", type));
+			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type));
 			returnType = new IntType();
 			name = "length";
 			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
 			// type = new StringType();
-			params = Arrays.asList(new VarEntity("__this", type), new VarEntity("left", new IntType()),
+			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type), new VarEntity("left", new IntType()),
 					new VarEntity("right", new IntType()));
 			returnType = new StringType();
 			name = "substring";
 			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
 			// type = new StringType();
-			params = Arrays.asList(new VarEntity("__this", type));
+			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type));
 			returnType = new IntType();
 			name = "parseInt";
 			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
 			// type = new StringType();
-			params = Arrays.asList(new VarEntity("__this", type), new VarEntity("pos", new IntType()));
+			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type), new VarEntity("pos", new IntType()));
 
 			// returnType = new IntType();
 			name = "ord";
@@ -903,14 +909,16 @@ public class ResolverAndChecker extends Visitor {
 		entity.params = parameters;
 		entity.isBuiltIn = true;
 
-		if (!curScope.isToplevel())
-			entity.isMember = true;
+		// if (!curScope.isToplevel())
+		// entity.isMember = true;
 
 		try {
-			if (curClass == null)
+			if (curClass == null) {
+				if (!curScope.isToplevel())
+					throw new CompileError("Need class scope");
 				curScope.put(name, entity);
-			else {
-				entity.isMember = true;
+			} else {
+				// entity.isMember = true;
 				entity.className = curClass.getName();
 				curScope.put(curClass.getDomain() + name, entity);
 			}
@@ -918,8 +926,9 @@ public class ResolverAndChecker extends Visitor {
 			throw new CompileError("Fuck idiot!");
 		}
 	}
+	// endregion
 
-	// --------------- scope - stack -----------------------
+	// region --------------- scope - stack -----------------------
 	/** push without vars */
 	private void pushScope() {
 		LocalScope scope = new LocalScope(getCurScope());
@@ -942,8 +951,9 @@ public class ResolverAndChecker extends Visitor {
 	private Scope getCurScope() {
 		return scopeStack.getLast();
 	}
+	// endregion
 
-	// --------------- add List -----------------------
+	// region --------------- add List -----------------------
 	protected final void visitStmtList(List<? extends StmtNode> stmts) {
 		if (!stmts.isEmpty())
 			for (StmtNode n : stmts)
@@ -961,5 +971,5 @@ public class ResolverAndChecker extends Visitor {
 			for (DeclNode n : decls)
 				visit(n);
 	}
-
+	// endregion
 }

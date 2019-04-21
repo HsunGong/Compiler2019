@@ -2,6 +2,8 @@ package mxcompiler.utils.type;
 
 import java.util.HashMap;
 
+import mxcompiler.ir.register.RegValue;
+
 abstract public class Type {
 	/**
 	 * can get name-string by type.X.toString() method get compare by
@@ -34,11 +36,11 @@ abstract public class Type {
 	}
 
 	public InnerType innerType;
-	private int size = -1;
+	private int size = RegValue.RegSize;
 
 	/** return default type's memory-size */
 	public int getSize(){
-		return size; // TODO: return REG_SIZE in configuration
+		return size;
 	}
 
 	public InnerType getInnerType() {

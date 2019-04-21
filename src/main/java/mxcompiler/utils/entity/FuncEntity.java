@@ -3,6 +3,7 @@ package mxcompiler.utils.entity;
 import mxcompiler.ast.declaration.FuncDeclNode;
 import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.ast.statement.BlockStmtNode;
+import mxcompiler.error.CompileError;
 import mxcompiler.utils.type.ClassType;
 import mxcompiler.utils.type.FuncType;
 import mxcompiler.utils.type.NullType;
@@ -23,7 +24,7 @@ public class FuncEntity extends Entity {
 	public List<VarEntity> params = new ArrayList<VarEntity>();;
 
 	public String className = "";
-	public boolean isMember = false;
+	// public boolean isMember = false; // useless
 
 	public boolean isBuiltIn = false;// if true -> outInfluence is true
 
@@ -62,7 +63,8 @@ public class FuncEntity extends Entity {
 			returnType = node.getReturnType().getType();
 			
 		// isConstruct = node.isConstruct();
-		isMember = true;
+		// isMember = true;
+		if (className == "") throw new CompileError("Need className");
 		this.className = className;
 	}
 
@@ -74,10 +76,12 @@ public class FuncEntity extends Entity {
 		return returnType;
 	}
 
+	public boolean isMember() { return className != ""; }
+
 	public void _dump(Dump d) {
 		d.printf("<Func Entity>:  name: %s, Type: %s\n", name, type.toString());
 		d.printf(" returnType: %s, isBuiltIn: %b\n", returnType.toString(), isBuiltIn);
-		d.printf(" isMember: %b, ClassName: %s\n", isMember, className);
+		d.printf(" isMember: %b, ClassName: %s\n", isMember(), className);
 		d.println(" params:");
 		d.addTab();
 		if (!params.isEmpty())

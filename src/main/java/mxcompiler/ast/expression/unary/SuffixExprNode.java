@@ -17,6 +17,7 @@ public class SuffixExprNode extends ExprNode {
 	}
 
 	public static enum Op {
+		// SELF_INC, SELF_DEC
 		SUF_INC("++"), SUF_DEC("--");
 		private String label;
 

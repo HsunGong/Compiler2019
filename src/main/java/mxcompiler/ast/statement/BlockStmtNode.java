@@ -14,14 +14,14 @@ public class BlockStmtNode extends StmtNode {
 		d.printf("<BlockStmtNode> %s\n", location.toString());
 	}
 
-	private List<StmtNode> stmts;
+	// private List<StmtNode> stmts;
 	private List<Node> stmtsAndDecls;
 	private LocalScope scope;
 
-	public BlockStmtNode(List<StmtNode> stmts, List<Node> all, Location location) {
+	public BlockStmtNode(List<Node> all, Location location) {
 		super(location);
 		
-		this.stmts = (stmts != null) ? stmts : new ArrayList<StmtNode>();
+		// this.stmts = (stmts != null) ? stmts : new ArrayList<StmtNode>();
 
 		this.stmtsAndDecls = (all != null) ? all : new ArrayList<Node>();
 
@@ -36,12 +36,9 @@ public class BlockStmtNode extends StmtNode {
 		return scope;
 	}
 
-	public void addStmt(StmtNode stmt) {
-		stmts.add(stmt);
-	}
-
-	public List<StmtNode> getStmts() {
-		return stmts;
+	public void addStmt(Node stmt) {
+		// stmts.add(stmt);
+		stmtsAndDecls.add(stmt);
 	}
 
 	public List<Node> getAll() {

@@ -12,9 +12,17 @@ public class BinaryOpExprNode extends ExprNode {
 	}
 
 	public static enum Op {
-		MUL("*"), DIV("/"), MOD("%"), ADD("+"), SUB("-"), SH_L("<<"), SH_R(">>"), GREATER(">"), LESS(
-				"<"), GREATER_EQUAL(">="), LESS_EQUAL("<="), EQUAL(
-						"=="), INEQUAL("!="), BIT_AND("&"), BIT_OR("|"), BIT_XOR("^"), LOGIC_AND("&&"), LOGIC_OR("||");
+		//  MUL, DIV, MOD,
+        // ADD, SUB,
+        // SHL, SHR,
+        // BIT_AND, BIT_XOR, BIR_OR, LOGICAL_AND, LOGICAL_OR, ASSIGN,
+        // LESS, LESS_EQUAL, GREATER, GREATER_EQUAL, EQUAL, INEQUAL
+		MUL("*"), DIV("/"), MOD("%"), ADD("+"), SUB("-"), 
+		SH_L("<<"), SH_R(">>"), 
+		GREATER(">"), LESS("<"), GREATER_EQUAL(">="), LESS_EQUAL("<="), 
+		EQUAL("=="), INEQUAL("!="), 
+		BIT_AND("&"), BIT_OR("|"), BIT_XOR("^"), 
+		LOGIC_AND("&&"), LOGIC_OR("||");
 
 		private String label;
 

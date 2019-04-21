@@ -15,7 +15,8 @@ abstract public class Scope {
 	 * reserved name of class FIX: maybe also builtIn Func?
 	 */
 	public enum BuiltIn {
-		ARRAY("_array"), STRING("_string"), THIS("__this"), DOMAIN(".");
+		// acc, array is not a class type
+		ARRAY("_array"), STRING("string"), THIS("__this"), DOMAIN(".");
 
 		private String label;
 
