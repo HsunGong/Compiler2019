@@ -81,10 +81,10 @@ abstract public class Scope {
 		}
 		// FIX: what is children to specify which function is their father?
 		for (Scope s : this.children) {
-			d.addTab();
+			// d.addTab();
 			d.print(">>>> child");
 			s._dump(d);
-			d.delTab();
+			// d.delTab();
 		}
 	}
 }

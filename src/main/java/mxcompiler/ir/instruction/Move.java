@@ -32,6 +32,6 @@ public class Move extends Quad {
     }
 
     public void _dump(Dump d) {
-        d.println("NO-Cond jump");
+        d.println("Move");
     }
 }

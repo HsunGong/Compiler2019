@@ -45,9 +45,9 @@ public class VarEntity extends Entity {
 	}
 
 	public void _dump(Dump d) {
-		d.printf("<Var Entity>:  name: %s, Type: %s\n", name, type.toString());
-		d.printf(" isMember: %b, ClassName: %s\n", isMember(), className);
-		d.printf(" isGlobal: %b\n", isGlobal);
+		d.printf(" <Var Entity>:  name: %s, Type: %s\n", name, type.toString());
+		d.printf("  isMember: %b, ClassName: %s\n", isMember(), className);
+		d.printf("  isGlobal: %b\n", isGlobal);
 	}
 
 	public void setClassName(String className) {

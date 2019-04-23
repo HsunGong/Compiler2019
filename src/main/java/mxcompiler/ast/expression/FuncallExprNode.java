@@ -6,6 +6,7 @@ import java.util.List;
 import mxcompiler.ast.*;
 import mxcompiler.utils.entity.FuncEntity;
 
+
 /** Also for class method */
 public class FuncallExprNode extends ExprNode {
 	@Override
@@ -15,7 +16,7 @@ public class FuncallExprNode extends ExprNode {
 
 	private ExprNode expr;
 	private List<ExprNode> params;
-	
+
 	// resolver
 	public FuncEntity funcEntity;
 

@@ -22,7 +22,8 @@ import mxcompiler.ir.register.*;
 
 
 /**
- * The whole IR is built under Control Flow Graph Considered no SSA, no tree
+ * The whole IR is built under Control Flow Graph Considered
+ * no SSA, no tree
  */
 public class IRBuilder implements ASTVisitor {
 
@@ -34,11 +35,11 @@ public class IRBuilder implements ASTVisitor {
     private ClassEntity curClass = null;
     private Function curFunc = null;
     private BasicBlock curBB = null;
-    private BasicBlock curLoopIncrBB, curLoopAfterBB; // cur
+    private BasicBlock curLoopStepBB, curLoopAfterBB; // cur
     private Scope curScope;
+    private boolean curWantAddr = false;
 
     private boolean isFuncArgDecl = false;
-    private boolean wantAddr = false;
 
     private boolean assignLhs = false;
     private boolean uselessStatic = false;
@@ -120,8 +121,7 @@ public class IRBuilder implements ASTVisitor {
                 }
 
                 visit(node.getInit());
-                // processIRAssign(vreg, 0, node.getInit(),
-                // node.getInit().getType().getVarSize(), false);
+                processIRAssign(vreg, 0, node.getInit(), node.getInit().getType().getRegSize(), false);
             }
         }
     }
@@ -178,7 +178,8 @@ public class IRBuilder implements ASTVisitor {
                 curBB.setJump(new Return(curBB, new IntImm(0)));
         }
 
-        // merge multiple return instructions to a single end basic block
+        // merge multiple return instructions to a single end basic
+        // block
         if (curFunc.returns.size() > 1) {
             BasicBlock mergeEnd = new BasicBlock(curFunc, curFunc.getName() + "_end");
 
@@ -214,7 +215,8 @@ public class IRBuilder implements ASTVisitor {
         curFunc = null;
     }
 
-    // region ----------------- global var func-init ------------------
+    // region ----------------- global var func-init
+    // ------------------
     // NOTE: make global var init as a function
     private final String INIT_FUNC_NAME = "_init_func";
 
@@ -249,10 +251,11 @@ public class IRBuilder implements ASTVisitor {
     }
     // endregion
 
+    // region stmt
+
     /**
-     * set basicblock inside the stmt not block-stmt 
-     * set new block outside block not
-     * the block-stmt
+     * set basicblock inside the stmt not block-stmt set new
+     * block outside block not the block-stmt
      */
     public void visit(BlockStmtNode node) {
         curScope = node.getScope();
@@ -271,7 +274,7 @@ public class IRBuilder implements ASTVisitor {
     }
 
     public void visit(ContinueStmtNode node) {
-        curBB.setJump(new Jump(curBB, curLoopIncrBB));
+        curBB.setJump(new Jump(curBB, curLoopStepBB));
     }
 
     public void visit(ForStmtNode node) {
@@ -288,9 +291,9 @@ public class IRBuilder implements ASTVisitor {
         root.forRecMap.put(node, new Root.ForRecord(condBB, incrBB, bodyBB, afterBB));
 
         // TODO: change into stack
-        BasicBlock tmpLoopIncrBB = curLoopIncrBB;
+        BasicBlock tmpLoopStepBB = curLoopStepBB;
         BasicBlock tmpLoopAfterBB = curLoopAfterBB;
-        curLoopIncrBB = incrBB;
+        curLoopStepBB = incrBB;
         curLoopAfterBB = afterBB;
         // region deal loop
 
@@ -325,27 +328,254 @@ public class IRBuilder implements ASTVisitor {
         curBB = afterBB;
 
         // endregion
-        curLoopIncrBB = tmpLoopIncrBB;
+        curLoopStepBB = tmpLoopStepBB;
         curLoopAfterBB = tmpLoopAfterBB;
-
-    }
-
-    public void visit(IfStmtNode node) {
-    }
-
-    public void visit(ReturnStmtNode node) {
     }
 
     public void visit(WhileStmtNode node) {
+        BasicBlock condBB, bodyBB, afterBB;
+        condBB = new BasicBlock(curFunc, "while_cond");
+        bodyBB = new BasicBlock(curFunc, "while_body");
+        afterBB = new BasicBlock(curFunc, "while_after");
+
+        BasicBlock tmpLoopStepBB = curLoopStepBB;
+        BasicBlock tmpLoopAfterBB = curLoopAfterBB;
+        curLoopStepBB = condBB;
+        curLoopAfterBB = afterBB;
+
+        curBB.setJump(new Jump(curBB, condBB));
+        curBB = condBB;
+        ExprNode cond = node.getCond();
+        cond.setThen(bodyBB);
+        cond.setElse(afterBB);
+        visit(cond);
+        if (cond instanceof BoolLiteralExprNode)
+            curBB.setJump(new CJump(curBB, cond.regValue, cond.getThen(), cond.getElse()));
+
+        curBB = bodyBB;
+        visit(node.getBody());
+        if (!curBB.hasJump())
+            curBB.setJump(new Jump(curBB, condBB));
+
+        curLoopStepBB = tmpLoopStepBB;
+        curLoopAfterBB = tmpLoopAfterBB;
+
+        curBB = afterBB;
     }
 
-    public void visit(LhsExprNode node) {
+    public void visit(IfStmtNode node) {
+        BasicBlock thenBB, elseBB, afterBB;
+        thenBB = new BasicBlock(curFunc, "if_then");
+        elseBB = (node.getElse() == null) ? null : new BasicBlock(curFunc, "if_else");
+        afterBB = new BasicBlock(curFunc, "if_after");
+
+        // cond
+        ExprNode cond = node.getCond();
+        cond.setThen(thenBB);
+        cond.setElse((node.getElse() == null) ? afterBB : elseBB);
+        visit(cond);
+        if (cond instanceof BoolLiteralExprNode)
+            curBB.setJump(new CJump(curBB, cond.regValue, cond.getElse(), cond.getThen()));
+
+        // then
+        curBB = thenBB;
+        visit(node.getThen());
+        if (!curBB.hasJump())
+            curBB.setJump(new Jump(curBB, afterBB));
+
+        // else
+        if (node.getElse() != null) {
+            curBB = elseBB;
+            visit(node.getElse());
+            if (!curBB.hasJump())
+                curBB.setJump(new Jump(curBB, afterBB));
+        }
+
+        curBB = afterBB;
     }
+
+    public void visit(ReturnStmtNode node) {
+        Type type = curFunc.getEntity().getReturnType();
+
+        if (type instanceof NullType || type instanceof VoidType) {
+            curBB.setJump(new Return(curBB, null));
+
+        } else {
+            ExprNode expr = node.getExpr();
+            if (type instanceof BoolType && !(expr instanceof BoolLiteralExprNode)) {
+                expr.setThen(new BasicBlock(curFunc, null));
+                expr.setElse(new BasicBlock(curFunc, null));
+                visit(expr);
+
+                VirtualRegister vreg = new VirtualRegister("ret_bool_value");
+                // set assign to vreg
+                processIRAssign(vreg, 0, node.getExpr(), RegValue.RegSize, false);
+                curBB.setJump(new Return(curBB, vreg));
+            } else {
+                visit(expr);
+                curBB.setJump(new Return(curBB, expr.regValue));
+            }
+        }
+    }
+
+    // endregion
 
     public void visit(ArefExprNode node) {
+        boolean tmpWantAddr = curWantAddr;
+        curWantAddr = false;
+
+        visit(node.getExpr());
+        if (uselessStatic)
+            return;
+        assignLhs = false;
+        visit(node.getIndex());
+
+        curWantAddr = tmpWantAddr;
+
+        VirtualRegister vreg = new VirtualRegister(null);
+        IntImm elementSize = new IntImm(node.getType().getRegSize()); 
+        // size of this level
+        // FIX: BUG: what is this ?
+        curBB.addInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL, node.getIndex().regValue, elementSize));
+        curBB.addInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, node.getExpr().regValue, vreg));
+
+        if (curWantAddr) {
+            node.addrValue = vreg;
+            node.offset = RegValue.RegSize;
+        } else {
+            curBB.addInst(new Load(curBB, vreg, node.getType().getRegSize(), vreg, RegValue.RegSize));
+
+            node.regValue = vreg;
+            if (node.getThen() != null)
+                curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
+        }
     }
 
     public void visit(MemberExprNode node) {
+        boolean tmpWantAddr = curWantAddr;
+        curWantAddr = false;
+
+        visit(node.getExpr());
+        assignLhs = false;
+
+        curWantAddr = tmpWantAddr;
+
+        RegValue classAddr = node.getExpr().regValue;
+        String className = ((ClassType) (node.getExpr().getType())).getName();
+
+        ClassEntity classEntity = (ClassEntity) toplevelScope.get(className);
+        VarEntity memberEntity = (VarEntity) classEntity.getScope().getCur(node.getMember());
+
+        if (curWantAddr) {
+            node.addrValue = classAddr;
+            node.offset = memberEntity.offset;
+        } else {
+            VirtualRegister vreg = new VirtualRegister(null);
+            node.regValue = vreg;
+            curBB.addInst(new Load(curBB, vreg, memberEntity.getType().getRegSize(), classAddr, memberEntity.offset));
+            if (node.getThen() != null)
+                curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
+        }
+    }
+
+    public void visit(FuncallExprNode node) {
+        FuncEntity entity = node.funcEntity;
+        String name = entity.getName();
+        List<RegValue> args = new ArrayList<>();
+        ExprNode thisExpr = null;
+
+        if (entity.isMember()) {
+            if (node.getExpr() instanceof MemberExprNode) {
+                thisExpr = ((MemberExprNode) (node.getExpr())).getExpr();
+            } else {
+                if (curClass == null)
+                    throw new CompileError("invalid member function call of this pointer");
+
+                thisExpr = new ThisExprNode(null);
+                thisExpr.setType(new ClassType(curClass.getName()));
+            }
+            visit(thisExpr);
+
+            String className;
+            if (thisExpr.getType() instanceof ClassType)
+                className = ((ClassType) (thisExpr.getType())).getName();
+            else if (thisExpr.getType() instanceof ArrayType)
+                className = Scope.BuiltIn.ARRAY.toString();
+            else
+                className = Scope.BuiltIn.STRING.toString();
+
+            name = className + Scope.BuiltIn.DOMAIN.toString() + name;
+            args.add(thisExpr.regValue);
+        }
+
+        // process built-in functions
+        if (entity.isBuiltIn) {
+            processBuiltInFuncCall(node, thisExpr, entity, name);
+            return;
+        }
+
+        // params -- args
+        for (ExprNode arg : node.getParam()) {
+            visit(arg);
+            args.add(arg.regValue);
+        }
+
+        Function func = root.getFunc(name);
+        VirtualRegister vreg = new VirtualRegister(null);
+        curBB.addInst(new Funcall(curBB, func, args, vreg));
+        node.regValue = vreg;
+
+        if (node.getThen() != null)
+            curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
+    }
+
+    public void visit(AssignExprNode node) {
+        boolean needMemOp = isMemoryAccess(node.getLhs());
+        curWantAddr = needMemOp;
+        assignLhs = true;
+
+        uselessStatic = false;
+        visit(node.getLhs());
+
+        assignLhs = false;
+        curWantAddr = false;
+
+        if (uselessStatic) {
+            uselessStatic = false;
+            return;
+        }
+
+        if (node.getRhs().getType() instanceof BoolType && !(node.getRhs() instanceof BoolLiteralExprNode)) {
+            node.getRhs().setThen(new BasicBlock(curFunc, null));
+            node.getRhs().setElse(new BasicBlock(curFunc, null));
+        }
+        visit(node.getRhs());
+
+        RegValue destion;
+        int addrOffset;
+        if (needMemOp) {
+            destion = node.getLhs().addrValue;
+            addrOffset = node.getLhs().offset;
+        } else {
+            destion = node.getLhs().regValue;
+            addrOffset = 0;
+        }
+
+        processIRAssign(destion, addrOffset, node.getRhs(), RegValue.RegSize, needMemOp);
+        node.regValue = node.getRhs().regValue;
+    }
+
+    public void visit(NewExprNode node) {
+    }
+
+    public void visit(BinaryOpExprNode node) {
+    }
+
+    public void visit(PrefixExprNode node) {
+    }
+
+    public void visit(SuffixExprNode node) {
+        processSelfIncDec(node.getExpr(), node, true, node.getOp() == SuffixExprNode.Op.SUF_INC);
     }
 
     public void visit(BoolLiteralExprNode node) {
@@ -357,31 +587,19 @@ public class IRBuilder implements ASTVisitor {
     public void visit(StringLiteralExprNode node) {
     }
 
-    public void visit(PrefixExprNode node) {
-    }
-
-    public void visit(SuffixExprNode node) {
-    }
-
-    public void visit(AssignExprNode node) {
-    }
-
-    public void visit(BinaryOpExprNode node) {
-    }
-
-    public void visit(FuncallExprNode node) {
-    }
-
     public void visit(IdentifierExprNode node) {
-    }
-
-    public void visit(NewExprNode node) {
     }
 
     public void visit(NullExprNode node) {
     }
 
     public void visit(ThisExprNode node) {
+    }
+
+    // region useless
+
+    public void visit(LhsExprNode node) {
+        node.accept(this);
     }
 
     public void visit(Node node) {
@@ -413,7 +631,74 @@ public class IRBuilder implements ASTVisitor {
     }
     // endregion
 
+    // endregion
+
     // region utils
 
+    private boolean checkIdentiferThisMemberAccess(IdentifierExprNode node) {
+    }
+
+    /**
+     * set rhs.value to destion
+     * <p>
+     * maybe (split to then or else)add this block into curBB
+     */
+    private void processIRAssign(RegValue destion, int addrOffset, ExprNode rhs, int size, boolean needMemOp) {
+        BasicBlock thenBB, elseBB;
+        thenBB = rhs.getThen();
+        elseBB = rhs.getElse();
+
+        if (thenBB != null) { // has branch
+            BasicBlock mergeBB = new BasicBlock(curFunc, null);
+            if (needMemOp) {
+                thenBB.addInst(new Store(thenBB, new IntImm(1), RegValue.RegSize, destion, addrOffset));
+                elseBB.addInst(new Store(elseBB, new IntImm(0), RegValue.RegSize, destion, addrOffset));
+            } else {
+                thenBB.addInst(new Move(thenBB, (VirtualRegister) destion, new IntImm(1)));
+                elseBB.addInst(new Move(elseBB, (VirtualRegister) destion, new IntImm(0)));
+            }
+
+            if (!thenBB.hasJump())
+                thenBB.setJump(new Jump(thenBB, mergeBB));
+            if (!elseBB.hasJump())
+                elseBB.setJump(new Jump(elseBB, mergeBB));
+
+            curBB = mergeBB;
+        } else { // no branch
+
+            if (needMemOp)
+                curBB.addInst(new Store(curBB, rhs.regValue, RegValue.RegSize, destion, addrOffset));
+            else
+                curBB.addInst(new Move(curBB, (Register) destion, rhs.regValue));
+        }
+    }
+
+    private void processSelfIncDec(ExprNode expr, ExprNode node, boolean isSuffix, boolean isInc) {
+    }
+
+    private void processPrintFuncCall(ExprNode arg, String funcName) {
+    }
+
+    private void processBuiltInFuncCall(FuncallExprNode node, ExprNode thisExpr, FuncEntity funcEntity,
+            String funcName) {
+    }
+
+    private void processArrayNew(NewExprNode node, VirtualRegister oreg, RegValue addr, int idx) {
+    }
+
+    private void processLogicalBinaryOp(BinaryOpExprNode node) {
+    }
+
+    private void processStringBinaryOp(BinaryOpExprNode node) {
+    }
+
+    private void processArithBinaryOp(BinaryOpExprNode node) {
+    }
+
+    private void processCmpBinaryOp(BinaryOpExprNode node) {
+    }
+
+    private boolean isMemoryAccess(ExprNode node) {
+    }
     // endregion
 }

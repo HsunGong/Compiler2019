@@ -4,10 +4,11 @@ import java.util.HashMap;
 
 import mxcompiler.ir.register.RegValue;
 
+
 abstract public class Type {
 	/**
-	 * can get name-string by type.X.toString() method get compare by
-	 * type.X.compareTo()
+	 * can get name-string by type.X.toString() method get
+	 * compare by type.X.compareTo()
 	 */
 	public static enum InnerType {
 		INT("int"), BOOL("bool"), STRING("string"), ARRAY("array"), NULL(""), VOID("void"), CLASS("class"), FUNCTION(
@@ -38,8 +39,10 @@ abstract public class Type {
 	public InnerType innerType;
 	private int size = RegValue.RegSize;
 
-	/** return default type's memory-size */
-	public int getSize(){
+	/**
+	 * return default type's memory-size(default=1-reg)
+	 */
+	public int getRegSize() {
 		return size;
 	}
 
@@ -58,10 +61,16 @@ abstract public class Type {
 	// }
 
 	// ATTENTION:
-	// NOTE: this can not be rewrite, cause, ifso new Bool Type != new
+	// NOTE: this can not be rewrite, cause, ifso new Bool Type
+	// != new
 	// Bool Type
 	// have to compare with innerType
 	public boolean isEqual(Type rhs) {
+		if (this.innerType == InnerType.CLASS && rhs.innerType == InnerType.CLASS) {
+			String x = ((ClassType) rhs).getName();
+			String y = ((ClassType) this).getName();
+			return (x.equals(y));
+		}
 		while (rhs.innerType.equals(InnerType.ARRAY) && this.innerType.equals(InnerType.ARRAY)) {
 			Type x = ((ArrayType) rhs).getBaseType();
 			Type y = ((ArrayType) this).getBaseType();

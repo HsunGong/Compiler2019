@@ -1,0 +1,14 @@
+class test {
+    test() {
+
+    }
+    void name0(){}
+    void name1(int x) {
+        name0();
+    }
+}
+
+
+int main() {
+    
+}

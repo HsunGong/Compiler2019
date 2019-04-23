@@ -23,7 +23,7 @@ import mxcompiler.main.Compiler;
 public class SemanticTest {
     private boolean shouldPass;
     private String[] args;
-    private static final String path = "/home/xun/Documents/mxc/src/test/testcase/";
+    private static final String path = "/home/xun/Documents/mxc/src/test/cases/";
 
     public SemanticTest(String[] args, boolean shouldPass) {
         this.args = args;

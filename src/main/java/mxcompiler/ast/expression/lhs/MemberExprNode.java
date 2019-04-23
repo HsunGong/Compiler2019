@@ -3,9 +3,10 @@ package mxcompiler.ast.expression.lhs;
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
 
+
 /**
- * MemberExpr is Member Access Node of '.' IN book file, it is ptrmember and
- * membernode
+ * MemberExpr is Member Access Node of '.' IN book file,
+ * <p> it is ptrmember and membernode
  */
 public class MemberExprNode extends LhsExprNode {
 	@Override

@@ -41,25 +41,28 @@ abstract public class ExprNode extends Node {
 
 	private BasicBlock thenBB, elseBB; // trueBB and FalseBB
 
-	// True
+	/** True */
 	public void setThen(BasicBlock thenBB) {
 		this.thenBB = thenBB;
 	}
 
+	/** True */
 	public BasicBlock getThen() {
 		return thenBB;
 	}
 
-	// False
+	/** False */
 	public void setElse(BasicBlock elseBB) {
 		this.elseBB = elseBB;
 	}
 
+	/** False */
 	public BasicBlock getElse() {
 		return elseBB;
 	}
 
-	public RegValue regValue, addValue;
-	public RegValue offsetValue;
-	
+	public RegValue regValue, addrValue;
+	/** addr-offset */
+	public int offset;
+
 }

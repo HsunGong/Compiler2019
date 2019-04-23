@@ -73,7 +73,7 @@ public class ResolverAndChecker extends Visitor {
 			throw new SemanticError("\"main\" function not found");
 		if (!(mainFunc.getReturnType() instanceof IntType))
 			throw new SemanticError("\"main\" function's return type should be \"int\"");
-		if (!mainFunc.params.isEmpty())
+		if (!mainFunc.getParams().isEmpty())
 			throw new SemanticError("\"main\" function should have no parameter");
 	}
 
@@ -127,7 +127,7 @@ public class ResolverAndChecker extends Visitor {
 
 			if (curClass != null) {
 				entity.offset = curClass.memSize;
-				curClass.memSize += node.getType().getType().getSize();
+				curClass.memSize += node.getType().getType().getRegSize();
 			}
 
 			getCurScope().put(node.getName(), entity);
@@ -146,12 +146,10 @@ public class ResolverAndChecker extends Visitor {
 					throw new CompileError("toplevel");
 
 				FuncEntity entity = new FuncEntity(node);
-				getCurScope().put(node.getName(), entity);
+				getCurScope().put(entity.getKey(), entity);
 			} else { // class-fun
-				FuncEntity entity = new FuncEntity(node, node.getName());
-				String key = curClass.getDomain() + node.getName();
-
-				getCurScope().put(key, entity);
+				FuncEntity entity = new FuncEntity(node, curClass.getName());
+				getCurScope().put(entity.getKey(), entity);
 			}
 		} catch (SemanticError e) {
 			throw new SemanticError("func Resolve " + e);
@@ -249,12 +247,8 @@ public class ResolverAndChecker extends Visitor {
 
 			// to add scope first
 			pushScope();
-			/**
-			 * ATTENTION:FIX: already add func name from global or from class-decl
-			 * <p>
-			 * class mem add __this; funcentity dont have __this; cause para dont need; use
-			 * func-entity-body to have __this is enough
-			 */
+
+			// params
 			if (curClass != null) {
 				getCurScope().put(Scope.BuiltIn.THIS.toString(), new VarEntity(Scope.BuiltIn.THIS.toString(), curClass.getType()));
 			}
@@ -523,7 +517,7 @@ public class ResolverAndChecker extends Visitor {
 			}
 
 			// check param size
-			int paraNum = funcallEntity.params.size();
+			int paraNum = funcallEntity.getParams().size();
 			int firstParaIdx = node.funcEntity.isMember() ? 1 : 0;
 			if (paraNum - firstParaIdx != node.getParam().size())
 				throw new SemanticError(
@@ -534,7 +528,7 @@ public class ResolverAndChecker extends Visitor {
 			boolean valid;
 			for (int i = 0; i < paraNum - firstParaIdx; ++i) {
 				ExprNode curParam = node.getParam().get(i);
-				VarEntity defParam = funcallEntity.params.get(i + firstParaIdx); // define in fun-decl
+				VarEntity defParam = funcallEntity.getParams().get(i + firstParaIdx); // define in fun-decl
 				visit(curParam);
 				if (curParam.getType() instanceof VoidType) // cause funcall-void
 					valid = false;
@@ -905,22 +899,18 @@ public class ResolverAndChecker extends Visitor {
 	 * Attention: FIX:BUG: these func dont have sub-scope!!!!!!!
 	 */
 	private void putBuiltInFunc(Scope curScope, String name, List<VarEntity> parameters, Type returnType) {
-		FuncEntity entity = new FuncEntity(name, new FuncType(name), returnType);
-		entity.params = parameters;
+		FuncEntity entity = new FuncEntity(name, new FuncType(name), returnType, parameters);
 		entity.isBuiltIn = true;
-
-		// if (!curScope.isToplevel())
-		// entity.isMember = true;
 
 		try {
 			if (curClass == null) {
 				if (!curScope.isToplevel())
 					throw new CompileError("Need class scope");
-				curScope.put(name, entity);
+				curScope.put(entity.getKey(), entity);
 			} else {
 				// entity.isMember = true;
 				entity.className = curClass.getName();
-				curScope.put(curClass.getDomain() + name, entity);
+				curScope.put(entity.getKey(), entity);
 			}
 		} catch (Error e) {
 			throw new CompileError("Fuck idiot!");

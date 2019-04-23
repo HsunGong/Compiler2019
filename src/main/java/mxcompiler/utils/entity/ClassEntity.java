@@ -34,8 +34,7 @@ public class ClassEntity extends Entity {
 	}
 
 	public void _dump(Dump d) {
-		d.printf("<Class Entity>:  name: %s, Type: %s\n", name, type.toString());
-		d.printf(" offset:%d\n", memSize);
+		d.printf(" <Class Entity>:  name: %s, Type: %s, offset:%d\n", name, type.toString(), memSize);
 		d.addTab();
 		scope._dump(d);
 		d.delTab();

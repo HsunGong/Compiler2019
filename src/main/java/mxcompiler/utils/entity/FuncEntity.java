@@ -14,23 +14,40 @@ import mxcompiler.utils.scope.Scope;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * returnType is NullType if construct! no entity cause, func has body of
- * block(which has a scope) // harm to build scope tree function is a scope!!!
- * FIX: from local resolver
+ * returnType is NullType if construct! no entity cause,
+ * func has body of block(which has a scope) // harm to
+ * build scope tree function is a scope!!! Store name as
+ * class.func (or func as global)
  */
 public class FuncEntity extends Entity {
 	private Type returnType;
-	public List<VarEntity> params = new ArrayList<VarEntity>();;
+	private List<VarEntity> params = new ArrayList<VarEntity>();;
 
 	public String className = "";
 	// public boolean isMember = false; // useless
 
 	public boolean isBuiltIn = false;// if true -> outInfluence is true
 
+	public String getKey() {
+		return className == "" ? name : className + Scope.BuiltIn.DOMAIN.toString() + name;
+	}
+
+	public List<VarEntity> getParams() {
+		return params;
+	}
+
 	public FuncEntity(String name, Type type, Type returnType) {
 		super(name, type);
 		this.returnType = returnType;
+	}
+
+	public FuncEntity(String name, Type type, Type returnType, List<VarEntity> params) {
+		this(name, type, returnType);
+		if (params == null)
+			throw new CompileError("Error init funcentity");
+		this.params = params;
 	}
 
 	public FuncEntity(FuncDeclNode node) {
@@ -61,10 +78,11 @@ public class FuncEntity extends Entity {
 			throw new Error("set function error");
 		else
 			returnType = node.getReturnType().getType();
-			
+
 		// isConstruct = node.isConstruct();
 		// isMember = true;
-		if (className == "") throw new CompileError("Need className");
+		if (className == "")
+			throw new CompileError("Need className");
 		this.className = className;
 	}
 
@@ -76,13 +94,15 @@ public class FuncEntity extends Entity {
 		return returnType;
 	}
 
-	public boolean isMember() { return className != ""; }
+	public boolean isMember() {
+		return className != "";
+	}
 
 	public void _dump(Dump d) {
-		d.printf("<Func Entity>:  name: %s, Type: %s\n", name, type.toString());
-		d.printf(" returnType: %s, isBuiltIn: %b\n", returnType.toString(), isBuiltIn);
-		d.printf(" isMember: %b, ClassName: %s\n", isMember(), className);
-		d.println(" params:");
+		d.printf(" <Func Entity>:  name: %s, Type: %s\n", name, type.toString());
+		d.printf("  returnType: %s, isBuiltIn: %b\n", returnType.toString(), isBuiltIn);
+		d.printf("  isMember: %b, ClassName: %s\n", isMember(), className);
+		d.println("  params:");
 		d.addTab();
 		if (!params.isEmpty())
 			for (VarEntity e : params)
