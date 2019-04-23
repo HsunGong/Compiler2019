@@ -31,8 +31,8 @@ public class Root {
     }
 
     // domin = "."
-    static public final String BUILTIN_STRING_LENGTH_FUNC_NAME = BuiltIn.STRING.toString() + ".length";
-    static public final String BUILTIN_ARRAY_SIZE_FUNC_NAME = BuiltIn.ARRAY.toString() + ".size";
+    static public final String BUILTIN_STRING_LENGTH_FUNC_NAME = BuiltIn.STRING.toDomain() + "length";
+    static public final String BUILTIN_ARRAY_SIZE_FUNC_NAME = BuiltIn.ARRAY.toDomain() + "size";
 
     public void initBuiltInFunc() {
         addFunc("print", "_Z5_printPc");
@@ -43,15 +43,15 @@ public class Root {
         addFunc("getInt", "_Z6_getIntv");
         addFunc("toString", "_Z8_toStringi");
 
-        addFunc(BuiltIn.STRING.toString() + ".substring", "_Z27_string_substringPcii");
-        addFunc(BuiltIn.STRING.toString() + ".parseInt", "_Z26_string_parseIntPc");
-        addFunc(BuiltIn.STRING.toString() + ".ord", "_Z21_string_ordPci");
+        addFunc(BuiltIn.STRING.toDomain() + "substring", "_Z27_string_substringPcii");
+        addFunc(BuiltIn.STRING.toDomain() + "parseInt", "_Z26_string_parseIntPc");
+        addFunc(BuiltIn.STRING.toDomain() + "ord", "_Z21_string_ordPci");
 
-        addFunc(BuiltIn.STRING.toString() + ".concat", "__builtin_string_concat");
-        addFunc(BuiltIn.STRING.toString() + ".equal", "__builtin_string_equal");
-        addFunc(BuiltIn.STRING.toString() + ".inequal", "__builtin_string_inequal");
-        addFunc(BuiltIn.STRING.toString() + ".less", "__builtin_string_less");
-        addFunc(BuiltIn.STRING.toString() + ".less_equal", "__builtin_string_less_equal");
+        addFunc(BuiltIn.STRING.toDomain() + "concat", "__builtin_string_concat");
+        addFunc(BuiltIn.STRING.toDomain() + "equal", "__builtin_string_equal");
+        addFunc(BuiltIn.STRING.toDomain() + "inequal", "__builtin_string_inequal");
+        addFunc(BuiltIn.STRING.toDomain() + "less", "__builtin_string_less");
+        addFunc(BuiltIn.STRING.toDomain() + "less_equal", "__builtin_string_less_equal");
     }
 
     public Map<String, Function> getBuiltInFunc() {

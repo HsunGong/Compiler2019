@@ -10,13 +10,15 @@ import mxcompiler.utils.Dump;
 import mxcompiler.utils.entity.Entity;
 import mxcompiler.error.*;
 
+import mxcompiler.utils.Tool;
+
 abstract public class Scope {
 	/**
 	 * reserved name of class FIX: maybe also builtIn Func?
 	 */
 	public enum BuiltIn {
 		// acc, array is not a class type
-		ARRAY("_array"), STRING("string"), THIS("__this"), DOMAIN(".");
+		ARRAY(Tool.ARRAY), STRING(Tool.STRING), THIS(Tool.THIS), DOMAIN(Tool.DOMAIN);
 
 		private String label;
 
@@ -27,6 +29,11 @@ abstract public class Scope {
 		public String toString() {
 			return label;
 		}
+
+		public String toDomain() {
+			return label + DOMAIN.toString();
+		}
+
 
 		private static final HashMap<String, BuiltIn> keyMap = new HashMap<String, BuiltIn>();
 		static {

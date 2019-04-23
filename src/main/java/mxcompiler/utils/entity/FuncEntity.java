@@ -34,7 +34,7 @@ public class FuncEntity extends Entity {
 		return className == "" ? name : className + Scope.BuiltIn.DOMAIN.toString() + name;
 	}
 
-	public List<VarEntity> getParams() {
+	public List<VarEntity> getParam() {
 		return params;
 	}
 

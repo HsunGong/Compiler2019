@@ -2,6 +2,7 @@ package mxcompiler.main;
 
 import java.util.*;
 
+import mxcompiler.utils.Tool;
 import mxcompiler.utils.entity.*;
 import mxcompiler.utils.scope.*;
 import mxcompiler.utils.type.*;
@@ -433,7 +434,7 @@ public class IRBuilder implements ASTVisitor {
         curWantAddr = tmpWantAddr;
 
         VirtualRegister vreg = new VirtualRegister(null);
-        IntImm elementSize = new IntImm(node.getType().getRegSize()); 
+        IntImm elementSize = new IntImm(node.getType().getRegSize());
         // size of this level
         // FIX: BUG: what is this ?
         curBB.addInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL, node.getIndex().regValue, elementSize));
@@ -480,19 +481,19 @@ public class IRBuilder implements ASTVisitor {
 
     public void visit(FuncallExprNode node) {
         FuncEntity entity = node.funcEntity;
-        String name = entity.getName();
+        String keyName = entity.getName();
         List<RegValue> args = new ArrayList<>();
         ExprNode thisExpr = null;
 
         if (entity.isMember()) {
-            if (node.getExpr() instanceof MemberExprNode) {
+            if (node.getExpr() instanceof MemberExprNode) { // has more member
                 thisExpr = ((MemberExprNode) (node.getExpr())).getExpr();
-            } else {
+            } else { // last level of member
                 if (curClass == null)
                     throw new CompileError("invalid member function call of this pointer");
 
                 thisExpr = new ThisExprNode(null);
-                thisExpr.setType(new ClassType(curClass.getName()));
+                thisExpr.setType(curClass.getType());
             }
             visit(thisExpr);
 
@@ -504,13 +505,13 @@ public class IRBuilder implements ASTVisitor {
             else
                 className = Scope.BuiltIn.STRING.toString();
 
-            name = className + Scope.BuiltIn.DOMAIN.toString() + name;
+            keyName = className + Scope.BuiltIn.DOMAIN.toString() + keyName;
             args.add(thisExpr.regValue);
         }
 
         // process built-in functions
         if (entity.isBuiltIn) {
-            processBuiltInFuncCall(node, thisExpr, entity, name);
+            processBuiltInFuncCall(node, thisExpr, entity, keyName);
             return;
         }
 
@@ -520,12 +521,12 @@ public class IRBuilder implements ASTVisitor {
             args.add(arg.regValue);
         }
 
-        Function func = root.getFunc(name);
+        Function func = root.getFunc(keyName);
         VirtualRegister vreg = new VirtualRegister(null);
         curBB.addInst(new Funcall(curBB, func, args, vreg));
         node.regValue = vreg;
 
-        if (node.getThen() != null)
+        if (node.getThen() != null) // FIX: getElse == null ?
             curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
     }
 
@@ -566,6 +567,26 @@ public class IRBuilder implements ASTVisitor {
     }
 
     public void visit(NewExprNode node) {
+        VirtualRegister vreg = new VirtualRegister(null);
+        Type newType = node.getNewType().getType();
+        if (newType instanceof ClassType) {
+            String className = ((ClassType) newType).getName();
+            ClassEntity classEntity = (ClassEntity) globalScope.get(Scope.classKey(className));
+            currentBB.addInst(new IRHeapAlloc(currentBB, vreg, new IntImmediate(classEntity.getMemorySize())));
+            //  call construction function
+            String funcName = IRRoot.irMemberFuncName(className, className);
+            IRFunction irFunc = ir.getFunc(funcName);
+            if (irFunc != null) {
+                List<RegValue> args = new ArrayList<>();
+                args.add(vreg);
+                currentBB.addInst(new IRFunctionCall(currentBB, irFunc, args, null));
+            }
+        } else if (newType instanceof ArrayType) {
+            processArrayNew(node, vreg, null, 0);
+        } else {
+            throw new CompilerError("invalid new type");
+        }
+        node.setRegValue(vreg);
     }
 
     public void visit(BinaryOpExprNode node) {
@@ -635,13 +656,11 @@ public class IRBuilder implements ASTVisitor {
 
     // region utils
 
-    private boolean checkIdentiferThisMemberAccess(IdentifierExprNode node) {
-    }
-
     /**
      * set rhs.value to destion
      * <p>
      * maybe (split to then or else)add this block into curBB
+     * Assign, return, varInit
      */
     private void processIRAssign(RegValue destion, int addrOffset, ExprNode rhs, int size, boolean needMemOp) {
         BasicBlock thenBB, elseBB;
@@ -676,11 +695,136 @@ public class IRBuilder implements ASTVisitor {
     private void processSelfIncDec(ExprNode expr, ExprNode node, boolean isSuffix, boolean isInc) {
     }
 
+    // print(A + B); -> print(A); print(B);
+    // println(A + B); -> print(A); println(B);
     private void processPrintFuncCall(ExprNode arg, String funcName) {
+        if (arg instanceof BinaryOpExprNode) {
+            processPrintFuncCall(((BinaryOpExprNode) arg).getLhs(), "print");
+            processPrintFuncCall(((BinaryOpExprNode) arg).getRhs(), funcName);
+            return;
+        }
+
+        Function calleeFunc;
+        List<RegValue> vArgs = new ArrayList<>();
+        // FIX: needed to add printINT
+        if (arg instanceof FuncallExprNode && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
+            // print(toString(n)); -> printInt(n);
+            ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
+            visit(intExpr);
+            calleeFunc = root.getBuiltInFunc(funcName + "Int");
+            vArgs.add(intExpr.regValue);
+        } else {
+            visit(arg);
+            calleeFunc = root.getBuiltInFunc(funcName);
+            vArgs.add(arg.regValue);
+        }
+
+        curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, null));
     }
 
-    private void processBuiltInFuncCall(FuncallExprNode node, ExprNode thisExpr, FuncEntity funcEntity,
-            String funcName) {
+    private void processBuiltInFuncCall(FuncallExprNode node, ExprNode thisExpr, FuncEntity entity, String keyName) {
+        boolean tmpWantAddr = curWantAddr;
+        curWantAddr = false;
+
+        ExprNode arg0, arg1;
+        VirtualRegister vreg;
+        Function calleeFunc;
+        List<RegValue> vArgs = new ArrayList<>();
+
+        switch (keyName) {
+        case Tool.PRINT_KEY:
+        case Tool.PRINTLN_KEY:
+            arg0 = node.getParam().get(0); // have to be string
+            processPrintFuncCall(arg0, keyName);
+            break;
+
+        case Tool.GETSTRING_KEY:
+            vreg = new VirtualRegister("getString");
+            vArgs.clear();
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.GETINT_KEY:
+            vreg = new VirtualRegister("getInt");
+            vArgs.clear();
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.TOSTRING_KEY:
+            arg0 = node.getParam().get(0);
+            visit(arg0);
+
+            vreg = new VirtualRegister("toString");
+            vArgs.clear();
+            vArgs.add(arg0.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.SUBSTRING_KEY:
+            arg0 = node.getParam().get(0);
+            visit(arg0);
+            arg1 = node.getParam().get(1);
+            visit(arg1);
+
+            vreg = new VirtualRegister("subString");
+            vArgs.clear();
+            vArgs.add(thisExpr.regValue);
+            vArgs.add(arg0.regValue);
+            vArgs.add(arg1.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.PARSEINT_KEY:
+            vreg = new VirtualRegister("parseInt");
+            vArgs.clear();
+            vArgs.add(thisExpr.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.ORD_KEY:
+            arg0 = node.getParam().get(0);
+            visit(arg0);
+
+            vreg = new VirtualRegister("ord");
+            vArgs.clear();
+            vArgs.add(thisExpr.regValue);
+            vArgs.add(arg0.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+
+            // FIX: could be optimized by add and load
+            break;
+
+        case Tool.LENGTH_KEY:
+        case Tool.SIZE_KEY:
+            vreg = new VirtualRegister("size_length");
+
+            curBB.addInst(new Load(curBB, vreg, RegValue.RegSize, thisExpr.regValue, 0));
+            node.regValue = vreg;
+            break;
+
+        default:
+            throw new CompileError("invalid built-in function call");
+        }
+
+        curWantAddr = tmpWantAddr;
     }
 
     private void processArrayNew(NewExprNode node, VirtualRegister oreg, RegValue addr, int idx) {
@@ -698,7 +842,34 @@ public class IRBuilder implements ASTVisitor {
     private void processCmpBinaryOp(BinaryOpExprNode node) {
     }
 
+    // need to use memory store and load
     private boolean isMemoryAccess(ExprNode node) {
+        // return node instanceof ArefExprNode || node instanceof
+        // MemberExprNode
+        // || (node instanceof IdentifierExprNode &&
+        // checkIdentiferThisMemberAccess((IdentifierExprNode)
+        // node));
+        if (node instanceof ArefExprNode || node instanceof MemberExprNode)
+            return true;
+        if ((node instanceof IdentifierExprNode && checkIdentiferMemberAccess((IdentifierExprNode) node)))
+            return true;
+        return false;
     }
+
+    /** check class-mem access */
+    private boolean checkIdentiferMemberAccess(IdentifierExprNode node) {
+        // only need to check once
+        if (!node.isChecked()) {
+            if (curClass != null) {
+                VarEntity varEntity = (VarEntity) curScope.get(node.getIdentifier());
+                node.setNeedMemOp(varEntity.register == null);
+            } else {
+                node.setNeedMemOp(false);
+            }
+            node.setChecked(true);
+        }
+        return node.isNeedMemOp();
+    }
+
     // endregion
 }

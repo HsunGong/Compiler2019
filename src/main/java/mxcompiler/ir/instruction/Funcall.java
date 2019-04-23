@@ -13,13 +13,13 @@ public class Funcall extends Quad {
     private List<RegValue> args;
     private RegValue dst;
 
-    public Funcall(BasicBlock parent, Function func, List<RegValue> args, RegValue dst) {
+    public Funcall(BasicBlock parent, Function func, List<RegValue> args, RegValue destion) {
         super(parent);
         this.func = func;
         if (args == null)
             throw new CompileError("Funcall args should be empty not null");
         this.args = args;
-        this.dst = dst;
+        this.dst = destion;
 
         // reloadUsedRegistersRegValues
     }

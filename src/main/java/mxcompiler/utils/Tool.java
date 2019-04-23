@@ -1,0 +1,59 @@
+package mxcompiler.utils;
+
+import mxcompiler.utils.scope.Scope;
+
+
+public class Tool {
+    // region builtIn
+    // class
+
+    public static final String STRING = "string";
+    public static final String ARRAY = "_array";
+    public static final String THIS = "__this";
+    public static final String DOMAIN = ".";
+
+    // function
+    public static final String PRINT = "print";
+    public static final String PRINTLN = "println";
+    public static final String PRINTINT = "printInt";
+    public static final String PRINTLNINT = "printlnInt";
+    public static final String GETSTRING = "getString";
+    public static final String GETINT = "getInt";
+    public static final String TOSTRING = "toString";
+    
+    public static final String SUBSTRING = "subString";
+    public static final String PARSEINT = "parseInt";
+    public static final String ORD = "ord";
+    public static final String SIZE = "size";
+    public static final String LENGTH = "length";
+
+
+    public static final String CONCAT = "concat";
+    public static final String EQUAL = "equal";
+    public static final String INEQUAL = "inequal";
+    public static final String LESS = "less";
+    public static final String LESS_EQUAL = "less_equal";
+
+    public static final String PRINT_KEY = PRINT;
+    public static final String PRINTLN_KEY = PRINTLN;
+    public static final String PRINTINT_KEY = PRINTINT;
+    public static final String PRINTLNINT_KEY = PRINTLNINT;
+    public static final String GETSTRING_KEY = GETSTRING;
+    public static final String GETINT_KEY = GETINT;
+    public static final String TOSTRING_KEY = TOSTRING;
+    
+    public static final String SUBSTRING_KEY = STRING + DOMAIN + SUBSTRING;
+    public static final String PARSEINT_KEY = STRING + DOMAIN + PARSEINT;
+    public static final String ORD_KEY = STRING + DOMAIN + ORD;
+    public static final String LENGTH_KEY = STRING + DOMAIN + LENGTH;
+
+    public static final String SIZE_KEY = ARRAY + DOMAIN + SIZE;
+
+    public static final String CONCAT_KEY = STRING + DOMAIN + CONCAT;
+    public static final String EQUAL_KEY = STRING + DOMAIN + EQUAL;
+    public static final String INEQUAL_KEY = STRING + DOMAIN + INEQUAL;
+    public static final String LESS_KEY = STRING + DOMAIN + LESS;
+    public static final String LESS_EQUAL_KEY = STRING + DOMAIN + LESS_EQUAL;
+
+    // endregion
+}

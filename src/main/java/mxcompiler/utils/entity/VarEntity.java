@@ -13,6 +13,7 @@ public class VarEntity extends Entity {
 	private String className = "";
 	public boolean isGlobal = false;
 	
+	/** irRegister */
 	public RegValue register;
 	public boolean unUsed = false;
 

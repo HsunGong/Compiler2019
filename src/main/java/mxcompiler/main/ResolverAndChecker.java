@@ -73,7 +73,7 @@ public class ResolverAndChecker extends Visitor {
 			throw new SemanticError("\"main\" function not found");
 		if (!(mainFunc.getReturnType() instanceof IntType))
 			throw new SemanticError("\"main\" function's return type should be \"int\"");
-		if (!mainFunc.getParams().isEmpty())
+		if (!mainFunc.getParam().isEmpty())
 			throw new SemanticError("\"main\" function should have no parameter");
 	}
 
@@ -517,7 +517,7 @@ public class ResolverAndChecker extends Visitor {
 			}
 
 			// check param size
-			int paraNum = funcallEntity.getParams().size();
+			int paraNum = funcallEntity.getParam().size();
 			int firstParaIdx = node.funcEntity.isMember() ? 1 : 0;
 			if (paraNum - firstParaIdx != node.getParam().size())
 				throw new SemanticError(
@@ -528,7 +528,7 @@ public class ResolverAndChecker extends Visitor {
 			boolean valid;
 			for (int i = 0; i < paraNum - firstParaIdx; ++i) {
 				ExprNode curParam = node.getParam().get(i);
-				VarEntity defParam = funcallEntity.getParams().get(i + firstParaIdx); // define in fun-decl
+				VarEntity defParam = funcallEntity.getParam().get(i + firstParaIdx); // define in fun-decl
 				visit(curParam);
 				if (curParam.getType() instanceof VoidType) // cause funcall-void
 					valid = false;
