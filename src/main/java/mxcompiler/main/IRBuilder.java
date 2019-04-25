@@ -26,7 +26,7 @@ import mxcompiler.ir.register.*;
  */
 public class IRBuilder extends Visitor {
 
-    private Root root = new Root();
+    public final Root root = new Root();
 
     private ToplevelScope toplevelScope;
     private List<GlobalVarInit> globalInitList = new ArrayList<>();
@@ -60,6 +60,9 @@ public class IRBuilder extends Visitor {
 
     // region visit decl
 
+    /**
+     * mainfunction
+     */
     public void visit(ASTNode node) {
         toplevelScope = node.getScope();
         curScope = toplevelScope;
@@ -98,6 +101,8 @@ public class IRBuilder extends Visitor {
         for (Function irFunc : root.getFunc().values())
             irFunc.updateCalleeSet();
         root.updateCalleeSet();
+
+        TwoRegOpTransformer();
     }
 
     public void visit(VarDeclNode node) {
@@ -1357,5 +1362,42 @@ public class IRBuilder extends Visitor {
         return node.isNeedMemOp();
     }
 
+    private void TwoRegOpTransformer() {
+        for (Function irFunc : root.getFunc().values())
+            for (BasicBlock bb : irFunc.getReversePostOrder())
+                for (Quad inst : bb.getInsts()) {
+                    if (!(inst instanceof Bin))
+                        continue;
+                    Bin BinInst = (Bin) inst;
+
+                    if (BinInst.getDst() == BinInst.getLhs())
+                        continue;
+
+                    if (BinInst.getDst() == BinInst.getRhs()) {
+
+                        if (BinInst.isCommutative()) {
+                            swap(BinInst.getRhs(), BinInst.getLhs());
+                        } else {
+                            VirtualRegister vreg = new VirtualRegister("rhsBak");
+                            BinInst.prependInst(
+                                    new IRMove(BinInst.getParentBB(), vreg, BinInst.getRhs()));
+                            BinInst.prependInst(new IRMove(BinInst.getParentBB(),
+                                    BinInst.getDest(), BinInst.getLhs()));
+
+                            BinInst.setLhs(BinInst.getDest());
+                            BinInst.setRhs(vreg);
+                        }
+
+                    } else if (BinInst.getOp() != BinaryOpExprNode.Op.DIV
+                            && BinInst.getOp() != BinaryOpExprNode.Op.MOD) {
+
+                        BinInst.prependInst(new IRMove(BinInst.getParentBB(),
+                                BinInst.getDest(), BinInst.getLhs()));
+                        BinInst.setLhs(BinInst.getDest());
+
+                    }
+                }
+
+    }
     // endregion
 }

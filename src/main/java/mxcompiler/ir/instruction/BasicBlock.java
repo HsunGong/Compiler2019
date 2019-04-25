@@ -10,21 +10,11 @@ import mxcompiler.error.CompileError;
 
 
 public class BasicBlock {
-    // private IRInstruction firstInst = null, lastInst = null;
-    private LinkedList<Quad> insts = new LinkedList<>();
-
     private Function func;
     private String name;
     // private int ord
 
-    private Set<BasicBlock> prev = new HashSet<>();
-    private Set<BasicBlock> next = new HashSet<>(); // may be linked-List
-
-    // FIX:??
-    public ForStmtNode forNode = null; // StmtNode ??
-    public int postOrderIdx, preOrderIdx;
-
-    private boolean hasJump = false; // hasJumpInst
+    public ForStmtNode forNode;
 
     public BasicBlock(Function func, String name) {
         this.func = func;
@@ -38,6 +28,48 @@ public class BasicBlock {
     public Function getFunc() {
         return func;
     }
+
+    // region prev-next BB
+
+    // double direction
+    private Set<BasicBlock> prev = new HashSet<>();
+    private Set<BasicBlock> next = new HashSet<>(); // may be linked-List
+
+    private void addPrev(BasicBlock bb) {
+        prev.add(bb);
+    }
+
+    private void addNext(BasicBlock bb) {
+        next.add(bb);
+        if (bb != null)
+            bb.addPrev(this);
+    }
+
+    private void delPrev(BasicBlock bb) {
+        prev.remove(bb);
+    }
+
+    private void delNext(BasicBlock bb) {
+        next.remove(bb);
+        if (bb != null)
+            bb.delPrev(this);
+    }
+
+    public Set<BasicBlock> getPrev() {
+        return prev;
+    }
+
+    public Set<BasicBlock> getNext() {
+        return next;
+    }
+
+    // endregion
+
+    // FIX:??
+    // public int postOrderIdx, preOrderIdx;
+
+    private LinkedList<Quad> insts = new LinkedList<>();
+    private boolean hasJump = false; // hasJumpInst
 
     public LinkedList<Quad> getInsts() {
         return insts;
@@ -56,6 +88,16 @@ public class BasicBlock {
         insts.add(inst);
     }
 
+    /**
+     * 
+     */
+    public void addAfterInst(int index, Quad nextInst) {
+        if (hasJump)
+            throw new CompileError("Block is finished");
+
+        insts.add(index, nextInst);
+    }
+
     public void delInst(Quad inst) {
         if (hasJump && inst == insts.getLast())
             delJump();
@@ -65,55 +107,13 @@ public class BasicBlock {
             insts.remove(inst);
     }
 
-    public void clearInsts() { // reInit
+    /**
+     * reInit() -- only for insts and jumps
+     */
+    public void clearInsts() {
         insts = new LinkedList<>();
         hasJump = false;
     }
-
-    // region prev-next
-    public Set<BasicBlock> getPrev() {
-        return prev;
-    }
-
-    public void addPrev(BasicBlock bb) {
-        try {
-            prev.add(bb);
-        } catch (Exception e) {
-            throw new CompileError("add" + e.getMessage());
-        }
-    }
-
-    public void delPrev(BasicBlock bb) {
-        try {
-            prev.remove(bb);
-        } catch (Exception e) {
-            throw new CompileError("del" + e.getMessage());
-        }
-    }
-
-    public Set<BasicBlock> getNext() {
-        return next;
-    }
-
-    public void addNext(BasicBlock bb) {
-        try {
-            next.add(bb);
-            if (bb != null)
-                bb.addPrev(this);
-        } catch (Exception e) {
-            throw new CompileError("add" + e.getMessage());
-        }
-    }
-
-    public void delNext(BasicBlock bb) {
-        try {
-            next.remove(bb);
-            bb.delPrev(this);
-        } catch (Exception e) {
-            throw new CompileError("del" + e.getMessage());
-        }
-    }
-    // endregion
 
     // region jump
     public boolean hasJump() {

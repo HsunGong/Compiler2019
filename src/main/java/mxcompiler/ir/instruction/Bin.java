@@ -43,6 +43,16 @@ public class Bin extends Quad {
         return lhs;
     }
 
+    /**
+     * false: sub, div, mod, sh_l, sh_r
+     * <p>
+     * E.g. true: {@code a + b} <-> {@code b + a} 
+     */
+    public boolean isCommutative() {
+        return op == Op.ADD || op == Op.MUL || op == Op.BIT_AND || op == Op.BIT_OR
+                || op == Op.BIT_XOR;
+    }
+
     // @Override
     // public IRUnaryOperation copyRename(Map<Object, Object>
     // renameMap) {

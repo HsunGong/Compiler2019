@@ -10,8 +10,10 @@ import java.io.PrintStream;
 import mxcompiler.parser.*;
 import mxcompiler.utils.scope.ScopeDump;
 import mxcompiler.error.*;
+import mxcompiler.ir.Root;
 import mxcompiler.main.CompilerMode.DumpMode;
 import mxcompiler.ast.*;
+
 
 public final class Compiler {
 	static final public String ProgName = "mxc";
@@ -33,11 +35,12 @@ public final class Compiler {
 	public void execute(String[] args) throws Error {
 		// parse options
 		opts = new Option(args);
-		
+
 		try {
 			this.fileIn = opts.sourceFile();
 			try {
-				this.dumpOut = new PrintStream(new FileOutputStream("./src/test/test.out", false));
+				this.dumpOut = new PrintStream(
+						new FileOutputStream("./src/test/test.out", false));
 				fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
 			} catch (Exception e) {
 				// throw new Error(e);
@@ -47,8 +50,10 @@ public final class Compiler {
 			compile();
 
 		} catch (Error e) {
-			if (opts.mode().equals(CompilerMode.Default)) System.out.println(e.getMessage());
-			else throw new Error(e);
+			if (opts.mode().equals(CompilerMode.Default))
+				System.out.println(e.getMessage());
+			else
+				throw new Error(e);
 		}
 
 	}
@@ -57,7 +62,8 @@ public final class Compiler {
 	private PrintStream fileOut;
 	private PrintStream errOut = System.out;
 	private PrintStream dumpOut;
-	private ASTNode root;
+	private ASTNode astRoot;
+	private Root irRoot;
 
 	// file compiler with errorHandler
 	private void compile() throws Error {
@@ -66,19 +72,27 @@ public final class Compiler {
 			semanticAnalyze();
 
 			buildIR();
-		} catch(Exception e) {
+		} catch (Exception e) {
 			throw new Error(e);
 		}
 	}
 
 	private void buildIR() throws Error {
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println("IR Builder begin");
+
 		UsagePreChecker usagePreChecker = new UsagePreChecker();
-		usagePreChecker.visit(root);
+		usagePreChecker.visit(astRoot);
 
 		IRBuilder treeIrBuilder = new IRBuilder();
-		treeIrBuilder.visit(root);
+		treeIrBuilder.visit(astRoot);
+
+		irRoot = treeIrBuilder.root;
 
 
+
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println(">>> IR Builder end");
 	}
 
 	private void semanticAnalyze() throws Error {
@@ -86,10 +100,11 @@ public final class Compiler {
 			System.out.println("Resolver begin");
 
 		ResolverAndChecker RCer = new ResolverAndChecker();
-		RCer.visit(root);
+		RCer.visit(astRoot);
 
-		if (opts.dumpMode().contains(DumpMode.ScopeDump) || opts.dumpMode().contains(DumpMode.AllDump)) {
-			new ScopeDump(dumpOut).visit(root);
+		if (opts.dumpMode().contains(DumpMode.ScopeDump)
+				|| opts.dumpMode().contains(DumpMode.AllDump)) {
+			new ScopeDump(dumpOut).visit(astRoot);
 		}
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> Resolver end");
@@ -105,13 +120,14 @@ public final class Compiler {
 		parser.removeErrorListeners();
 		parser.addErrorListener(errHandler);
 
-		ParseTree tree = parser.compilationUnit(); // the begin root of my g4 file
+		ParseTree tree = parser.compilationUnit(); // the begin astRoot of my g4 file
 
 		ASTBuilder astBuilder = new ASTBuilder();
-		root = (ASTNode) astBuilder.visit(tree);
+		astRoot = (ASTNode) astBuilder.visit(tree);
 
-		if (opts.dumpMode().contains(DumpMode.ASTDump) || opts.dumpMode().contains(DumpMode.AllDump)) {
-			new ASTDump(dumpOut).visit(root);
+		if (opts.dumpMode().contains(DumpMode.ASTDump)
+				|| opts.dumpMode().contains(DumpMode.AllDump)) {
+			new ASTDump(dumpOut).visit(astRoot);
 		}
 
 		if (opts.mode().equals(CompilerMode.Debug))

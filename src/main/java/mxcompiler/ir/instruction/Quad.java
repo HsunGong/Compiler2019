@@ -23,23 +23,6 @@ abstract public class Quad {
     // prepend: pre -> new -> this -> next
     // append: pre -> this -> new -> next
 
-    public void remove() {
-        if (removed) {
-            throw new CompileError("an instruction already removed");
-        }
-        removed = true;
-        parent.delInst(this);
-    }
-
-    public void replace(Quad inst) {
-        if (removed) {
-            throw new CompileError("an instruction already removed");
-        }
-        removed = true;
-        parent.delInst(this);
-        parent.addInst(inst);
-    }
-
     public BasicBlock getParent() {
         return parent;
     }
