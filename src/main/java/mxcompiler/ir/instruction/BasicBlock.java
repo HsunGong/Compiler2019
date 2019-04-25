@@ -75,41 +75,103 @@ public class BasicBlock {
         return insts;
     }
 
-    private void replaceInst(Quad before, Quad after) {
-        int index = insts.indexOf(before);
-        insts.remove(before);
-        insts.add(index, after);
-    }
-
-    public void addInst(Quad inst) {
+    // remove, add indx, del index implement with iter
+    // add, del with last
+    public void addLastInst(Quad inst) {
         if (hasJump)
             throw new CompileError("Block is finished");
 
-        insts.add(inst);
+        insts.addLast(inst);
     }
 
-    /**
-     * 
+    /** 
+     * double check
      */
-    public void addAfterInst(int index, Quad nextInst) {
-        if (hasJump)
-            throw new CompileError("Block is finished");
-
-        insts.add(index, nextInst);
-    }
-
-    public void delInst(Quad inst) {
+    public void delLastInst(Quad inst) {
         if (hasJump && inst == insts.getLast())
             delJump();
-        else if (inst instanceof JumpQuad) // FIX: Fine
+        else if (insts.getLast() != inst || inst instanceof JumpQuad) // FIX: Fine
             throw new CompileError("Error when del Jump quad");
         else
-            insts.remove(inst);
+            insts.removeLast();
     }
 
-    /**
-     * reInit() -- only for insts and jumps
+    /** remove
+     * <p>
+     * illigal: don't have iter.next() after origin
+     * 
+     * <pre>
+     * // origin: iter inst(select) (inst2)
+     * iter.next(); inst ...
+     * // before: inst(select) iter (inst2)
+     * delInst(iter)
+     * // after: iter (inst2)
+     * </pre>
      */
+    public void removeInst(ListIterator<Quad> iter) {
+        Quad inst = iter.previous();
+        if (hasJump && inst == insts.getLast())
+            delJump();
+        else if (insts.getLast() != inst || inst instanceof JumpQuad) // FIX: Fine
+            throw new CompileError("Error when del Jump quad");
+        else
+            iter.remove(); // remove inst
+    }
+
+    /** append
+     * <p>
+     * illigal: don't have iter.next() after origin
+     * 
+     * <pre>
+     * // origin: iter inst(will select) inst2
+     * inst = iter.next(); inst ...
+     * // before: inst(select) iter inst2
+     * bb.addBeforeInst(iter, new_inst)
+     * // after: inst(select) new_inst iter inst2
+     * </pre>
+     */
+    public void addAfterInst(ListIterator<Quad> iter, Quad newInst) {
+        iter.add(newInst);
+    }
+
+    /** prepend
+     * <p>
+     * illigal: don't have iter.next() before
+     * 
+     * <pre>
+     * // origin: inst1 iter inst(will select) inst2
+     * inst = iter.next(); inst ...
+     * // before: inst1 inst(select) iter inst2
+     * bb.addBeforeInst(iter, new_inst)
+     * // after : inst1 new_inst origin_iter inst(select) return_iter inst2
+     * </pre>
+     */
+    public void addBeforeInst(ListIterator<Quad> iter, Quad newInst) {
+        if (!iter.hasPrevious()) // check origin inst
+            throw new CompileError("Error add-before inst");
+
+        iter.previous(); // get inst1
+        iter.add(newInst); // get origin_iter
+        iter.next(); // get return_iter
+    }
+
+    /** replace
+     * 
+     * <pre>
+     * // origin:  iter inst(will select) inst2
+     * before: inst = iter.next(); inst ...
+     * // before: inst(select) iter inst2
+     * bb.addBeforeInst(iter, new_inst)
+     * // after: new_inst iter inst2
+     * </pre>
+     */
+    public void replaceInst(ListIterator<Quad> iter, Quad newInst) {
+        if (!iter.hasPrevious()) // check origin inst
+            throw new CompileError("can not get iter.previous");
+        iter.set(newInst);
+    }
+
+    /** reInit() -- only for insts and jumps */
     public void clearInsts() {
         insts = new LinkedList<>();
         hasJump = false;
@@ -124,7 +186,7 @@ public class BasicBlock {
     public void setJump(JumpQuad inst) {
         if (hasJump)
             throw new CompileError("Already has jump");
-        addInst(inst);
+        addLastInst(inst);
         hasJump = true;
 
         if (inst instanceof CJump) { // 2 branch
@@ -146,7 +208,7 @@ public class BasicBlock {
         if (!(last instanceof JumpQuad))
             throw new CompileError("invalid type of Remove Jump");
 
-        insts.remove(last);
+        insts.removeLast();
 
         // del block or returns
         if (last instanceof CJump) {

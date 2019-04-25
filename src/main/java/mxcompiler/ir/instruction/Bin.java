@@ -40,13 +40,21 @@ public class Bin extends Quad {
     }
 
     public RegValue getLhs() {
-        return lhs;
+        return rhs;
+    }
+
+    public void setLhs(RegValue lhs) {
+        this.lhs = lhs;
+    }
+
+    public void setRhs(RegValue rhs) {
+        this.rhs = rhs;
     }
 
     /**
      * false: sub, div, mod, sh_l, sh_r
      * <p>
-     * E.g. true: {@code a + b} <-> {@code b + a} 
+     * E.g. true: {@code a + b} <-> {@code b + a}
      */
     public boolean isCommutative() {
         return op == Op.ADD || op == Op.MUL || op == Op.BIT_AND || op == Op.BIT_OR

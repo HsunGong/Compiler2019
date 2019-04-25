@@ -22,7 +22,8 @@ import mxcompiler.ir.register.*;
 
 
 /**
- * The whole IR is built under Control Flow Graph Considered no SSA, no tree
+ * The whole IR is built under Control Flow Graph Considered no SSA, no
+ * tree
  */
 public class IRBuilder extends Visitor {
 
@@ -39,7 +40,7 @@ public class IRBuilder extends Visitor {
 
     /**
      * selfDecrIncr -> {@code want = true, if(needMemOp =
-     * isMemoryAccess(expr))}
+                        * isMemoryAccess(expr))}
      * <p>
      * assignNode -> {@code wantAddr = needMemOp =
      * isMemoryAccess(node.getLhs())}
@@ -48,21 +49,15 @@ public class IRBuilder extends Visitor {
 
     private boolean isFuncArgDecl = false;
 
-    /**
-     * only when {@link #visit(AssignExprNode) }, {@code assignLhs = true;}
-     */
+    /** only when {@link #visit(AssignExprNode) }, {@code assignLhs = true;} */
     private boolean assignLhs = false;
 
-    /**
-     * only when {@link #visit(IdentifierExprNode)}
-     */
+    /** only when {@link #visit(IdentifierExprNode)} */
     private boolean uselessStatic = false;
 
     // region visit decl
 
-    /**
-     * mainfunction
-     */
+    /** mainfunction */
     public void visit(ASTNode node) {
         toplevelScope = node.getScope();
         curScope = toplevelScope;
@@ -105,150 +100,10 @@ public class IRBuilder extends Visitor {
         TwoRegOpTransformer();
     }
 
-    public void visit(VarDeclNode node) {
-        VarEntity entity = (VarEntity) curScope.get(node.getName());
-        if (entity.unUsed)
-            return;
-
-        if (curScope == toplevelScope) { // global var
-            StaticData data = new StaticVar(node.getName(), RegValue.RegSize);
-            root.putStaticData(data); // has order
-            entity.register = data;
-
-            if (node.getInit() != null) {
-                GlobalVarInit init = new GlobalVarInit(node.getName(), node.getInit());
-                globalInitList.add(init); // has order
-            }
-
-            if (node.getInit() != null) {
-                GlobalVarInit init = new GlobalVarInit(node.getName(), node.getInit());
-                globalInitList.add(init);
-            }
-        } else { // other var
-            VirtualRegister vreg = new VirtualRegister(node.getName());
-            entity.register = vreg;
-
-            if (isFuncArgDecl)
-                curFunc.argVReg.add(vreg);
-
-            if (node.getInit() == null) {
-                if (!isFuncArgDecl) {
-                    // curBB.addInst(new Move(curBB, vreg, new IntImm(0)));
-                    System.out.println("Node init with args");
-                }
-            } else {
-                // a init var; not literal
-                if (node.getInit().getType() instanceof BoolType
-                        && !(node.getInit() instanceof BoolLiteralExprNode)) {
-                    node.getInit().setThen(new BasicBlock(curFunc, null));
-                    node.getInit().setElse(new BasicBlock(curFunc, null));
-                }
-
-                visit(node.getInit());
-                dealAssign(vreg, 0, node.getInit(), node.getInit().getType().getRegSize(),
-                        false);
-            }
-        }
-    }
-
-    public void visit(ClassDeclNode node) {
-        if (curScope == toplevelScope)
-            throw new CompileError("ClassDecl Have to be toplevelScope in IRBuilder");
-        curClass = (ClassEntity) toplevelScope.get(node.getName());
-
-        //
-        for (FuncDeclNode decl : node.getFunc())
-            visit(decl);
-
-        curClass = null;
-    }
-
-    public void visit(FuncDeclNode node) {
-        String name = (curClass == null) ? node.getName()
-                : curClass.getDomain() + node.getName();
-        curFunc = root.getFunc(name);
-        if (curFunc == null)
-            throw new CompileError("Can not find funcdecl in ir:" + name);
-        curBB = curFunc.initStart();
-
-        Scope tmp = curScope;
-        curScope = node.getBody().getScope(); // func-block-scope
-        // region params
-
-        if (curClass != null) { // deal this-param
-            VarEntity entity = (VarEntity) curScope.get(Scope.BuiltIn.THIS.toString());
-
-            VirtualRegister vreg = new VirtualRegister(Scope.BuiltIn.THIS.toString());
-            entity.register = vreg;
-            curFunc.argVReg.add(vreg);
-        }
-        isFuncArgDecl = true; // deal other param
-        for (VarDeclNode argDecl : node.getVar())
-            visit(argDecl);
-        isFuncArgDecl = false;
-        // endregion
-        curScope = tmp;
-
-        // region add inst
-        // global init func
-        if (node.getName().equals("main"))
-            curBB.addInst(
-                    new Funcall(curBB, root.getFunc(INIT_FUNC_NAME), new ArrayList<>(), null));
-
-        visit(node.getBody());
-
-        // final-return (may have other return in other blocks)
-        if (!curBB.hasJump()) { // return type
-            if (node.getReturnType().getType() instanceof NullType
-                    || node.getReturnType().getType() instanceof VoidType)
-                curBB.setJump(new Return(curBB, null));
-            else // has return value fix: todo: why need intImm ??
-                curBB.setJump(new Return(curBB, new IntImm(0)));
-        }
-
-        // merge multiple return instructions to a single end basic
-        // block
-        if (curFunc.returns.size() > 1) {
-            BasicBlock mergeEnd = new BasicBlock(curFunc, curFunc.getName() + "_end");
-
-            // set return value
-            VirtualRegister retReg;
-            if (node.getReturnType().getType() instanceof NullType
-                    || node.getReturnType().getType() instanceof VoidType)
-                retReg = null;
-            else
-                retReg = new VirtualRegister("return_value");
-
-            // transfer return block to jump block
-            List<Return> retList = new ArrayList<>(curFunc.returns);
-            for (Return ret : retList) {
-                BasicBlock beforeRet = ret.getParent();
-                beforeRet.delInst(ret);
-
-                if (ret.getReturnVal() != null) { // add move to reg
-                    Move tmpInst = new Move(beforeRet, retReg, ret.getReturnVal());
-                    beforeRet.addInst(tmpInst);
-                }
-
-                beforeRet.setJump(new Jump(beforeRet, mergeEnd));
-            }
-
-            mergeEnd.setJump(new Return(mergeEnd, retReg));
-            curFunc.end = mergeEnd;
-        } else
-            curFunc.end = curFunc.returns.get(0).getParent();
-        // endregion
-
-        curBB = null;
-        curFunc = null;
-    }
-    // endregion
-
-    // region ----------------- global var func-init
-    // ------------------
-    // NOTE: make global var init as a function
+    // ----------------- global var func-init -----------------
     private final String INIT_FUNC_NAME = "_init_func";
 
+    /** NOTE: make global var init as a function */
     private FuncDeclNode makeGlobalVarInit() {
         if (toplevelScope != curScope)
             throw new CompileError("Error when global var init");
@@ -279,13 +134,141 @@ public class IRBuilder extends Visitor {
         root.putFunc(newIRFunc);
         return funcNode;
     }
+
+    public void visit(VarDeclNode node) {
+        VarEntity entity = (VarEntity) curScope.get(node.getName());
+        if (entity.unUsed)
+            return;
+
+        if (curScope == toplevelScope) { // global var
+            StaticData data = new StaticVar(node.getName(), RegValue.RegSize);
+            root.putStaticData(data); // has order
+            entity.register = data;
+
+            if (node.getInit() != null) {
+                GlobalVarInit init = new GlobalVarInit(node.getName(), node.getInit());
+                globalInitList.add(init); // has order
+            }
+
+        } else { // other var
+            VirtualRegister vreg = new VirtualRegister(node.getName());
+            entity.register = vreg;
+
+            if (isFuncArgDecl)
+                curFunc.argVReg.add(vreg);
+
+            if (node.getInit() == null) {
+                if (!isFuncArgDecl) { // init with 0
+                    curBB.addLastInst(new Move(curBB, vreg, new IntImm(0)));
+                }
+            } else {
+                // a init var; not literal
+                if (node.getInit().getType() instanceof BoolType
+                        && !(node.getInit() instanceof BoolLiteralExprNode)) {
+                    node.getInit().setThen(new BasicBlock(curFunc, null));
+                    node.getInit().setElse(new BasicBlock(curFunc, null));
+                }
+
+                visit(node.getInit());
+                dealAssign(vreg, 0, node.getInit(), node.getInit().getType().getRegSize(),
+                        false);
+            }
+        }
+    }
+
+    public void visit(ClassDeclNode node) {
+        curClass = (ClassEntity) toplevelScope.get(node.getName());
+
+        curScope = curClass.getScope();
+        for (FuncDeclNode decl : node.getFunc())
+            visit(decl);
+        curScope = curScope.getParent();
+        curClass = null;
+    }
+
+    public void visit(FuncDeclNode node) {
+        String name = (curClass == null) ? node.getName()
+                : curClass.getDomain() + node.getName();
+        curFunc = root.getFunc(name);
+        curBB = curFunc.initStart();
+
+        // region params
+        Scope tmp = curScope;
+        curScope = node.getBody().getScope(); // func-block-scope
+
+        if (curClass != null) { // deal this-param
+            VarEntity entity = (VarEntity) curScope.get(Scope.BuiltIn.THIS.toString());
+
+            VirtualRegister vreg = new VirtualRegister(Scope.BuiltIn.THIS.toString());
+            entity.register = vreg;
+            curFunc.argVReg.add(vreg);
+        }
+
+        isFuncArgDecl = true; // deal other param
+        for (VarDeclNode argDecl : node.getVar())
+            visit(argDecl);
+        isFuncArgDecl = false;
+
+        curScope = tmp;
+        // endregion
+
+        // region add inst
+        // global init func
+        if (node.getName().equals("main"))
+            curBB.addLastInst(
+                    new Funcall(curBB, root.getFunc(INIT_FUNC_NAME), new ArrayList<>(), null));
+
+        visit(node.getBody());
+
+        // final-return (may have other return in other blocks)
+        if (!curBB.hasJump()) { // return type
+            if (node.getReturnType().getType() instanceof NullType
+                    || node.getReturnType().getType() instanceof VoidType)
+                curBB.setJump(new Return(curBB, null));
+            else // has return value fix: todo: why need intImm ??
+                curBB.setJump(new Return(curBB, new IntImm(0)));
+        }
+
+        // merge multiple return instructions to a single end basic block
+        if (curFunc.returns.size() > 1) {
+            BasicBlock mergeEnd = new BasicBlock(curFunc, curFunc.getName() + "_end");
+
+            // set return value
+            VirtualRegister retReg;
+            if (node.getReturnType().getType() instanceof NullType
+                    || node.getReturnType().getType() instanceof VoidType)
+                retReg = null;
+            else
+                retReg = new VirtualRegister("return_value");
+
+            // transfer return block to jump block
+            List<Return> retList = new ArrayList<>(curFunc.returns);
+            for (Return ret : retList) {
+                BasicBlock beforeRet = ret.getParent();
+
+                beforeRet.delLastInst(ret);
+                if (ret.getReturnValue() != null) { // add move to reg
+                    Move tmpInst = new Move(beforeRet, retReg, ret.getReturnValue());
+                    beforeRet.addLastInst(tmpInst);
+                }
+                beforeRet.setJump(new Jump(beforeRet, mergeEnd));
+            }
+
+            mergeEnd.setJump(new Return(mergeEnd, retReg));
+            curFunc.end = mergeEnd;
+        } else
+            curFunc.end = curFunc.returns.get(0).getParent();
+        // endregion
+
+        curFunc = null;
+    }
     // endregion
 
     // region stmt
 
     /**
-     * set basicblock inside the stmt not block-stmt set new block outside block not
-     * the block-stmt
+     * set basicblock inside the stmt not block-stmt set new block outside
+     * block not the block-stmt
      */
     public void visit(BlockStmtNode node) {
         curScope = node.getScope();
@@ -307,13 +290,13 @@ public class IRBuilder extends Visitor {
         curBB.setJump(new Jump(curBB, curLoopStepBB));
     }
 
+    // FIX: for and while --> optim ?? by do while
     public void visit(ForStmtNode node) {
         BasicBlock condBB, incrBB, bodyBB, afterBB;
         ExprNode cond = node.getCond(), incr = node.getIncr();
 
         bodyBB = new BasicBlock(curFunc, "for_body");
         condBB = (cond != null) ? new BasicBlock(curFunc, "for_cond") : bodyBB;
-        // FIX::?? why and why not bodyBB?
         incrBB = (incr != null) ? new BasicBlock(curFunc, "for_incr") : condBB;
         afterBB = new BasicBlock(curFunc, "for_after");
         condBB.forNode = incrBB.forNode = bodyBB.forNode = afterBB.forNode = node;
@@ -327,9 +310,9 @@ public class IRBuilder extends Visitor {
         curLoopAfterBB = afterBB;
         // region deal loop
 
+        visitDeclList(node.getVar()); // BUG: can delete
         if (node.getInit() != null) // can not put in body-BB
             visit(node.getInit());
-
         curBB.setJump(new Jump(curBB, condBB));
 
         if (cond != null) {
@@ -340,8 +323,6 @@ public class IRBuilder extends Visitor {
 
             if (cond instanceof BoolLiteralExprNode)
                 curBB.setJump(new CJump(curBB, cond.regValue, cond.getThen(), cond.getElse()));
-            else
-                throw new CompileError("For condition without bool");
         }
 
         if (incr != null) { // can not put in body-BB
@@ -372,8 +353,8 @@ public class IRBuilder extends Visitor {
         BasicBlock tmpLoopAfterBB = curLoopAfterBB;
         curLoopStepBB = condBB;
         curLoopAfterBB = afterBB;
-
         curBB.setJump(new Jump(curBB, condBB));
+
         curBB = condBB;
         ExprNode cond = node.getCond();
         cond.setThen(bodyBB);
@@ -426,6 +407,8 @@ public class IRBuilder extends Visitor {
 
     public void visit(ReturnStmtNode node) {
         Type type = curFunc.getEntity().getReturnType();
+        if (type == null)
+            throw new CompileError("unbearable!!!");
 
         if (type instanceof NullType || type instanceof VoidType) {
             curBB.setJump(new Return(curBB, null));
@@ -451,7 +434,6 @@ public class IRBuilder extends Visitor {
     // endregion
 
     // region visit expr
-
     private void dealSelfIncrDecr(ExprNode expr, ExprNode node, boolean isSuffix,
             boolean isIncr) {
         boolean needMemOp = needMemoryAccess(expr);
@@ -463,7 +445,7 @@ public class IRBuilder extends Visitor {
         if (isSuffix) { // x++
             VirtualRegister vreg = new VirtualRegister(null);
             // store expr-value first
-            curBB.addInst(new Move(curBB, vreg, expr.regValue));
+            curBB.addLastInst(new Move(curBB, vreg, expr.regValue));
             node.regValue = vreg; // cause expr.regValue may change later
         } else {
             node.regValue = expr.regValue;
@@ -478,16 +460,16 @@ public class IRBuilder extends Visitor {
             visit(expr);
 
             VirtualRegister vreg = new VirtualRegister(null);
-            curBB.addInst(new Bin(curBB, vreg, op, expr.regValue, one));
-            curBB.addInst(
+            curBB.addLastInst(new Bin(curBB, vreg, op, expr.regValue, one));
+            curBB.addLastInst(
                     new Store(curBB, vreg, RegValue.RegSize, expr.regValue, expr.offset));
 
             if (!isSuffix)
                 expr.regValue = vreg;
         } else {
-            // curBB.addInst(new Bin(curBB, (Register) expr.regValue,
+            // curBB.addLastInst(new Bin(curBB, (Register) expr.regValue,
             // op, expr.regValue, one));
-            curBB.addInst(new Bin(curBB, expr.regValue, op, expr.regValue, one));
+            curBB.addLastInst(new Bin(curBB, expr.regValue, op, expr.regValue, one));
         }
         curWantAddr = tmpWantAddr;
 
@@ -504,23 +486,23 @@ public class IRBuilder extends Visitor {
             break;
 
         case POSI:
+            visit(sub);
             node.regValue = sub.regValue;
             // BUG: FIX: TODO: no visit ???
-            visit(sub);
             break;
 
         case NEGA:
             vreg = new VirtualRegister(null);
             node.regValue = vreg;
             visit(sub);
-            curBB.addInst(new Uni(curBB, vreg, PrefixExprNode.Op.NEGA, sub.regValue));
+            curBB.addLastInst(new Uni(curBB, vreg, PrefixExprNode.Op.NEGA, sub.regValue));
             break;
 
         case BIT_NOT:
             vreg = new VirtualRegister(null);
             node.regValue = vreg;
             visit(sub);
-            curBB.addInst(new Uni(curBB, vreg, PrefixExprNode.Op.BIT_NOT, sub.regValue));
+            curBB.addLastInst(new Uni(curBB, vreg, PrefixExprNode.Op.BIT_NOT, sub.regValue));
             break;
 
         case LOGIC_NOT: // exchange true and false
@@ -556,7 +538,7 @@ public class IRBuilder extends Visitor {
     }
 
     public void visit(NullExprNode node) {
-        node.regValue = new IntImm(0);
+        node.regValue = new IntImm(0); // reg = 0(addr or value)
     }
 
     // short-compute
@@ -571,8 +553,7 @@ public class IRBuilder extends Visitor {
             node.getLhs().setElse(new BasicBlock(curFunc, "or_lhs_false"));
             visit(node.getLhs());
             curBB = node.getLhs().getElse();
-        } else // UGLY: can del it
-            throw new CompileError("invalid boolean binary operation");
+        }
 
         node.getRhs().setThen(node.getThen());
         node.getRhs().setElse(node.getElse());
@@ -602,7 +583,6 @@ public class IRBuilder extends Visitor {
             throw new CompileError("Never happen: don't split logic oper");
 
         switch (op) {
-
         case SH_L:
             tmp = new IntImm(lhsImm << rhsImm);
             if (!bothConst)
@@ -712,11 +692,11 @@ public class IRBuilder extends Visitor {
                     || op != BinaryOpExprNode.Op.GREATER_EQUAL
                     || op != BinaryOpExprNode.Op.GREATER) {
                 node.regValue = vreg;
-                curBB.addInst(new Bin(curBB, vreg, op, lhs, rhs));
+                curBB.addLastInst(new Bin(curBB, vreg, op, lhs, rhs));
 
             } else { // cmp
 
-                curBB.addInst(new Cmp(curBB, vreg, op, lhs, rhs));
+                curBB.addLastInst(new Cmp(curBB, vreg, op, lhs, rhs));
                 if (node.getThen() != null) { // will jump
                     curBB.setJump(new CJump(curBB, vreg, node.getThen(), node.getElse()));
                 } else { // will not jump
@@ -725,13 +705,6 @@ public class IRBuilder extends Visitor {
 
             }
         }
-    }
-
-    private void swap(Object a, Object b) {
-        Object tmp;
-        tmp = a;
-        a = b;
-        b = tmp;
     }
 
     private void dealStringBinaryOp(BinaryOpExprNode node) {
@@ -813,7 +786,7 @@ public class IRBuilder extends Visitor {
             args.add(node.getRhs().regValue);
 
             VirtualRegister vreg = new VirtualRegister(null);
-            curBB.addInst(new Funcall(curBB, calleeFunc, args, vreg));
+            curBB.addLastInst(new Funcall(curBB, calleeFunc, args, vreg));
 
             if (node.getThen() != null) {
                 curBB.setJump(new CJump(curBB, vreg, node.getThen(), node.getElse()));
@@ -874,8 +847,8 @@ public class IRBuilder extends Visitor {
             VirtualRegister vreg = new VirtualRegister(null);
             node.regValue = vreg;
             // Pre-calced: what if FIX: class.arr ?? (can not init ??)
-            curBB.addInst(new Load(curBB, vreg, memberEntity.getType().getRegSize(), classAddr,
-                    memberEntity.getCurOffset()));
+            curBB.addLastInst(new Load(curBB, vreg, memberEntity.getType().getRegSize(),
+                    classAddr, memberEntity.getCurOffset()));
 
             if (node.getThen() != null)
                 curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
@@ -902,16 +875,16 @@ public class IRBuilder extends Visitor {
         IntImm elementSize = new IntImm(node.getType().getRegSize());
 
         // vreg <- real-addr = addr + size*index
-        curBB.addInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL, node.getIndex().regValue,
-                elementSize));
-        curBB.addInst(
+        curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL,
+                node.getIndex().regValue, elementSize));
+        curBB.addLastInst(
                 new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, node.getExpr().regValue, vreg));
 
         if (curWantAddr) {
             node.addrValue = vreg;
             node.offset = RegValue.RegSize;
         } else { // variable
-            curBB.addInst(new Load(curBB, vreg, node.getType().getRegSize(), vreg,
+            curBB.addLastInst(new Load(curBB, vreg, node.getType().getRegSize(), vreg,
                     RegValue.RegSize));
 
             node.regValue = vreg;
@@ -920,12 +893,145 @@ public class IRBuilder extends Visitor {
         }
     }
 
+    /**
+     * print(A + B); -> print(A); print(B);
+     * <p>
+     * println(A + B); -> print(A); println(B);
+     */
+    private void dealPrintFuncCall(ExprNode arg, String funcName) {
+        if (arg instanceof BinaryOpExprNode) {
+            dealPrintFuncCall(((BinaryOpExprNode) arg).getLhs(), "print");
+            dealPrintFuncCall(((BinaryOpExprNode) arg).getRhs(), funcName);
+            return;
+        }
+
+        Function calleeFunc;
+        List<RegValue> vArgs = new ArrayList<>();
+        if (arg instanceof FuncallExprNode
+                && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
+            // print(toString(n)); -> printInt(n);
+            ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
+            visit(intExpr);
+            calleeFunc = root.getBuiltInFunc(funcName + "Int");
+            vArgs.add(intExpr.regValue);
+        } else {
+            visit(arg);
+            calleeFunc = root.getBuiltInFunc(funcName);
+            vArgs.add(arg.regValue);
+        }
+
+        curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, null));
+    }
+
+    private void dealBuiltInFuncCall(FuncallExprNode node, ExprNode thisExpr,
+            FuncEntity entity, String keyName) {
+        boolean tmpWantAddr = curWantAddr;
+        curWantAddr = false;
+
+        ExprNode arg0, arg1;
+        VirtualRegister vreg;
+        Function calleeFunc;
+        List<RegValue> vArgs = new ArrayList<>();
+
+        switch (keyName) {
+        case Tool.PRINT_KEY:
+        case Tool.PRINTLN_KEY:
+            arg0 = node.getParam().get(0); // have to be string
+            dealPrintFuncCall(arg0, keyName);
+            break;
+
+        case Tool.GETSTRING_KEY:
+            vreg = new VirtualRegister(Tool.GETSTRING);
+            vArgs.clear();
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.GETINT_KEY:
+            vreg = new VirtualRegister(Tool.GETINT);
+            vArgs.clear();
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.TOSTRING_KEY:
+            vreg = new VirtualRegister(Tool.TOSTRING);
+            arg0 = node.getParam().get(0);
+            visit(arg0);
+            vArgs.clear();
+            vArgs.add(arg0.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.SUBSTRING_KEY:
+            vreg = new VirtualRegister(Tool.SUBSTRING);
+            arg0 = node.getParam().get(0);
+            visit(arg0);
+            arg1 = node.getParam().get(1);
+            visit(arg1);
+            vArgs.clear();
+            vArgs.add(thisExpr.regValue);
+            vArgs.add(arg0.regValue);
+            vArgs.add(arg1.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.PARSEINT_KEY:
+            vreg = new VirtualRegister(Tool.PARSEINT);
+            vArgs.clear();
+            vArgs.add(thisExpr.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+            break;
+
+        case Tool.ORD_KEY:
+            vreg = new VirtualRegister(Tool.ORD);
+            arg0 = node.getParam().get(0);
+            visit(arg0);
+            vArgs.clear();
+            vArgs.add(thisExpr.regValue);
+            vArgs.add(arg0.regValue);
+
+            calleeFunc = root.getBuiltInFunc(keyName);
+            curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
+            node.regValue = vreg;
+
+            // FIX: could be optimized by add and load
+            break;
+
+        case Tool.LENGTH_KEY:
+        case Tool.SIZE_KEY:
+            vreg = new VirtualRegister("size_or_length");
+
+            curBB.addLastInst(new Load(curBB, vreg, RegValue.RegSize, thisExpr.regValue, 0));
+            node.regValue = vreg;
+            break;
+
+        default:
+            throw new CompileError("invalid built-in function call");
+        }
+
+        curWantAddr = tmpWantAddr;
+    }
+
     public void visit(FuncallExprNode node) {
         FuncEntity entity = node.funcEntity;
         String keyName = entity.getName();
         List<RegValue> args = new ArrayList<>();
-        ExprNode thisExpr = null;
 
+        ExprNode thisExpr = null;
         if (entity.isMember()) {
             if (node.getExpr() instanceof MemberExprNode) {
                 thisExpr = ((MemberExprNode) (node.getExpr())).getExpr(); // recursive till
@@ -965,7 +1071,7 @@ public class IRBuilder extends Visitor {
 
         Function func = root.getFunc(keyName);
         VirtualRegister vreg = new VirtualRegister(null);
-        curBB.addInst(new Funcall(curBB, func, args, vreg));
+        curBB.addLastInst(new Funcall(curBB, func, args, vreg));
         node.regValue = vreg;
 
         if (node.getThen() != null)
@@ -973,8 +1079,8 @@ public class IRBuilder extends Visitor {
     }
 
     /**
-     * FIX: TODO: use as a single statement is useless, can delete assignNode-value,
-     * but need assign lhs
+     * FIX: TODO: use as a single statement is useless, can delete
+     * assignNode-value, but need assign lhs
      */
     public void visit(AssignExprNode node) {
         boolean needMemOp = needMemoryAccess(node.getLhs());
@@ -1017,9 +1123,8 @@ public class IRBuilder extends Visitor {
     public void visit(ThisExprNode node) {
         VarEntity thisEntity = (VarEntity) curScope.get(Tool.THIS);
         node.regValue = thisEntity.register;
-        if (node.getThen() != null) {
+        if (node.getThen() != null)
             curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
-        }
     }
 
     public void visit(IdentifierExprNode node) {
@@ -1060,6 +1165,70 @@ public class IRBuilder extends Visitor {
         }
     }
 
+    /** may have recurrence */
+    private void dealArrNew(NewExprNode node, VirtualRegister oreg, RegValue addr, int idx) {
+        VirtualRegister vreg = new VirtualRegister(null);
+        ExprNode dim = node.getDims().get(idx);
+
+        boolean tmpWantAddr = curWantAddr;
+        curWantAddr = false;
+        visit(dim);
+        curWantAddr = tmpWantAddr;
+
+        // vreg <- real-addr = addr + size*index
+        curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL, dim.regValue,
+                new IntImm(RegValue.RegSize)));
+        curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, vreg,
+                new IntImm(RegValue.RegSize)));
+
+        curBB.addLastInst(new HeapAlloc(curBB, vreg, vreg));
+        curBB.addLastInst(new Store(curBB, dim.regValue, RegValue.RegSize, vreg, 0));
+
+        // has more idx -> need loop-alloc
+        if (idx < node.getDims().size() - 1) {
+            VirtualRegister loop_idx = new VirtualRegister(null);
+            VirtualRegister addrNow = new VirtualRegister(null);
+
+            // init loop_idx and addr
+            curBB.addLastInst(new Move(curBB, loop_idx, new IntImm(0)));
+            curBB.addLastInst(new Move(curBB, addrNow, vreg));
+            BasicBlock condBB = new BasicBlock(curFunc, "while_cond");
+            BasicBlock bodyBB = new BasicBlock(curFunc, "while_body");
+            BasicBlock afterBB = new BasicBlock(curFunc, "while_after");
+
+            curBB.setJump(new Jump(curBB, condBB));
+
+            // loop_idx ~ dim[idx].index_value
+            // (cause high dim need idx*regSize times)
+            curBB = condBB;
+            BinaryOpExprNode.Op op = BinaryOpExprNode.Op.LESS;
+            VirtualRegister cmpReg = new VirtualRegister(null);
+            curBB.addLastInst(new Cmp(curBB, cmpReg, op, loop_idx, dim.regValue));
+            curBB.setJump(new CJump(curBB, cmpReg, bodyBB, afterBB));
+
+            // addrNow <- addrNow + regSize
+            // deal next-dim
+            // loop_idx <- loop_idx + 1
+            // jump to condBB
+            curBB = bodyBB;
+            curBB.addLastInst(new Bin(curBB, addrNow, BinaryOpExprNode.Op.ADD, addrNow,
+                    new IntImm(RegValue.RegSize)));
+            dealArrNew(node, null, addrNow, idx + 1);
+            curBB.addLastInst(new Bin(curBB, loop_idx, BinaryOpExprNode.Op.ADD, loop_idx,
+                    new IntImm(1)));
+            curBB.setJump(new Jump(curBB, condBB));
+
+            curBB = afterBB;
+        }
+
+        if (idx == 0) { // 1-dim
+            curBB.addLastInst(new Move(curBB, oreg, vreg));
+        } else { // more dims
+            curBB.addLastInst(new Store(curBB, vreg, RegValue.RegSize, addr, 0));
+        }
+
+    }
+
     public void visit(NewExprNode node) {
         VirtualRegister vreg = new VirtualRegister(null);
         Type newType = node.getNewType().getType();
@@ -1067,7 +1236,7 @@ public class IRBuilder extends Visitor {
         if (newType instanceof ClassType) {
             String className = ((ClassType) newType).getName();
             ClassEntity classEntity = (ClassEntity) toplevelScope.get(className);
-            curBB.addInst(new HeapAlloc(curBB, vreg, new IntImm(classEntity.memSize)));
+            curBB.addLastInst(new HeapAlloc(curBB, vreg, new IntImm(classEntity.memSize)));
 
             // call construction function
             String funcName = className + Tool.DOMAIN + className;
@@ -1075,7 +1244,7 @@ public class IRBuilder extends Visitor {
             if (irFunc != null) {
                 List<RegValue> args = new ArrayList<>();
                 args.add(vreg);
-                curBB.addInst(new Funcall(curBB, irFunc, args, null));
+                curBB.addLastInst(new Funcall(curBB, irFunc, args, null));
             }
 
         } else if (newType instanceof ArrayType) {
@@ -1109,16 +1278,16 @@ public class IRBuilder extends Visitor {
             // why IntImm? if has branch, no need to care value
             // FIX: BUG: TODO:still messy
             if (needMemOp) {
-                thenBB.addInst(new Store(thenBB, new IntImm(1), RegValue.RegSize, destion,
+                thenBB.addLastInst(new Store(thenBB, new IntImm(1), RegValue.RegSize, destion,
                         addrOffset));
-                elseBB.addInst(new Store(elseBB, new IntImm(0), RegValue.RegSize, destion,
+                elseBB.addLastInst(new Store(elseBB, new IntImm(0), RegValue.RegSize, destion,
                         addrOffset));
             } else {
-                thenBB.addInst(new Move(thenBB, (VirtualRegister) destion, new IntImm(1)));
-                elseBB.addInst(new Move(elseBB, (VirtualRegister) destion, new IntImm(0)));
+                thenBB.addLastInst(new Move(thenBB, (VirtualRegister) destion, new IntImm(1)));
+                elseBB.addLastInst(new Move(elseBB, (VirtualRegister) destion, new IntImm(0)));
             }
 
-            // if then or else addInst, can not hasJump anymore
+            // if then or else addLastInst, can not hasJump anymore
             if (!thenBB.hasJump())
                 thenBB.setJump(new Jump(thenBB, mergeBB));
             if (!elseBB.hasJump())
@@ -1127,211 +1296,11 @@ public class IRBuilder extends Visitor {
             curBB = mergeBB;
         } else { // no branch
             if (needMemOp)
-                curBB.addInst(
+                curBB.addLastInst(
                         new Store(curBB, rhs.regValue, RegValue.RegSize, destion, addrOffset));
             else
-                curBB.addInst(new Move(curBB, (Register) destion, rhs.regValue));
+                curBB.addLastInst(new Move(curBB, (Register) destion, rhs.regValue));
         }
-    }
-
-    /**
-     * print(A + B); -> print(A); print(B);
-     * <p>
-     * println(A + B); -> print(A); println(B);
-     */
-    private void dealPrintFuncCall(ExprNode arg, String funcName) {
-        if (arg instanceof BinaryOpExprNode) {
-            dealPrintFuncCall(((BinaryOpExprNode) arg).getLhs(), "print");
-            dealPrintFuncCall(((BinaryOpExprNode) arg).getRhs(), funcName);
-            return;
-        }
-
-        Function calleeFunc;
-        List<RegValue> vArgs = new ArrayList<>();
-        // FIX: needed to add printINT better or not ??
-        if (arg instanceof FuncallExprNode
-                && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
-            // print(toString(n)); -> printInt(n);
-            ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
-            visit(intExpr);
-            calleeFunc = root.getBuiltInFunc(funcName + "Int");
-            vArgs.add(intExpr.regValue);
-        } else {
-            visit(arg);
-            calleeFunc = root.getBuiltInFunc(funcName);
-            vArgs.add(arg.regValue);
-        }
-
-        curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, null));
-    }
-
-    private void dealBuiltInFuncCall(FuncallExprNode node, ExprNode thisExpr,
-            FuncEntity entity, String keyName) {
-        boolean tmpWantAddr = curWantAddr;
-        curWantAddr = false;
-
-        ExprNode arg0, arg1;
-        VirtualRegister vreg;
-        Function calleeFunc;
-        List<RegValue> vArgs = new ArrayList<>();
-
-        switch (keyName) {
-        case Tool.PRINT_KEY:
-        case Tool.PRINTLN_KEY:
-            arg0 = node.getParam().get(0); // have to be string
-            dealPrintFuncCall(arg0, keyName);
-            break;
-
-        case Tool.GETSTRING_KEY:
-            vreg = new VirtualRegister("getString");
-            vArgs.clear();
-
-            calleeFunc = root.getBuiltInFunc(keyName);
-            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
-            node.regValue = vreg;
-            break;
-
-        case Tool.GETINT_KEY:
-            vreg = new VirtualRegister("getInt");
-            vArgs.clear();
-
-            calleeFunc = root.getBuiltInFunc(keyName);
-            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
-            node.regValue = vreg;
-            break;
-
-        case Tool.TOSTRING_KEY:
-            vreg = new VirtualRegister("toString");
-            arg0 = node.getParam().get(0);
-            visit(arg0);
-            vArgs.clear();
-            vArgs.add(arg0.regValue);
-
-            calleeFunc = root.getBuiltInFunc(keyName);
-            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
-            node.regValue = vreg;
-            break;
-
-        case Tool.SUBSTRING_KEY:
-            vreg = new VirtualRegister("subString");
-            arg0 = node.getParam().get(0);
-            visit(arg0);
-            arg1 = node.getParam().get(1);
-            visit(arg1);
-            vArgs.clear();
-            vArgs.add(thisExpr.regValue);
-            vArgs.add(arg0.regValue);
-            vArgs.add(arg1.regValue);
-
-            calleeFunc = root.getBuiltInFunc(keyName);
-            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
-            node.regValue = vreg;
-            break;
-
-        case Tool.PARSEINT_KEY:
-            vreg = new VirtualRegister("parseInt");
-            vArgs.clear();
-            vArgs.add(thisExpr.regValue);
-
-            calleeFunc = root.getBuiltInFunc(keyName);
-            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
-            node.regValue = vreg;
-            break;
-
-        case Tool.ORD_KEY:
-            vreg = new VirtualRegister("ord");
-            arg0 = node.getParam().get(0);
-            visit(arg0);
-            vArgs.clear();
-            vArgs.add(thisExpr.regValue);
-            vArgs.add(arg0.regValue);
-
-            calleeFunc = root.getBuiltInFunc(keyName);
-            curBB.addInst(new Funcall(curBB, calleeFunc, vArgs, vreg));
-            node.regValue = vreg;
-
-            // FIX: could be optimized by add and load
-            break;
-
-        case Tool.LENGTH_KEY:
-        case Tool.SIZE_KEY:
-            vreg = new VirtualRegister("size_length");
-
-            curBB.addInst(new Load(curBB, vreg, RegValue.RegSize, thisExpr.regValue, 0));
-            node.regValue = vreg;
-            break;
-
-        default:
-            throw new CompileError("invalid built-in function call");
-        }
-
-        curWantAddr = tmpWantAddr;
-    }
-
-    /**
-     * may have recurrence
-     */
-    private void dealArrNew(NewExprNode node, VirtualRegister oreg, RegValue addr, int idx) {
-        VirtualRegister vreg = new VirtualRegister(null);
-        ExprNode dim = node.getDims().get(idx);
-        boolean tmpWantAddr = curWantAddr;
-        curWantAddr = false;
-
-        visit(dim);
-
-        curWantAddr = tmpWantAddr;
-        // vreg <- real-addr = addr + size*index
-        curBB.addInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL, dim.regValue,
-                new IntImm(RegValue.RegSize)));
-        curBB.addInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, vreg,
-                new IntImm(RegValue.RegSize)));
-
-        curBB.addInst(new HeapAlloc(curBB, vreg, vreg));
-        curBB.addInst(new Store(curBB, dim.regValue, RegValue.RegSize, vreg, 0));
-
-        // has more idx -> need loop-alloc
-        if (idx < node.getDims().size() - 1) {
-            VirtualRegister loop_idx = new VirtualRegister(null);
-            VirtualRegister addrNow = new VirtualRegister(null);
-
-            // init loop_idx and addr
-            curBB.addInst(new Move(curBB, loop_idx, new IntImm(0)));
-            curBB.addInst(new Move(curBB, addrNow, vreg));
-            BasicBlock condBB = new BasicBlock(curFunc, "while_cond");
-            BasicBlock bodyBB = new BasicBlock(curFunc, "while_body");
-            BasicBlock afterBB = new BasicBlock(curFunc, "while_after");
-
-            curBB.setJump(new Jump(curBB, condBB));
-
-            // loop_idx ~ dim[idx].index_value
-            // (cause high dim need idx*regSize times)
-            curBB = condBB;
-            BinaryOpExprNode.Op op = BinaryOpExprNode.Op.LESS;
-            VirtualRegister cmpReg = new VirtualRegister(null);
-            curBB.addInst(new Cmp(curBB, cmpReg, op, loop_idx, dim.regValue));
-            curBB.setJump(new CJump(curBB, cmpReg, bodyBB, afterBB));
-
-            // addrNow <- addrNow + regSize
-            // deal next-dim
-            // loop_idx <- loop_idx + 1
-            // jump to condBB
-            curBB = bodyBB;
-            curBB.addInst(new Bin(curBB, addrNow, BinaryOpExprNode.Op.ADD, addrNow,
-                    new IntImm(RegValue.RegSize)));
-            dealArrNew(node, null, addrNow, idx + 1);
-            curBB.addInst(new Bin(curBB, loop_idx, BinaryOpExprNode.Op.ADD, loop_idx,
-                    new IntImm(1)));
-            curBB.setJump(new Jump(curBB, condBB));
-
-            curBB = afterBB;
-        }
-
-        if (idx == 0) { // 1-dim
-            curBB.addInst(new Move(curBB, oreg, vreg));
-        } else { // more dims
-            curBB.addInst(new Store(curBB, vreg, RegValue.RegSize, addr, 0));
-        }
-
     }
 
     /** need to use memory store and load */
@@ -1362,42 +1331,55 @@ public class IRBuilder extends Visitor {
         return node.isNeedMemOp();
     }
 
+    private void swap(Object a, Object b) {
+        Object tmp;
+        tmp = a;
+        a = b;
+        b = tmp;
+    }
+
     private void TwoRegOpTransformer() {
         for (Function irFunc : root.getFunc().values())
-            for (BasicBlock bb : irFunc.getReversePostOrder())
-                for (Quad inst : bb.getInsts()) {
-                    if (!(inst instanceof Bin))
+            for (BasicBlock bb : irFunc.getReversePostOrder()) {
+                ListIterator<Quad> iter = bb.getInsts().listIterator();
+
+                while (iter.hasNext()) {
+                    Quad next = iter.next();
+                    if (!(next instanceof Bin))
                         continue;
-                    Bin BinInst = (Bin) inst;
 
-                    if (BinInst.getDst() == BinInst.getLhs())
+                    Bin binInst = (Bin) next;
+                    RegValue dst = binInst.getDst();
+                    RegValue lhs = binInst.getLhs();
+                    if (dst == lhs)
                         continue;
+                    RegValue rhs = binInst.getRhs();
 
-                    if (BinInst.getDst() == BinInst.getRhs()) {
+                    if (dst == rhs) {
+                        if (binInst.isCommutative())
+                            swap(lhs, rhs);
+                        else {
+                            VirtualRegister vreg = new VirtualRegister("rhs_backup");
+                            bb.addBeforeInst(iter, new Move(bb, vreg, rhs));
+                            bb.addBeforeInst(iter, new Move(bb, dst, lhs));
 
-                        if (BinInst.isCommutative()) {
-                            swap(BinInst.getRhs(), BinInst.getLhs());
-                        } else {
-                            VirtualRegister vreg = new VirtualRegister("rhsBak");
-                            BinInst.prependInst(
-                                    new IRMove(BinInst.getParentBB(), vreg, BinInst.getRhs()));
-                            BinInst.prependInst(new IRMove(BinInst.getParentBB(),
-                                    BinInst.getDest(), BinInst.getLhs()));
-
-                            BinInst.setLhs(BinInst.getDest());
-                            BinInst.setRhs(vreg);
+                            binInst.setLhs(dst);
+                            binInst.setRhs(vreg);
                         }
+                    } else if (binInst.getOp() != BinaryOpExprNode.Op.DIV
+                            && binInst.getOp() != BinaryOpExprNode.Op.MOD) {
+                        bb.addBeforeInst(iter, new Move(bb, dst, lhs));
 
-                    } else if (BinInst.getOp() != BinaryOpExprNode.Op.DIV
-                            && BinInst.getOp() != BinaryOpExprNode.Op.MOD) {
-
-                        BinInst.prependInst(new IRMove(BinInst.getParentBB(),
-                                BinInst.getDest(), BinInst.getLhs()));
-                        BinInst.setLhs(BinInst.getDest());
-
+                        binInst.setLhs(dst);
                     }
                 }
+            }
 
     }
+    // endregion
+
+
+    // region inline-funcall
+
     // endregion
 }

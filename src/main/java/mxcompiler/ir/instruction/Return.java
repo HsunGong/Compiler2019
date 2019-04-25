@@ -14,7 +14,7 @@ public class Return extends JumpQuad {
         // reloadUsedRegistersRegValues
     }
 
-    public RegValue getReturnVal() {
+    public RegValue getReturnValue() {
         return val;
     }
 

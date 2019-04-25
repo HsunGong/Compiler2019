@@ -44,17 +44,16 @@ public class ResolverAndChecker extends Visitor {
 	// region resolve
 	/**
 	 * start localresolver not main (cause use
-	 * {@code this.visit(ASTNode node)}) or so called
-	 * pre-scanner But just this top-level
+	 * {@code this.visit(ASTNode node)}) or so called pre-scanner But just this
+	 * top-level
 	 * <p>
-	 * add global-funcs, classes-funcs, classes - for only top
-	 * decl FIX: not vars?
+	 * add global-funcs, classes-funcs, classes - for only top decl FIX: not
+	 * vars?
 	 * 
 	 * <p>
-	 * class and function can not be override, and within
-	 * sameScope, name can not be the same However, to support
-	 * class.fun can be the same name as class and global fun,
-	 * add special id with class name
+	 * class and function can not be override, and within sameScope, name can
+	 * not be the same However, to support class.fun can be the same name as
+	 * class and global fun, add special id with class name
 	 */
 	protected void resolve(ASTNode root) {
 		if (!(getCurScope() instanceof ToplevelScope))
@@ -334,8 +333,8 @@ public class ResolverAndChecker extends Visitor {
 	/**
 	 * {@inheritDoc} temportory scope
 	 * <p>
-	 * {@literal add scope inside or outside} cause the block
-	 * has order to define var, can not add var first
+	 * {@literal add scope inside or outside} cause the block has order to
+	 * define var, can not add var first
 	 */
 	@Override
 	public void visit(BlockStmtNode node) {
@@ -390,6 +389,7 @@ public class ResolverAndChecker extends Visitor {
 			throw new SemanticError(
 					"Condition expression of for loop statement should have type \"bool\"");
 
+		visitDeclList(node.getVar());
 		visit(node.getInit());
 		visit(node.getIncr());
 
@@ -512,8 +512,10 @@ public class ResolverAndChecker extends Visitor {
 				throw new SemanticError("not found " + className);
 
 			// NOTE: is getCur: var first; else func
-			memEntity = classEntity.getScope().getCur(node.getMember());
-			if (memEntity == null) {
+			try {
+				memEntity = classEntity.getScope().getCur(node.getMember());
+			} catch (Error e) {
+
 				memEntity = classEntity.getScope()
 						.getCur(classEntity.getDomain() + node.getMember());
 				if (memEntity == null)
@@ -979,8 +981,8 @@ public class ResolverAndChecker extends Visitor {
 	}
 
 	/**
-	 * just pop, and get cur-poped scope Attention: have to
-	 * judge if is the toplevel
+	 * just pop, and get cur-poped scope Attention: have to judge if is the
+	 * toplevel
 	 * <p>
 	 * Normally, it is not.(But what else ^_^)
 	 */
