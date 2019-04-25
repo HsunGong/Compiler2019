@@ -43,15 +43,18 @@ public class ResolverAndChecker extends Visitor {
 
 	// region resolve
 	/**
-	 * start localresolver not main (cause use {@code this.visit(ASTNode node)}) or
-	 * so called pre-scanner But just this top-level
+	 * start localresolver not main (cause use
+	 * {@code this.visit(ASTNode node)}) or so called
+	 * pre-scanner But just this top-level
 	 * <p>
-	 * add global-funcs, classes-funcs, classes - for only top decl FIX: not vars?
+	 * add global-funcs, classes-funcs, classes - for only top
+	 * decl FIX: not vars?
 	 * 
 	 * <p>
-	 * class and function can not be override, and within sameScope, name can not be
-	 * the same However, to support class.fun can be the same name as class and
-	 * global fun, add special id with class name
+	 * class and function can not be override, and within
+	 * sameScope, name can not be the same However, to support
+	 * class.fun can be the same name as class and global fun,
+	 * add special id with class name
 	 */
 	protected void resolve(ASTNode root) {
 		if (!(getCurScope() instanceof ToplevelScope))
@@ -94,7 +97,6 @@ public class ResolverAndChecker extends Visitor {
 				throw new CompileError("toplevel");
 
 			getCurScope().put(node.getName(), entity);
-			// getCurScope().get(node.getName());
 
 			pushScope(entity.getScope());
 			curClass = entity;
@@ -120,13 +122,15 @@ public class ResolverAndChecker extends Visitor {
 	 */
 	public void resolve(VarDeclNode node) {
 		try {
-			VarEntity entity = (curClass == null) ? new VarEntity(node.getName(), node.getType().getType())
-					: new VarEntity(node.getName(), node.getType().getType(), curClass.getName());
+			VarEntity entity = (curClass == null)
+					? new VarEntity(node.getName(), node.getType().getType())
+					: new VarEntity(node.getName(), node.getType().getType(),
+							curClass.getName());
 
 			entity.isGlobal = (getCurScope() instanceof ToplevelScope);
 
 			if (curClass != null) {
-				entity.offset = curClass.memSize;
+				entity.setCurOffset(curClass.memSize);
 				curClass.memSize += node.getType().getType().getRegSize();
 			}
 
@@ -191,6 +195,8 @@ public class ResolverAndChecker extends Visitor {
 
 		try {
 			ClassEntity entity = (ClassEntity) getCurScope().get(node.getName());
+			if (entity == null)
+				throw new SemanticError("not found " + node.getName());
 
 			pushScope(entity.getScope());
 			curClass = entity;// replaced by curClass = new ClassType(entity.getName());
@@ -221,25 +227,31 @@ public class ResolverAndChecker extends Visitor {
 				if (!(getCurScope() instanceof ToplevelScope))
 					throw new CompileError("toplevel");
 				entity = (FuncEntity) getCurScope().get(node.getName());
-			} else
+			} else {
 				entity = (FuncEntity) getCurScope().get(curClass.getDomain() + node.getName());
+			}
+
+			if (entity == null)
+				throw new SemanticError("not found " + node.getName());
 
 			curReturnType = entity.getReturnType();
 			// check return Type
 			if (!node.hasReturn()) { // may be construct
 				// can not be construct 1-type
 				if (curClass == null)
-					throw new SemanticError("Construct Function " + node.getName() + " do not belong to class");
+					throw new SemanticError("Construct Function " + node.getName()
+							+ " do not belong to class");
 
 				// can not be construct 2-type
 				if (!node.getName().equals(curClass.getName()))
-					throw new SemanticError(
-							"Function " + node.getName() + " should have a return type or construct name is wrong");
+					throw new SemanticError("Function " + node.getName()
+							+ " should have a return type or construct name is wrong");
 			} else {
 				// check class exist
 				if (curReturnType instanceof ClassType) {
 					String name = ((ClassType) curReturnType).getName();
-					if (!(getCurScope().get(name) instanceof ClassEntity))
+					Entity tmp = getCurScope().get(name);
+					if (tmp == null || !(tmp instanceof ClassEntity))
 						throw new CompileError("no such class");
 				}
 
@@ -250,7 +262,8 @@ public class ResolverAndChecker extends Visitor {
 
 			// params
 			if (curClass != null) {
-				getCurScope().put(Scope.BuiltIn.THIS.toString(), new VarEntity(Scope.BuiltIn.THIS.toString(), curClass.getType()));
+				getCurScope().put(Scope.BuiltIn.THIS.toString(),
+						new VarEntity(Scope.BuiltIn.THIS.toString(), curClass.getType()));
 			}
 			// Other-Parameters
 			for (VarDeclNode var : node.getVar()) {
@@ -275,7 +288,8 @@ public class ResolverAndChecker extends Visitor {
 		try {
 			if (node.getType() instanceof ClassType) {
 				String typeName = ((ClassType) node.getType()).getName();
-				if (!(getCurScope().get(typeName) instanceof ClassEntity))
+				Entity tmp = getCurScope().get(typeName);
+				if (tmp == null || !(tmp instanceof ClassEntity))
 					throw new CompileError("no such class");
 			}
 		} catch (Error e) {
@@ -298,7 +312,8 @@ public class ResolverAndChecker extends Visitor {
 				visit(node.getInit());
 
 				boolean valid = false;
-				if (node.getType().getType() instanceof VoidType || node.getInit().getType() instanceof VoidType)
+				if (node.getType().getType() instanceof VoidType
+						|| node.getInit().getType() instanceof VoidType)
 					valid = false;
 				else if (node.getType().getType().isEqual(node.getInit().getType()))
 					valid = true;
@@ -308,7 +323,8 @@ public class ResolverAndChecker extends Visitor {
 
 				if (!valid)
 					throw new SemanticError("Invalid variable init value: expected "
-							+ node.getType().getType().toString() + " but got " + node.getInit().getType().toString());
+							+ node.getType().getType().toString() + " but got "
+							+ node.getInit().getType().toString());
 			}
 		} catch (SemanticError e) {
 			throw new SemanticError("VarEntity Check " + e);
@@ -318,8 +334,8 @@ public class ResolverAndChecker extends Visitor {
 	/**
 	 * {@inheritDoc} temportory scope
 	 * <p>
-	 * {@literal add scope inside or outside} cause the block has order to define
-	 * var, can not add var first
+	 * {@literal add scope inside or outside} cause the block
+	 * has order to define var, can not add var first
 	 */
 	@Override
 	public void visit(BlockStmtNode node) {
@@ -338,14 +354,16 @@ public class ResolverAndChecker extends Visitor {
 		popScope();
 	}
 
-	// ------------------------------- type checking -------------------------------
+	// ------------------------------- type checking
+	// -------------------------------
 
 	@Override
 	public void visit(IfStmtNode node) {
 		visit(node.getCond());
 		// CHECKING
 		if (!(node.getCond().getType() instanceof BoolType))
-			throw new SemanticError("Condition expression of while loop statement should have type \"bool\"");
+			throw new SemanticError(
+					"Condition expression of while loop statement should have type \"bool\"");
 
 		visit(node.getThen());
 		visit(node.getElse());
@@ -357,7 +375,8 @@ public class ResolverAndChecker extends Visitor {
 		// UGLY: maybe can check not to define cond-int again
 		// CHECKING
 		if (!(node.getCond().getType() instanceof BoolType))
-			throw new SemanticError("Condition expression of while loop statement should have type \"bool\"");
+			throw new SemanticError(
+					"Condition expression of while loop statement should have type \"bool\"");
 
 		++loop;
 		visit(node.getBody());
@@ -368,7 +387,8 @@ public class ResolverAndChecker extends Visitor {
 	public void visit(ForStmtNode node) {
 		visit(node.getCond());
 		if (!(node.getCond().getType() instanceof BoolType))
-			throw new SemanticError("Condition expression of for loop statement should have type \"bool\"");
+			throw new SemanticError(
+					"Condition expression of for loop statement should have type \"bool\"");
 
 		visit(node.getInit());
 		visit(node.getIncr());
@@ -395,13 +415,15 @@ public class ResolverAndChecker extends Visitor {
 	@Override
 	public void visit(ContinueStmtNode node) {
 		if (loop <= 0)
-			throw new SemanticError("Continue statement cannot be used outside of loop statement");
+			throw new SemanticError(
+					"Continue statement cannot be used outside of loop statement");
 	}
 
 	@Override
 	public void visit(BreakStmtNode node) {
 		if (loop <= 0)
-			throw new SemanticError("Break statement cannot be used outside of loop statement");
+			throw new SemanticError(
+					"Break statement cannot be used outside of loop statement");
 	}
 
 	@Override
@@ -416,10 +438,12 @@ public class ResolverAndChecker extends Visitor {
 			if (!(curReturnType instanceof NullType || curReturnType instanceof VoidType))
 				valid = false;
 		} else {
-			if (node.getExpr().getType() instanceof NullType || node.getExpr().getType() instanceof VoidType)
+			if (node.getExpr().getType() instanceof NullType
+					|| node.getExpr().getType() instanceof VoidType)
 				valid = false;
 			else if (node.getExpr().getType() instanceof MNullType)
-				valid = (curReturnType instanceof ClassType || curReturnType instanceof ArrayType);
+				valid = (curReturnType instanceof ClassType
+						|| curReturnType instanceof ArrayType);
 			else if (!(node.getExpr().getType().isEqual(curReturnType)))
 				valid = false;
 		}
@@ -428,8 +452,8 @@ public class ResolverAndChecker extends Visitor {
 			if (curReturnType instanceof NullType || curReturnType instanceof VoidType)
 				throw new SemanticError("Return statement should have no return value");
 			else
-				throw new SemanticError(
-						"Return statement should have return value of type " + curReturnType.toString());
+				throw new SemanticError("Return statement should have return value of type "
+						+ curReturnType.toString());
 		}
 
 	}
@@ -438,10 +462,11 @@ public class ResolverAndChecker extends Visitor {
 	public void visit(SuffixExprNode node) {
 		visit(node.getExpr());
 		if (!(node.getExpr().getType() instanceof IntType))
-			throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to type "
-					+ node.getExpr().getType().toString());
+			throw new SemanticError("Operator " + node.getOp().toString()
+					+ " cannot be applied to type " + node.getExpr().getType().toString());
 		if (!(node.getExpr().isLeftValue()))
-			throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to right value");
+			throw new SemanticError("Operator " + node.getOp().toString()
+					+ " cannot be applied to right value");
 
 		node.setType(new IntType());
 		node.setIsLeftValue(false);
@@ -451,11 +476,13 @@ public class ResolverAndChecker extends Visitor {
 	public void visit(ArefExprNode node) {
 		visit(node.getExpr());
 		if (!(node.getExpr().getType() instanceof ArrayType))
-			throw new SemanticError("Type " + node.getExpr().getType().toString() + " is not arrayType");
+			throw new SemanticError(
+					"Type " + node.getExpr().getType().toString() + " is not arrayType");
 
 		visit(node.getIndex());
 		if (!(node.getIndex().getType() instanceof IntType))
-			throw new SemanticError("ArrayIndexType should have Int but got " + node.getExpr().getType().toString());
+			throw new SemanticError("ArrayIndexType should have Int but got "
+					+ node.getExpr().getType().toString());
 
 		// BUG: double domian arrayType - set dim seems not get dims
 		node.setType(((ArrayType) node.getExpr().getType()).getBaseType());
@@ -476,25 +503,27 @@ public class ResolverAndChecker extends Visitor {
 		} else if (node.getExpr().getType() instanceof ArrayType) {
 			className = Scope.BuiltIn.ARRAY.toString();
 		} else
-			throw new SemanticError(
-					node.getExpr().getType().toString() + ", No such Type can be used in member access expression");
+			throw new SemanticError(node.getExpr().getType().toString()
+					+ ", No such Type can be used in member access expression");
 
 		try {
 			ClassEntity classEntity = (ClassEntity) scopeStack.getFirst().get(className);
-			try {
-				memEntity = classEntity.getScope().getCur(classEntity.getDomain() + node.getMember()); // NOTE: is //
-																										// getCur
-			} catch (Error e) {
-				memEntity = classEntity.getScope().getCur(node.getMember()); // NOTE: is getCur
-				if (!(memEntity instanceof VarEntity))
-					throw new SemanticError("not varEntity of member");
-			}
+			if (classEntity == null)
+				throw new SemanticError("not found " + className);
 
-			// contain a funcall expr from before
-			if (memEntity instanceof FuncEntity)
+			// NOTE: is getCur: var first; else func
+			memEntity = classEntity.getScope().getCur(node.getMember());
+			if (memEntity == null) {
+				memEntity = classEntity.getScope()
+						.getCur(classEntity.getDomain() + node.getMember());
+				if (memEntity == null)
+					throw new SemanticError("not varEntity of member");
+
+				// contain a funcall expr from before
 				curFuncEntity = (FuncEntity) memEntity;
+			}
 		} catch (Error e) {
-			throw new SemanticError(e.getMessage());
+			throw new SemanticError("Member check " + e.getMessage());
 		}
 
 		node.setType(memEntity.getType());
@@ -505,7 +534,8 @@ public class ResolverAndChecker extends Visitor {
 	public void visit(FuncallExprNode node) {
 		visit(node.getExpr());
 		if (!(node.getExpr().getType() instanceof FuncType))
-			throw new SemanticError(node.getExpr().getType().toString() + " is not funcall expr");
+			throw new SemanticError(
+					node.getExpr().getType().toString() + " is not funcall expr");
 
 		try {
 
@@ -520,27 +550,31 @@ public class ResolverAndChecker extends Visitor {
 			int paraNum = funcallEntity.getParam().size();
 			int firstParaIdx = node.funcEntity.isMember() ? 1 : 0;
 			if (paraNum - firstParaIdx != node.getParam().size())
-				throw new SemanticError(
-						node.getLocation().toString() + "Function call has inconsistent number of arguments, expected "
-								+ paraNum + " but got " + node.getParam().size());
+				throw new SemanticError(node.getLocation().toString()
+						+ "Function call has inconsistent number of arguments, expected "
+						+ paraNum + " but got " + node.getParam().size());
 
 			// check param type
 			boolean valid;
 			for (int i = 0; i < paraNum - firstParaIdx; ++i) {
 				ExprNode curParam = node.getParam().get(i);
-				VarEntity defParam = funcallEntity.getParam().get(i + firstParaIdx); // define in fun-decl
+				VarEntity defParam = funcallEntity.getParam().get(i + firstParaIdx); // define
+																						// in
+																						// fun-decl
 				visit(curParam);
 				if (curParam.getType() instanceof VoidType) // cause funcall-void
 					valid = false;
 				else if (curParam.getType() instanceof MNullType)
-					valid = (defParam.getType() instanceof ClassType || defParam.getType() instanceof ArrayType);
+					valid = (defParam.getType() instanceof ClassType
+							|| defParam.getType() instanceof ArrayType);
 				else
 					valid = (defParam.getType().isEqual(curParam.getType()));
 
 				if (!valid) {
 					throw new SemanticError(curParam.getLocation().toString()
 							+ "Function call has inconsistent type of arguments, expected "
-							+ defParam.getType().toString() + " but got " + curParam.getType().toString());
+							+ defParam.getType().toString() + " but got "
+							+ curParam.getType().toString());
 				}
 			}
 
@@ -559,14 +593,14 @@ public class ResolverAndChecker extends Visitor {
 		try {
 
 			switch (node.getOp()) {
-			case PRE_DEC:
-			case PRE_INC:
+			case DEC:
+			case INC:
 				if (!(preExpr.getType() instanceof IntType))
-					throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to type"
-							+ preExpr.getType().toString());
+					throw new SemanticError("Operator " + node.getOp().toString()
+							+ " cannot be applied to type" + preExpr.getType().toString());
 				if (!(preExpr.isLeftValue()))
-					throw new SemanticError(
-							"Operator " + node.getOp().toString() + " cannot be applied to right value");
+					throw new SemanticError("Operator " + node.getOp().toString()
+							+ " cannot be applied to right value");
 
 				node.setType(new IntType());
 				node.setIsLeftValue(true);
@@ -575,15 +609,15 @@ public class ResolverAndChecker extends Visitor {
 			case NEGA:
 			case BIT_NOT:
 				if (!(preExpr.getType() instanceof IntType))
-					throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to type "
-							+ preExpr.getType().toString());
+					throw new SemanticError("Operator " + node.getOp().toString()
+							+ " cannot be applied to type " + preExpr.getType().toString());
 				node.setType(new IntType());
 				node.setIsLeftValue(false);
 				break;
 			case LOGIC_NOT:
 				if (!(preExpr.getType() instanceof BoolType))
-					throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to type "
-							+ preExpr.getType().toString());
+					throw new SemanticError("Operator " + node.getOp().toString()
+							+ " cannot be applied to type " + preExpr.getType().toString());
 				node.setType(new BoolType());
 				node.setIsLeftValue(false);
 				break;
@@ -637,11 +671,13 @@ public class ResolverAndChecker extends Visitor {
 		case BIT_AND:
 		case BIT_XOR:
 			if (!(lhsType instanceof IntType))
-				throw new SemanticError(node.getLocation().toString() + " Operator " + node.getOp().toString()
-						+ " cannot be applied to type " + lhsType.toString());
+				throw new SemanticError(
+						node.getLocation().toString() + " Operator " + node.getOp().toString()
+								+ " cannot be applied to type " + lhsType.toString());
 			if (!(rhsType instanceof IntType))
-				throw new SemanticError(node.getLocation().toString() + "Operator " + node.getOp().toString()
-						+ " cannot be applied to type " + rhsType.toString());
+				throw new SemanticError(
+						node.getLocation().toString() + "Operator " + node.getOp().toString()
+								+ " cannot be applied to type " + rhsType.toString());
 
 			node.setType(new IntType());
 			node.setIsLeftValue(false);
@@ -651,14 +687,15 @@ public class ResolverAndChecker extends Visitor {
 		case GREATER_EQUAL:
 		case LESS_EQUAL:
 			if (!(lhsType.isEqual(rhsType)))
-				throw new SemanticError(node.getLocation().toString() + "Operator " + node.getOp().toString()
-						+ " cannot be applied to different types " + rhsType.toString() + " and " + lhsType.toString());
+				throw new SemanticError(node.getLocation().toString() + "Operator "
+						+ node.getOp().toString() + " cannot be applied to different types "
+						+ rhsType.toString() + " and " + lhsType.toString());
 			if (!(lhsType instanceof IntType || lhsType instanceof StringType))
-				throw new SemanticError(
-						"Operator " + node.getOp().toString() + " cannot be applied to type " + lhsType.toString());
+				throw new SemanticError("Operator " + node.getOp().toString()
+						+ " cannot be applied to type " + lhsType.toString());
 			if (!(rhsType instanceof IntType || rhsType instanceof StringType))
-				throw new SemanticError(
-						"Operator " + node.getOp().toString() + " cannot be applied to type " + lhsType.toString());
+				throw new SemanticError("Operator " + node.getOp().toString()
+						+ " cannot be applied to type " + lhsType.toString());
 
 			node.setType(new BoolType());
 			node.setIsLeftValue(false);
@@ -677,8 +714,9 @@ public class ResolverAndChecker extends Visitor {
 				valid = (lhsType instanceof ClassType || lhsType instanceof ArrayType);
 
 			if (!valid)
-				throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to different types"
-						+ lhsType.toString() + " and " + rhsType.toString());
+				throw new SemanticError("Operator " + node.getOp().toString()
+						+ " cannot be applied to different types" + lhsType.toString()
+						+ " and " + rhsType.toString());
 
 			node.setType(new BoolType());
 			node.setIsLeftValue(false);
@@ -686,11 +724,11 @@ public class ResolverAndChecker extends Visitor {
 		case LOGIC_OR:
 		case LOGIC_AND:
 			if (!(lhsType instanceof BoolType))
-				throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to different types"
-						+ lhsType.toString());
+				throw new SemanticError("Operator " + node.getOp().toString()
+						+ " cannot be applied to different types" + lhsType.toString());
 			if (!(rhsType instanceof BoolType))
-				throw new SemanticError("Operator " + node.getOp().toString() + " cannot be applied to different types"
-						+ rhsType.toString());
+				throw new SemanticError("Operator " + node.getOp().toString()
+						+ " cannot be applied to different types" + rhsType.toString());
 
 			node.setType(new BoolType());
 			node.setIsLeftValue(false);
@@ -721,8 +759,8 @@ public class ResolverAndChecker extends Visitor {
 			invalid = true;
 
 		if (invalid)
-			throw new SemanticError("Assignment operator cannot be applied to different types " + lhsType.toString()
-					+ " and " + rhsType.toString());
+			throw new SemanticError("Assignment operator cannot be applied to different types "
+					+ lhsType.toString() + " and " + rhsType.toString());
 
 		// NOTE: support for a = b = c
 		node.setType(lhsType);
@@ -737,8 +775,8 @@ public class ResolverAndChecker extends Visitor {
 		// toplevel or class-level
 		entity = getCurScope().getVarFun(name, (curClass == null) ? "" : curClass.getDomain());
 
-		if (entity instanceof ClassEntity)
-			throw new SemanticError("get Idenfier as class");
+		if (entity == null || entity instanceof ClassEntity)
+			throw new SemanticError("No such id or get Idenfier as class");
 
 		if (entity instanceof VarEntity) {
 			node.entity = (VarEntity) entity;
@@ -754,13 +792,18 @@ public class ResolverAndChecker extends Visitor {
 
 	@Override
 	public void visit(ThisExprNode node) {
-		Entity entity = getCurScope().get(Scope.BuiltIn.THIS.toString());
+		try {
+			Entity entity = getCurScope().get(Scope.BuiltIn.THIS.toString());
 
-		if (!(entity instanceof VarEntity))
-			throw new SemanticError("Invalid entity type for \"this\"");
+			if (entity == null || !(entity instanceof VarEntity))
+				throw new SemanticError("Invalid entity type for \"this\"");
 
-		node.setIsLeftValue(false);
-		node.setType(entity.getType());
+			node.setIsLeftValue(false);
+			node.setType(entity.getType());
+
+		} catch (Error e) {
+			throw new SemanticError("This expr check " + e.getMessage());
+		}
 
 	}
 
@@ -790,7 +833,8 @@ public class ResolverAndChecker extends Visitor {
 
 	// endregion
 
-	// region ------------- build-in classes and functions ---------------
+	// region ------------- build-in classes and functions
+	// ---------------
 	/** add BuiltIn func and BuiltIn class */
 	private void putBuiltIn(ToplevelScope toplevelScope) {
 		String name;
@@ -806,7 +850,8 @@ public class ResolverAndChecker extends Visitor {
 		putBuiltInFunc(toplevelScope, name, params, returnType);
 
 		// type = new StringType(m4);
-		// params = Collections.singletonList(new VarEntity("str", type));
+		// params = Collections.singletonList(new VarEntity("str",
+		// type));
 		// returnType = nmew VoidType();
 		name = "println";
 		putBuiltInFunc(toplevelScope, name, params, returnType);
@@ -857,7 +902,8 @@ public class ResolverAndChecker extends Visitor {
 			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
 			// type = new StringType();
-			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type), new VarEntity("left", new IntType()),
+			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type),
+					new VarEntity("left", new IntType()),
 					new VarEntity("right", new IntType()));
 			returnType = new StringType();
 			name = "substring";
@@ -870,7 +916,8 @@ public class ResolverAndChecker extends Visitor {
 			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);
 
 			// type = new StringType();
-			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type), new VarEntity("pos", new IntType()));
+			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type),
+					new VarEntity("pos", new IntType()));
 
 			// returnType = new IntType();
 			name = "ord";
@@ -898,7 +945,8 @@ public class ResolverAndChecker extends Visitor {
 	 * <p>
 	 * Attention: FIX:BUG: these func dont have sub-scope!!!!!!!
 	 */
-	private void putBuiltInFunc(Scope curScope, String name, List<VarEntity> parameters, Type returnType) {
+	private void putBuiltInFunc(Scope curScope, String name, List<VarEntity> parameters,
+			Type returnType) {
 		FuncEntity entity = new FuncEntity(name, new FuncType(name), returnType, parameters);
 		entity.isBuiltIn = true;
 
@@ -918,7 +966,8 @@ public class ResolverAndChecker extends Visitor {
 	}
 	// endregion
 
-	// region --------------- scope - stack -----------------------
+	// region --------------- scope - stack
+	// -----------------------
 	/** push without vars */
 	private void pushScope() {
 		LocalScope scope = new LocalScope(getCurScope());
@@ -930,7 +979,8 @@ public class ResolverAndChecker extends Visitor {
 	}
 
 	/**
-	 * just pop, and get cur-poped scope Attention: have to judge if is the toplevel
+	 * just pop, and get cur-poped scope Attention: have to
+	 * judge if is the toplevel
 	 * <p>
 	 * Normally, it is not.(But what else ^_^)
 	 */

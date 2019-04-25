@@ -20,10 +20,6 @@ public class Function {
     public BasicBlock end = null;
     public List<Return> returns = new ArrayList<>();
 
-    // TODO: dfs
-    private List<BasicBlock> reversePostOrder = null;
-    private List<BasicBlock> reversePreOrder = null;
-
     public boolean recursiveCall = false;
     public boolean isMemFunc = false;
 
@@ -62,8 +58,44 @@ public class Function {
     // private Set<PhysicalRegister> usedPhysicalGeneralRegs = new HashSet<>();
 
 
-    // public Set<Function> calleeSet = new HashSet<>();
+    // region dfs
+        // TODO: dfs
+    private List<BasicBlock> reversePostOrder = null;
+    private List<BasicBlock> reversePreOrder = null;
+
+    public Set<Function> calleeSet = new HashSet<>();
+
+    public void updateCalleeSet() {
+        // calleeSet.clear();
+        // for (BasicBlock bb : getReversePostOrder()) {
+        // for (IRInstruction inst = bb.getFirstInst(); inst != null; inst = inst
+        // .getNextInst()) {
+        // if (inst instanceof IRFunctionCall) {
+        // calleeSet.add(((IRFunctionCall) inst).getFunc());
+        // }
+        // }
+        // }
+    }
+
     // public Set<Function> recursiveCalleeSet = new HashSet<>();
+    public List<BasicBlock> getReversePostOrder() {
+        // if (reversePostOrder == null) {
+        // calcReversePostOrder();
+        // }
+        return reversePostOrder;
+    }
+
+    public void calcReversePostOrder() {
+        // reversePostOrder = new ArrayList<>();
+        // dfsVisited = new HashSet<>();
+        // dfsPostOrder(startBB);
+        // dfsVisited = null;
+        // for (int i = 0; i < reversePostOrder.size(); ++i) {
+        //     reversePostOrder.get(i).setPostOrderIdx(i);
+        // }
+        Collections.reverse(reversePostOrder);
+    }
+    // endregion
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

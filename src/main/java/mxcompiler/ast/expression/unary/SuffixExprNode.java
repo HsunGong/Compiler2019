@@ -6,8 +6,12 @@ import java.util.HashMap;
 
 import mxcompiler.ast.*;
 
+
 /**
- * No longer support UnaryArithmeticOpNode
+ * No longer support UnaryArithmeticOpNode. It is included
+ * in {@link SuffixExprNode} and {@code PrefixExprNode}
+ * <p>
+ * Like {@code x++}
  */
 public class SuffixExprNode extends ExprNode {
 	@Override

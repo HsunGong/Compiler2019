@@ -3,7 +3,13 @@ AST-Dump START
 declarations are below:
 	<ClassDeclNode> (1:0)
 	 name: test
-	 varDecls: null
+	 varDecls:
+		<VarDeclNode> (10:10)
+		 name: ss
+		 type:
+			<TypeNode> (10:4)
+			 type: class test2
+		 init: null
 	 funcMember:
 		<FuncDeclNode> (2:4)
 		 name: test
@@ -48,16 +54,66 @@ declarations are below:
 						<IdentifierExprNode> (7:8)
 						identifier: name0
 					 args: null
-	<FuncDeclNode> (12:0)
+				<ExprStmtNode> (8:8)
+				 expr:
+					<PrefixExprNode> (8:8)
+					 op: INC
+					 expr:
+						<IdentifierExprNode> (8:10)
+						identifier: x
+	<ClassDeclNode> (13:0)
+	 name: test2
+	 varDecls: null
+	 funcMember:
+		<FuncDeclNode> (14:4)
+		 name: name0
+		 hasReturn: true
+		 returnType:
+			<TypeNode> (14:4)
+			 type: void
+		 parameterList: null
+		 body:
+			<BlockStmtNode> (14:16)
+			 stmtsAnddecls: 
+	<FuncDeclNode> (17:0)
 	 name: main
 	 hasReturn: true
 	 returnType:
-		<TypeNode> (12:0)
+		<TypeNode> (17:0)
 		 type: int
 	 parameterList: null
 	 body:
-		<BlockStmtNode> (12:11)
+		<BlockStmtNode> (17:11)
 		 stmtsAnddecls: 
+			<VarDeclNode> (18:9)
+			 name: x
+			 type:
+				<TypeNode> (18:4)
+				 type: class test
+			 init: null
+			<ExprStmtNode> (19:4)
+			 expr:
+				<FuncallExprNode> (19:4)
+				 expr:
+					<MemberExprNode> (19:4)
+					 member: name0
+					 expr:
+						<IdentifierExprNode> (19:4)
+						identifier: x
+				 args: null
+			<ExprStmtNode> (20:4)
+			 expr:
+				<FuncallExprNode> (20:4)
+				 expr:
+					<MemberExprNode> (20:4)
+					 member: name0
+					 expr:
+						<MemberExprNode> (20:4)
+						 member: ss
+						 expr:
+							<IdentifierExprNode> (20:4)
+							identifier: x
+				 args: null
 AST-Dump END
 
 
@@ -143,8 +199,11 @@ Scope: isTop: true
 		 <Var Entity>:  name: pos, Type: int
 		  isMember: false, ClassName: 
 		  isGlobal: false
- <Class Entity>:  name: test, Type: class test, offset:8
+ <Class Entity>:  name: test, Type: class test, offset:16
 	Scope: isTop: false
+	 <Var Entity>:  name: ss, Type: class test2
+	  isMember: true, ClassName: test
+	  isGlobal: false
 	 <Func Entity>:  name: test, Type: function test
 	  returnType: , isBuiltIn: false
 	  isMember: true, ClassName: test
@@ -183,6 +242,19 @@ Scope: isTop: true
 	  isGlobal: false
 	 <Var Entity>:  name: x, Type: int
 	  isMember: true, ClassName: test
+	  isGlobal: false
+ <Class Entity>:  name: test2, Type: class test2, offset:0
+	Scope: isTop: false
+	 <Func Entity>:  name: name0, Type: function name0
+	  returnType: void, isBuiltIn: false
+	  isMember: true, ClassName: test2
+	  params:
+		 <Var Entity>:  name: __this, Type: class test2
+		  isMember: false, ClassName: 
+		  isGlobal: false
+	>>>> child	Scope: isTop: false
+	 <Var Entity>:  name: __this, Type: class test2
+	  isMember: false, ClassName: 
 	  isGlobal: false
  <Func Entity>:  name: main, Type: function main
   returnType: int, isBuiltIn: false
@@ -236,6 +308,9 @@ Scope: isTop: true
 	  isMember: false, ClassName: 
 	  isGlobal: false
 >>>> childScope: isTop: false
+ <Var Entity>:  name: ss, Type: class test2
+  isMember: true, ClassName: test
+  isGlobal: false
  <Func Entity>:  name: test, Type: function test
   returnType: , isBuiltIn: false
   isMember: true, ClassName: test
@@ -276,6 +351,21 @@ Scope: isTop: true
   isMember: true, ClassName: test
   isGlobal: false
 >>>> childScope: isTop: false
+ <Func Entity>:  name: name0, Type: function name0
+  returnType: void, isBuiltIn: false
+  isMember: true, ClassName: test2
+  params:
+	 <Var Entity>:  name: __this, Type: class test2
+	  isMember: false, ClassName: 
+	  isGlobal: false
+>>>> childScope: isTop: false
+ <Var Entity>:  name: __this, Type: class test2
+  isMember: false, ClassName: 
+  isGlobal: false
+>>>> childScope: isTop: false
+ <Var Entity>:  name: x, Type: class test
+  isMember: false, ClassName: 
+  isGlobal: false
 Scope-Dump END
 
 

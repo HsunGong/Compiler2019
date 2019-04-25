@@ -11,7 +11,7 @@ public class StaticString extends StaticData {
         this.val = value;
     }
 
-    public String getVal() {
+    public String getValue() {
         return val;
     }
 

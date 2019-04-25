@@ -72,7 +72,12 @@ public final class Compiler {
 	}
 
 	private void buildIR() throws Error {
-		IRBuilder irBuilder = new IRBuilder();
+		UsagePreChecker usagePreChecker = new UsagePreChecker();
+		usagePreChecker.visit(root);
+
+		IRBuilder treeIrBuilder = new IRBuilder();
+		treeIrBuilder.visit(root);
+
 
 	}
 

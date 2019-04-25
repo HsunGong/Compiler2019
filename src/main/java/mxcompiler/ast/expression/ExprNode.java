@@ -46,7 +46,11 @@ abstract public class ExprNode extends Node {
 		this.thenBB = thenBB;
 	}
 
-	/** True */
+	/**
+	 * True
+	 * <p>
+	 * if getThen() == null, means no more branchs
+	 */
 	public BasicBlock getThen() {
 		return thenBB;
 	}
@@ -61,8 +65,21 @@ abstract public class ExprNode extends Node {
 		return elseBB;
 	}
 
-	public RegValue regValue, addrValue;
-	/** addr-offset */
+	/**
+	 * <p>
+	 * for class(member), it is base-addr
+	 * <p>
+	 * for array(head), it is base-addr
+	 * <p>
+	 * for norm-expr, it is value
+	 * <p>
+	 * NOTE: TODO: (IRBuilder-MemberExprNode, ArefNode). sometimes no init,
+	 * means how to deal it ?? FIX: BUG:
+	 */
+	public RegValue regValue;
+	/** addr-base-value */
+	public RegValue addrValue;
+	/** addr-base-offset */
 	public int offset;
 
 }

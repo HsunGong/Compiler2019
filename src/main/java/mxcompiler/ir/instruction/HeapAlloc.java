@@ -7,14 +7,16 @@ import mxcompiler.ir.register.Register;
 import mxcompiler.utils.Dump;
 
 
-/** alloc memory */
+/**
+ * alloc memory for class or array
+ */
 public class HeapAlloc extends Quad {
     private RegValue dst;
     private RegValue allocSize;
 
     public HeapAlloc(BasicBlock parent, RegValue destion, RegValue allocSize) {
         super(parent);
-        // TOOD: copy to 
+        // TOOD: copy to
         if (!(destion instanceof Register))
             throw new CompileError("Error with register");
         this.dst = destion;
@@ -31,10 +33,12 @@ public class HeapAlloc extends Quad {
     }
 
     // @Override
-    // public IRHeapAlloc copyRename(Map<Object, Object> renameMap) {
-    //     return new IRHeapAlloc((BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
-    //             (IRRegister) renameMap.getOrDefault(dest, dest),
-    //             (RegValue) renameMap.getOrDefault(allocSize, allocSize));
+    // public IRHeapAlloc copyRename(Map<Object, Object>
+    // renameMap) {
+    // return new IRHeapAlloc((BasicBlock)
+    // renameMap.getOrDefault(getParentBB(), getParentBB()),
+    // (IRRegister) renameMap.getOrDefault(dest, dest),
+    // (RegValue) renameMap.getOrDefault(allocSize, allocSize));
     // }
 
     public void _dump(Dump d) {

@@ -15,6 +15,7 @@ public class Uni extends Quad {
         super(parent);
         this.dst = destion;
         this.rhs = object;
+        this.op = op;
     }
 
     public Op getOp() { return op; }

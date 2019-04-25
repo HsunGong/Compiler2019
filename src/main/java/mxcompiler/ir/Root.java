@@ -31,8 +31,10 @@ public class Root {
     }
 
     // domin = "."
-    static public final String BUILTIN_STRING_LENGTH_FUNC_NAME = BuiltIn.STRING.toDomain() + "length";
-    static public final String BUILTIN_ARRAY_SIZE_FUNC_NAME = BuiltIn.ARRAY.toDomain() + "size";
+    static public final String BUILTIN_STRING_LENGTH_FUNC_NAME = BuiltIn.STRING.toDomain()
+            + "length";
+    static public final String BUILTIN_ARRAY_SIZE_FUNC_NAME = BuiltIn.ARRAY.toDomain()
+            + "size";
 
     public void initBuiltInFunc() {
         addFunc("print", "_Z5_printPc");
@@ -84,7 +86,8 @@ public class Root {
     }
     // endregion
 
-    private Map<String, StaticString> staticStrs = new HashMap<>(); // Map<String, StaticString>
+    private Map<String, StaticString> staticStrs = new HashMap<>(); // Map<String,
+                                                                    // StaticString>
     private List<StaticData> staticDataList = new ArrayList<>();
     // region static
 
@@ -93,7 +96,7 @@ public class Root {
     }
 
     public void putStaticStr(StaticString str) {
-        staticStrs.put(str.getVal(), str);
+        staticStrs.put(str.getValue(), str);
     }
 
     public StaticString getStaticStr(String name) {
@@ -123,7 +126,28 @@ public class Root {
         }
     }
 
-    // public void updateCalleeSet() {}
+    public void updateCalleeSet() {
+        // Set<IRFunction> recursiveCalleeSet = new HashSet<>();
+        // for (IRFunction irFunction : funcs.values()) {
+        //     irFunction.recursiveCalleeSet.clear();
+        // }
+        // boolean changed = true;
+        // while (changed) {
+        //     changed = false;
+        //     for (IRFunction irFunction : funcs.values()) {
+        //         recursiveCalleeSet.clear();
+        //         recursiveCalleeSet.addAll(irFunction.calleeSet);
+        //         for (IRFunction calleeFunction : irFunction.calleeSet) {
+        //             recursiveCalleeSet.addAll(calleeFunction.recursiveCalleeSet);
+        //         }
+        //         if (!recursiveCalleeSet.equals(irFunction.recursiveCalleeSet)) {
+        //             irFunction.recursiveCalleeSet.clear();
+        //             irFunction.recursiveCalleeSet.addAll(recursiveCalleeSet);
+        //             changed = true;
+        //         }
+        //     }
+        // }
+    }
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

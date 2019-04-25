@@ -7,12 +7,18 @@ import mxcompiler.utils.type.Type;
 import mxcompiler.utils.type.VarType;
 import mxcompiler.utils.Dump;
 
+
 public class VarEntity extends Entity {
-	public int offset; // for Class-mem
+	/**
+	 * for Class-mem
+	 * <p>
+	 * {@code curVarOffset = class-base-addr + before-size}
+	 */
+	private int curOffset = -1;
 	// private boolean isMember = false;
 	private String className = "";
 	public boolean isGlobal = false;
-	
+
 	/** irRegister */
 	public RegValue register;
 	public boolean unUsed = false;
@@ -32,7 +38,9 @@ public class VarEntity extends Entity {
 		this.className = className;
 	}
 
-	public boolean isMember() { return className != ""; }
+	public boolean isMember() {
+		return className != "";
+	}
 
 	public VarEntity(VarDeclNode node) {
 		super(node.getName(), node.getType().getType());
@@ -55,5 +63,21 @@ public class VarEntity extends Entity {
 		if (this.className != null)
 			throw new Error("repeat define ClassName");
 		this.className = className;
+	}
+
+	/**
+	 * {@link #curOffset}
+	 */
+	public void setCurOffset(int offset) {
+		curOffset = offset;
+	}
+
+	/**
+	 * {@link #curOffset}
+	 */
+	public int getCurOffset() {
+		if (curOffset == -1)
+			throw new CompileError("Error access var offset");
+		return curOffset;
 	}
 }

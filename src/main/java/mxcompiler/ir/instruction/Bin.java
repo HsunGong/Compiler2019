@@ -1,48 +1,59 @@
 package mxcompiler.ir.instruction;
 
 import mxcompiler.ast.expression.BinaryOpExprNode.Op;
+import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
 import mxcompiler.utils.Dump;
 
-/** binary */
+
+/**
+ * binary
+ * <p>
+ * No more LOGIC_AND("&&"), LOGIC_OR("||")
+ */
 public class Bin extends Quad {
-    // binary
-    //  ADD, SUB, MUL, DIV, MOD,
-    //  SHL, SHR,
-    //  BITWISE_AND, BITWISE_OR, BITWISE_XOR
 
-    // compare
-    // GREATER, LESS, GREATER_EQUAL, LESS_EQUAL, EQUAL, INEQUAL
+    protected RegValue dst;
+    protected Op op;
+    protected RegValue lhs, rhs;
 
-    private RegValue dst;
-    private Op op;
-    private RegValue lhs, rhs;
-
-    public Bin(BasicBlock parent, RegValue destion, Op op, RegValue lhs, RegValue rhs){
+    public Bin(BasicBlock parent, RegValue destion, Op op, RegValue lhs, RegValue rhs) {
         super(parent);
         this.dst = destion;
         this.lhs = lhs;
         this.rhs = rhs;
+        this.op = op;
+        // reloadUsedRegistersRegValues();
     }
 
-    public Op getOp() { return op; }
-    public RegValue getDst() { return dst; }
-    public RegValue getRhs() { return rhs; }
-    public RegValue getLhs() { return lhs; }
+    public Op getOp() {
+        return op;
+    }
 
+    public RegValue getDst() {
+        return dst;
+    }
 
+    public RegValue getRhs() {
+        return rhs;
+    }
+
+    public RegValue getLhs() {
+        return lhs;
+    }
 
     // @Override
-    // public IRUnaryOperation copyRename(Map<Object, Object> renameMap) {
-    //     return new IRUnaryOperation(
-    //             (BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
-    //             (IRRegister) renameMap.getOrDefault(dest, dest),
-    //             op,
-    //             (RegValue) renameMap.getOrDefault(rhs, rhs)
-    //     );
+    // public IRUnaryOperation copyRename(Map<Object, Object>
+    // renameMap) {
+    // return new IRUnaryOperation(
+    // (BasicBlock) renameMap.getOrDefault(getParentBB(),
+    // getParentBB()),
+    // (IRRegister) renameMap.getOrDefault(dest, dest),
+    // op,
+    // (RegValue) renameMap.getOrDefault(rhs, rhs)
+    // );
     // }
-
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

@@ -5,10 +5,17 @@ class test {
     void name0(){}
     void name1(int x) {
         name0();
+        ++x;
     }
+    test2 ss;
 }
 
+class test2 {
+    void name0(){}
+}
 
 int main() {
-    
+    test x;
+    x.name0();
+    x.ss.name0();
 }

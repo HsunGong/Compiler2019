@@ -11,7 +11,7 @@ public class IntImm extends RegValue {
         this.val = value;
     }
 
-    public int getVal() {
+    public int getValue() {
         return val;
     }
 

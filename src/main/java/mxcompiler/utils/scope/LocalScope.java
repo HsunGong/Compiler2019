@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import mxcompiler.utils.entity.Entity;
 import mxcompiler.error.SemanticError;
 
+
 public class LocalScope extends Scope {
 	public LocalScope(Scope parent) {
 		super(parent);
@@ -19,7 +20,9 @@ public class LocalScope extends Scope {
 
 	// a little different from entities
 	// rather say variables or declarations
-	/** get entity for current level */
+	/**
+	 * get entity for current level throw error if not get
+	 */
 	public Entity getCur(String k) throws SemanticError {
 		Entity v = entities.get(k);
 		if (v == null) { // error
@@ -28,6 +31,7 @@ public class LocalScope extends Scope {
 		return v;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public Entity get(String k) throws SemanticError {
 		Entity v = entities.get(k);
@@ -37,6 +41,7 @@ public class LocalScope extends Scope {
 		return v;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public Entity getVarFun(String k, String domain) throws SemanticError {
 		Entity v = (entities.get(k) != null) ? entities.get(k) : entities.get(domain + k);

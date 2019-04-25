@@ -10,18 +10,22 @@ import mxcompiler.ast.expression.literal.*;
 import mxcompiler.ast.expression.lhs.*;
 import mxcompiler.ast.expression.unary.*;
 
+
 /**
- * if any operator you gonna do during non-terminal node or terminal node, just
- * rewrite visit function
+ * if any operator you gonna do during non-terminal node or
+ * terminal node, just rewrite visit function
  * <p>
  * ATTITION: take care of null Node
  * <p>
- * Maybe it is no use, but give a good example of how to write visitor
+ * Maybe it is no use, but give a good example of how to
+ * write visitor
  * <p>
- * use this class, so that dont need to implement all visit func in ASTVisitor
+ * use this class, so that dont need to implement all visit
+ * func in ASTVisitor
  */
 abstract public class Visitor implements ASTVisitor {
-	// NOTE: Wrong! visit DeclNode but can not change into detail instance
+	// NOTE: Wrong! visit DeclNode but can not change into
+	// detail instance
 	// 2, accept function to fix
 	public void visit(Node node) {
 		if (node == null)
@@ -193,23 +197,28 @@ abstract public class Visitor implements ASTVisitor {
 
 	// FIX: use ? extends Node to replace <Node>/**
 	/*
-	 * ATTENTION: can not use visit(this) for each node, cause error {@code if
-	 * (!decls.isEmpty()) for (DeclNode e : decls) visit(e); }
+	 * ATTENTION: can not use visit(this) for each node, cause
+	 * error {@code if (!decls.isEmpty()) for (DeclNode e :
+	 * decls) visit(e); }
 	 */
-	abstract protected void visitStmtList(List<? extends StmtNode> stmts);
+	// region --------------- add List -----------------------
+	protected void visitStmtList(List<? extends StmtNode> stmts) {
+		if (!stmts.isEmpty())
+			for (StmtNode n : stmts)
+				visit(n);
+	}
 
-	/**
-	 * {@code
-	 * if (!decls.isEmpty()) for (DeclNode e : decls) visit(e);
-	 * }
-	 */
-	abstract protected void visitExprList(List<? extends ExprNode> exprs);
+	protected void visitExprList(List<? extends ExprNode> exprs) {
+		if (!exprs.isEmpty())
+			for (ExprNode n : exprs)
+				visit(n);
+	}
 
-	/**
-	 * {@code
-	 * if (!decls.isEmpty()) for (DeclNode e : decls) visit(e);
-	 * }
-	 */
-	abstract protected void visitDeclList(List<? extends DeclNode> decls);
+	protected void visitDeclList(List<? extends DeclNode> decls) {
+		if (!decls.isEmpty())
+			for (DeclNode n : decls)
+				visit(n);
+	}
+	// endregion
 
 }

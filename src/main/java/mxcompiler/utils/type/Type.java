@@ -40,7 +40,10 @@ abstract public class Type {
 	private int size = RegValue.RegSize;
 
 	/**
-	 * return default type's memory-size(default=1-reg)
+	 * return default type's memory-size
+	 * <p>
+	 * (default=1-reg) {@summary because class and array only
+	 * store base-addr}
 	 */
 	public int getRegSize() {
 		return size;

@@ -6,20 +6,23 @@ import java.util.HashMap;
 
 import mxcompiler.ast.*;
 
+
 /**
- * No longer support UnaryArithmeticOpNode It is included in {@code suffix} and
- * {@code prefix}
+ * No longer support UnaryArithmeticOpNode. It is included
+ * in {@link SuffixExprNode} and {@code PrefixExprNode}
+ * <p>
+ * Like {@code ++x}
  */
 public class PrefixExprNode extends ExprNode {
 	@Override
 	public void _dump(ASTDump d) {
-		d.printf("<SuffixExprNode> %s\n", location.toString());
+		d.printf("<PrefixExprNode> %s\n", location.toString());
 		d.printf(" op: %s\n", getOp().toString());
 	}
 
 	public static enum Op {
-		//   SELF_INC, SELF_DEC, POSI, NEGE, LOGIC_NOT, BIT_NOT
-		PRE_INC("++"), PRE_DEC("--"), POSI("+"), NEGA("-"), LOGIC_NOT("!"), BIT_NOT("~");
+		// SELF_INC, SELF_DEC, POSI, NEGE, LOGIC_NOT, BIT_NOT
+		INC("++"), DEC("--"), POSI("+"), NEGA("-"), LOGIC_NOT("!"), BIT_NOT("~");
 
 		private String label;
 

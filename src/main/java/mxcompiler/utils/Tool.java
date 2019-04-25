@@ -28,11 +28,11 @@ public class Tool {
     public static final String LENGTH = "length";
 
 
-    public static final String CONCAT = "concat";
-    public static final String EQUAL = "equal";
-    public static final String INEQUAL = "inequal";
-    public static final String LESS = "less";
-    public static final String LESS_EQUAL = "less_equal";
+    public static final String STRING_CONCAT = "concat";
+    public static final String STRING_EQUAL = "equal";
+    public static final String STRING_INEQUAL = "inequal";
+    public static final String STRING_LESS = "less";
+    public static final String STRING_LESS_EQUAL = "less_equal";
 
     public static final String PRINT_KEY = PRINT;
     public static final String PRINTLN_KEY = PRINTLN;
@@ -49,11 +49,11 @@ public class Tool {
 
     public static final String SIZE_KEY = ARRAY + DOMAIN + SIZE;
 
-    public static final String CONCAT_KEY = STRING + DOMAIN + CONCAT;
-    public static final String EQUAL_KEY = STRING + DOMAIN + EQUAL;
-    public static final String INEQUAL_KEY = STRING + DOMAIN + INEQUAL;
-    public static final String LESS_KEY = STRING + DOMAIN + LESS;
-    public static final String LESS_EQUAL_KEY = STRING + DOMAIN + LESS_EQUAL;
+    public static final String STRING_CONCAT_KEY = STRING + DOMAIN + STRING_CONCAT;
+    public static final String STRING_EQUAL_KEY = STRING + DOMAIN + STRING_EQUAL;
+    public static final String STRING_INEQUAL_KEY = STRING + DOMAIN + STRING_INEQUAL;
+    public static final String STRING_LESS_KEY = STRING + DOMAIN + STRING_LESS;
+    public static final String STRING_LESS_EQUAL_KEY = STRING + DOMAIN + STRING_LESS_EQUAL;
 
     // endregion
 }

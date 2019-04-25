@@ -12,6 +12,7 @@ import mxcompiler.error.*;
 
 import mxcompiler.utils.Tool;
 
+
 abstract public class Scope {
 	/**
 	 * reserved name of class FIX: maybe also builtIn Func?
@@ -33,7 +34,6 @@ abstract public class Scope {
 		public String toDomain() {
 			return label + DOMAIN.toString();
 		}
-
 
 		private static final HashMap<String, BuiltIn> keyMap = new HashMap<String, BuiltIn>();
 		static {
@@ -76,9 +76,15 @@ abstract public class Scope {
 	protected Map<String, Entity> entities;
 
 	abstract public void put(String k, Entity v) throws SemanticError;
+	
+	/**  
+	 * no throw for get, if not exist, return null
+	 */
+	abstract public Entity get(String k) throws SemanticError; 
 
-	abstract public Entity get(String k) throws SemanticError; // DeclNode or called Entity
-
+	/**
+	 * no throw for get, if not exist, return null
+	 */
 	abstract public Entity getVarFun(String k, String domain) throws SemanticError;
 	
 	public final void _dump(Dump d) {
@@ -86,7 +92,8 @@ abstract public class Scope {
 		for (Entry<String, Entity> e : entities.entrySet()) {
 			e.getValue()._dump(d);
 		}
-		// FIX: what is children to specify which function is their father?
+		// FIX: what is children to specify which function is their
+		// father?
 		for (Scope s : this.children) {
 			// d.addTab();
 			d.print(">>>> child");

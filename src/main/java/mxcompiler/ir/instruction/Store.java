@@ -9,24 +9,24 @@ import mxcompiler.utils.Dump;
 public class Store extends Quad {
     private RegValue value;
     private int size;
-    private RegValue addr;
+    private RegValue baseAddr;
     private int offset;
     private boolean isStaticData;
 
-    public Store(BasicBlock parent, RegValue value, int size, RegValue addr, int addrOffset) {
+    public Store(BasicBlock parent, RegValue value, int size, RegValue baseAddr, int addrOffset) {
         super(parent);
         if (size == 0)
             System.err.println("bad size 0");
 
         this.value = value;
-        this.addr = addr;
+        this.baseAddr = baseAddr;
         this.offset = addrOffset;
         this.size = size;
         this.isStaticData = false;
         // reloadUsedRegistersRegValues();
     }
 
-    public Store(BasicBlock parent, RegValue value, int size, StaticData addr, boolean isLoadAddr) {
+    public Store(BasicBlock parent, RegValue value, int size, StaticData addr) {
         this(parent, value, size, addr, 0);
 
         this.isStaticData = true;
