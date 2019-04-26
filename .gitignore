@@ -4,7 +4,6 @@
 ref.tar
 
 target/
-src/main/java/mxcompiler/ir/
-src/main/java/mxcompiler/main/IRBuilder.java
+bin/
 
 eclipse-formatter.xml

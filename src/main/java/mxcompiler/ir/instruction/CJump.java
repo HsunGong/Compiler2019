@@ -4,6 +4,7 @@ import java.util.Map;
 
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
+import mxcompiler.ir.register.Register;
 import mxcompiler.utils.Dump;
 
 
@@ -37,6 +38,24 @@ public class CJump extends JumpQuad {
                 (RegValue) renameMap.getOrDefault(cond, cond),
                 (BasicBlock) renameMap.getOrDefault(thenBB, thenBB),
                 (BasicBlock) renameMap.getOrDefault(elseBB, elseBB));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void reloadUsedRegs() {
+        usedRegisters.clear();
+        usedRegValues.clear();
+        if (cond instanceof Register)
+            usedRegisters.add((Register) cond);
+        usedRegValues.add(cond);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUsedRegisters(Map<Register, Register> renameMap) {
+        if (cond instanceof Register)
+            cond = renameMap.get(cond);
+        reloadUsedRegs();
     }
 
     public void accept(IRVisitor visitor) {

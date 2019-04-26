@@ -3,8 +3,7 @@ package mxcompiler.ir.instruction;
 import java.util.Map;
 
 import mxcompiler.ir.IRVisitor;
-import mxcompiler.ir.register.RegValue;
-import mxcompiler.ir.register.StaticData;
+import mxcompiler.ir.register.*;
 import mxcompiler.utils.Dump;
 
 
@@ -47,6 +46,7 @@ public class Store extends Quad {
         return isStaticData;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Store copyRename(Map<Object, Object> renameMap) {
         if (isStaticData) {
@@ -58,6 +58,29 @@ public class Store extends Quad {
                     (RegValue) renameMap.getOrDefault(value, value), size,
                     (RegValue) renameMap.getOrDefault(baseAddr, baseAddr), offset);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void reloadUsedRegs() {
+        usedRegisters.clear();
+        usedRegValues.clear();
+        if (baseAddr instanceof Register && !(baseAddr instanceof StackSlot))
+            usedRegisters.add((Register) baseAddr);
+        if (value instanceof Register)
+            usedRegisters.add((Register) value);
+        usedRegValues.add(baseAddr);
+        usedRegValues.add(value);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUsedRegisters(Map<Register, Register> renameMap) {
+        if (baseAddr instanceof Register && !(baseAddr instanceof StackSlot))
+            baseAddr = renameMap.get(baseAddr);
+        if (value instanceof Register)
+            value = renameMap.get(value);
+        reloadUsedRegs();
     }
 
     public void accept(IRVisitor visitor) {

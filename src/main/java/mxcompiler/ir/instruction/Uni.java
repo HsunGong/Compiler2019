@@ -34,11 +34,40 @@ public class Uni extends Quad {
         return rhs;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Uni copyRename(Map<Object, Object> renameMap) {
         return new Uni((BasicBlock) renameMap.getOrDefault(parent, parent),
                 (Register) renameMap.getOrDefault(dst, dst), op,
                 (RegValue) renameMap.getOrDefault(rhs, rhs));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void reloadUsedRegs() {
+        usedRegisters.clear();
+        usedRegValues.clear();
+        if (rhs instanceof Register) usedRegisters.add((Register) rhs);
+        usedRegValues.add(rhs);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUsedRegisters(Map<Register, Register> renameMap) {
+        if (rhs instanceof Register) rhs = renameMap.get(rhs);
+        reloadUsedRegs();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Register getDefinedRegister() {
+        return (Register) dst;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setDefinedRegister(Register vreg) {
+        dst = vreg;
     }
 
     public void accept(IRVisitor visitor) {

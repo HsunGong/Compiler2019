@@ -5,6 +5,7 @@ import java.util.Map;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
 import mxcompiler.ir.register.Register;
+import mxcompiler.ir.register.StackSlot;
 import mxcompiler.ir.register.StaticData;
 import mxcompiler.utils.Dump;
 
@@ -60,6 +61,36 @@ public class Load extends Quad {
                     (Register) renameMap.getOrDefault(dst, dst), size,
                     (RegValue) renameMap.getOrDefault(addr, addr), offset);
         }
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void reloadUsedRegs() {
+        usedRegisters.clear();
+        usedRegValues.clear();
+        if (addr instanceof Register && !(addr instanceof StackSlot))
+            usedRegisters.add((Register) addr);
+        usedRegValues.add(addr);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUsedRegisters(Map<Register, Register> renameMap) {
+        if (addr instanceof Register && !(addr instanceof StackSlot))
+            addr = renameMap.get(addr);
+        reloadUsedRegs();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Register getDefinedRegister() {
+        return (Register) dst;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setDefinedRegister(Register vreg) {
+        dst = vreg;
     }
 
     public void accept(IRVisitor visitor) {

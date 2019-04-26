@@ -1379,8 +1379,7 @@ public class IRBuilder extends Visitor {
     }
     // endregion
 
-
-    // region inline-funcall
+    // region short cut to inline-funcall
     private final int MAX_INLINE_INST = 30;
     private final int MAX_LOW_INLINE_INST = 30;
     private final int MAX_FUNC_INST = 1 << 12;
@@ -1392,225 +1391,297 @@ public class IRBuilder extends Visitor {
     }
 
     private Map<Function, FuncInfo> funcInfoMap = new HashMap<>();
-    private Map<Function, Function> funcBakUpMap = new HashMap<>();
+    private Map<Function, Function> funcBackUpMap = new HashMap<>();
+
+    private Function genBackUpFunc(Function func) {
+        Function bakFunc = new Function(func.entity);
+        Map<Object, Object> bbRenameMap = new HashMap<>();
+        for (BasicBlock bb : func.getReversePostOrder())
+            bbRenameMap.put(bb, new BasicBlock(bakFunc, bb.getName()));
+
+        for (BasicBlock bb : func.getReversePostOrder()) {
+            BasicBlock bakBB = (BasicBlock) bbRenameMap.get(bb);
+
+            for (Quad inst : bb.getInsts()) {
+                if (inst instanceof JumpQuad)
+                    bakBB.setJump((JumpQuad) inst.copyRename(bbRenameMap));
+                else
+                    bakBB.addLastInst(inst.copyRename(bbRenameMap));
+            }
+        }
+
+        bakFunc.start = (BasicBlock) bbRenameMap.get(func.start);
+        bakFunc.end = (BasicBlock) bbRenameMap.get(func.end);
+        bakFunc.argVReg = func.argVReg;
+        return bakFunc;
+    }
 
     private void FuncInlineProcess() {
-        for (Function irFunction : ir.getFuncs().values()) {
-            irFunction.setRecursiveCall(irFunction.recursiveCalleeSet.contains(irFunction));
+        // pre-resolve
+        for (Function irFunc : root.getFunc().values()) { // add func
+            irFunc.isRecursiveCall = irFunc.recursiveCalleeSet.contains(irFunc);
             FuncInfo funcInfo = new FuncInfo();
-            funcInfo.recursiveCall = irFunction.isRecursiveCall();
-            funcInfo.memFunc = irFunction.isMemFunc();
-            funcInfoMap.put(irFunction, funcInfo);
+
+            funcInfo.recursiveCall = irFunc.isRecursiveCall;
+            funcInfo.memFunc = irFunc.isMemFunc;
+            funcInfoMap.put(irFunc, funcInfo);
         }
-        for (Function irFunction : ir.getFuncs().values()) {
-            FuncInfo funcInfo = funcInfoMap.get(irFunction);
-            for (BasicBlock bb : irFunction.getReversePostOrder()) {
-                for (IRInstruction inst = bb.getFirstInst(); inst != null; inst = inst.getNextInst()) {
+        for (Function irFunc : root.getFunc().values()) { // add calleeInfo
+            FuncInfo funcInfo = funcInfoMap.get(irFunc);
+
+            for (BasicBlock bb : irFunc.getReversePostOrder()) {
+                for (Quad inst : bb.getInsts()) {
                     ++funcInfo.numInst;
-                    if (inst instanceof FunctionCall) {
-                        FuncInfo calleeInfo = funcInfoMap.get(((FunctionCall) inst).getFunc());
-                        if (calleeInfo != null) {
+
+                    if (inst instanceof Funcall) {
+                        FuncInfo calleeInfo = funcInfoMap.get(((Funcall) inst).getFunc());
+
+                        if (calleeInfo != null)
                             ++calleeInfo.numCalled;
-                        }
                     }
                 }
             }
         }
 
+        // region remove unused function
         List<BasicBlock> reversePostOrder = new ArrayList<>();
         List<String> unCalledFuncs = new ArrayList<>();
-        boolean changed = true, thisFuncChanged;
-        while (changed) {
+
+        /** if changed, will restart func-bb-order */
+        boolean thisFuncChanged;
+        boolean changed;
+        do {
             changed = false;
             unCalledFuncs.clear();
-            for (Function irFunction : ir.getFuncs().values()) {
-                FuncInfo funcInfo = funcInfoMap.get(irFunction);
-                reversePostOrder.clear();
-                reversePostOrder.addAll(irFunction.getReversePostOrder());
-                thisFuncChanged = false;
-                for (BasicBlock bb : reversePostOrder) {
-                    for (IRInstruction inst = bb.getFirstInst(), nextInst; inst != null; inst = nextInst) {
-                        // inst.getNextInst() may be changed later
-                        nextInst = inst.getNextInst();
-                        if (!(inst instanceof FunctionCall)) continue;
-                        FuncInfo calleeInfo = funcInfoMap.get(((FunctionCall) inst).getFunc());
-                        if (calleeInfo == null) continue; // skip built-in functions
-                        if (calleeInfo.recursiveCall) continue; // skip self recursive function
-                        if (calleeInfo.memFunc) continue;
-                        if (calleeInfo.numInst > MAX_LOW_INLINE_INST || calleeInfo.numInst + funcInfo.numInst > MAX_FUNC_INST) continue;
 
-                        nextInst = inlineFunctionCall((FunctionCall) inst);
-                        funcInfo.numInst += calleeInfo.numInst;
+            for (Function irFunc : root.getFunc().values()) {
+                thisFuncChanged = false;
+
+                FuncInfo funcInfo = funcInfoMap.get(irFunc);
+                reversePostOrder.clear(); // cur func
+                reversePostOrder.addAll(irFunc.getReversePostOrder());
+
+                for (BasicBlock bb : reversePostOrder) {
+                    ListIterator<Quad> iter = bb.getInsts().listIterator();
+                    while (iter.hasNext()) {
+                        Quad inst = iter.next();
+                        if (!(inst instanceof Funcall))
+                            continue;
+                        FuncInfo calleeInfo = funcInfoMap.get(((Funcall) inst).getFunc());
+                        if (calleeInfo == null)
+                            continue; // skip built-in functions
+                        if (calleeInfo.recursiveCall)
+                            continue; // skip self recursive function
+                        if (calleeInfo.memFunc)
+                            continue;
+                        if (calleeInfo.numInst > MAX_LOW_INLINE_INST
+                                || calleeInfo.numInst + funcInfo.numInst > MAX_FUNC_INST)
+                            continue;
+
+                        ListIterator<Quad> newIter = bb.getInsts()
+                                .listIterator(iter.previousIndex());
+                        iter = inlineFuncall(newIter); // iter has to point to next
+
                         changed = true;
                         thisFuncChanged = true;
+                        funcInfo.numInst += calleeInfo.numInst;
+
                         --calleeInfo.numCalled;
-                        if (calleeInfo.numCalled == 0) {
-                            unCalledFuncs.add(((FunctionCall) inst).getFunc().getName());
-                        }
+                        if (calleeInfo.numCalled == 0)
+                            unCalledFuncs.add(((Funcall) inst).getFunc().getName());
                     }
                 }
-                if (thisFuncChanged) {
-                    irFunction.calcReversePostOrder();
-                }
-            }
-            for (String funcName : unCalledFuncs) {
-                ir.removeFunc(funcName);
-            }
-        }
-        for (Function irFunction : ir.getFuncs().values()) {
-            irFunction.updateCalleeSet();
-        }
-        ir.updateCalleeSet();
 
-        // inline recursive functions
+                if (thisFuncChanged)
+                    irFunc.initReversePostOrder();
+            }
+
+            // del-func
+            for (String funcName : unCalledFuncs)
+                root.delFunc(funcName);
+        } while (changed);
+
+        for (Function irFunc : root.getFunc().values()) {
+            irFunc.updateCalleeSet();
+        }
+        root.updateCalleeSet();
+        // endregion
+
+        // region inline recursive functions
         reversePostOrder = new ArrayList<>();
+
         changed = true;
         for (int i = 0; changed && i < MAX_INLINE_DEPTH; ++i) {
             changed = false;
 
             // bak up self recursive functions
-            funcBakUpMap.clear();
-            for (Function irFunction : ir.getFuncs().values()) {
-                FuncInfo funcInfo = funcInfoMap.get(irFunction);
-                if (!funcInfo.recursiveCall) continue;
-                funcBakUpMap.put(irFunction, genBakUpFunc(irFunction));
+            funcBackUpMap.clear();
+            for (Function irFunc : root.getFunc().values()) {
+                FuncInfo funcInfo = funcInfoMap.get(irFunc);
+                if (!funcInfo.recursiveCall)
+                    continue;
+                funcBackUpMap.put(irFunc, genBackUpFunc(irFunc));
             }
 
-            for (Function irFunction : ir.getFuncs().values()) {
-                FuncInfo funcInfo = funcInfoMap.get(irFunction);
+            for (Function irFunc : root.getFunc().values()) {
+                FuncInfo funcInfo = funcInfoMap.get(irFunc);
                 reversePostOrder.clear();
-                reversePostOrder.addAll(irFunction.getReversePostOrder());
+                reversePostOrder.addAll(irFunc.getReversePostOrder());
                 thisFuncChanged = false;
-                for (BasicBlock bb : reversePostOrder) {
-                    for (IRInstruction inst = bb.getFirstInst(), nextInst; inst != null; inst = nextInst) {
-                        // inst.getNextInst() may be changed later
-                        nextInst = inst.getNextInst();
-                        if (!(inst instanceof FunctionCall)) continue;
-                        FuncInfo calleeInfo = funcInfoMap.get(((FunctionCall) inst).getFunc());
-                        if (calleeInfo == null) continue; // skip built-in functions
-                        if (calleeInfo.memFunc) continue;
-                        if (calleeInfo.numInst > MAX_INLINE_INST || calleeInfo.numInst + funcInfo.numInst > MAX_FUNC_INST) continue;
 
-                        nextInst = inlineFunctionCall((FunctionCall) inst);
-                        int numAddInst = calleeInfo.numInst;
-                        funcInfo.numInst += numAddInst;
+                for (BasicBlock bb : reversePostOrder) {
+                    ListIterator<Quad> iter = bb.getInsts().listIterator();
+                    while (iter.hasNext()) {
+                        Quad inst = iter.next();
+
+                        if (!(inst instanceof Funcall))
+                            continue;
+                        FuncInfo calleeInfo = funcInfoMap.get(((Funcall) inst).getFunc());
+                        if (calleeInfo == null)
+                            continue; // skip built-in functions
+                        if (calleeInfo.memFunc)
+                            continue;
+                        if (calleeInfo.numInst > MAX_INLINE_INST
+                                || calleeInfo.numInst + funcInfo.numInst > MAX_FUNC_INST)
+                            continue;
+
+                        ListIterator<Quad> newIter = bb.getInsts()
+                                .listIterator(iter.previousIndex());
+                        iter = inlineFuncall(newIter); // iter has to point to next
                         changed = true;
                         thisFuncChanged = true;
+                        funcInfo.numInst += calleeInfo.numInst;
                     }
                 }
-                if (thisFuncChanged) {
-                    irFunction.calcReversePostOrder();
-                }
+
+                if (thisFuncChanged)
+                    irFunc.initReversePostOrder();
             }
         }
-        for (Function irFunction : ir.getFuncs().values()) {
-            irFunction.updateCalleeSet();
-        }
-        ir.updateCalleeSet();
+
+        for (Function irFunc : root.getFunc().values())
+            irFunc.updateCalleeSet();
+        root.updateCalleeSet();
+        // endregion
     }
 
-    private Function genBakUpFunc(Function func) {
-        Function bakFunc = new Function();
-        Map<Object, Object> bbRenameMap = new HashMap<>();
-        for (BasicBlock bb : func.getReversePostOrder()) {
-            bbRenameMap.put(bb, new BasicBlock(bakFunc, bb.getName()));
-        }
-        for (BasicBlock bb : func.getReversePostOrder()) {
-            BasicBlock bakBB = (BasicBlock) bbRenameMap.get(bb);
-            for (IRInstruction inst = bb.getFirstInst(); inst != null; inst = inst.getNextInst()) {
-                if (inst instanceof IRJumpInstruction) {
-                    bakBB.setJumpInst((IRJumpInstruction) inst.copyRename(bbRenameMap));
-                } else {
-                    bakBB.addInst(inst.copyRename(bbRenameMap));
-                }
-            }
-        }
-        bakFunc.setStartBB((BasicBlock) bbRenameMap.get(func.getStartBB()));
-        bakFunc.setEndBB((BasicBlock) bbRenameMap.get(func.getEndBB()));
-        bakFunc.setArgVRegList(func.getArgVRegList());
-        return bakFunc;
-    }
+    /**
+     * iter has to point to next
+     * <p>
+     * make function into block(means inline)
+     * <p>
+     * 
+     * <pre>
+     * // before: inst(selected) iter inst2
+     * // before: newIter inst(selected) inst2
+     * inlineFuncall(iter)
+     * </pre>
+     */
+    private ListIterator<Quad> inlineFuncall(ListIterator<Quad> iter) {
+        Funcall funcCallInst = (Funcall) iter.next();
+        BasicBlock parent = funcCallInst.getParent();
 
-    private IRInstruction inlineFunctionCall(FunctionCall funcCallInst) {
-        Function callerFunc = funcCallInst.getParentBB().getFunc(), calleeFunc;
-        calleeFunc = funcBakUpMap.getOrDefault(funcCallInst.getFunc(), funcCallInst.getFunc());
+        Function callerFunc = funcCallInst.getParent().getFunc();
+        Function calleeFunc = funcBackUpMap.getOrDefault(funcCallInst.getFunc(),
+                funcCallInst.getFunc());
         List<BasicBlock> reversePostOrder = calleeFunc.getReversePostOrder();
 
         Map<Object, Object> renameMap = new HashMap<>();
-        BasicBlock oldEndBB = calleeFunc.getEndBB();
+        BasicBlock oldEndBB = calleeFunc.end;
         BasicBlock newEndBB = new BasicBlock(callerFunc, oldEndBB.getName());
         renameMap.put(oldEndBB, newEndBB);
-        renameMap.put(calleeFunc.getStartBB(), funcCallInst.getParentBB());
-        if (callerFunc.getEndBB() == funcCallInst.getParentBB()) {
-            callerFunc.setEndBB(newEndBB);
+        renameMap.put(calleeFunc.start, funcCallInst.getParent());
+
+        // FIX: ???
+        if (oldEndBB == funcCallInst.getParent()) {
+            oldEndBB = newEndBB;
         }
 
-        Map<Object, Object> callBBRenameMap = Collections.singletonMap(funcCallInst.getParentBB(), newEndBB);
-        for (IRInstruction inst = funcCallInst.getNextInst(); inst != null; inst = inst.getNextInst()) {
-            if (inst instanceof IRJumpInstruction) {
-                newEndBB.setJumpInst(((IRJumpInstruction) inst).copyRename(callBBRenameMap));
+        Map<Object, Object> callBBRenameMap = Collections
+                .singletonMap(funcCallInst.getParent(), newEndBB);
+        while (iter.hasNext()) {
+            Quad inst = iter.next();
+
+            if (inst instanceof JumpQuad) {
+                newEndBB.setJump((JumpQuad) ((JumpQuad) inst).copyRename(callBBRenameMap));
             } else {
-                newEndBB.addInst(inst.copyRename(callBBRenameMap));
+                newEndBB.addLastInst(inst.copyRename(callBBRenameMap));
             }
-            inst.remove();
+            parent.removeInst(iter);
         }
-        IRInstruction newEndBBFisrtInst = newEndBB.getFirstInst();
+
+        Quad newEndBBFisrtInst = newEndBB.getInsts().getFirst();
         for (int i = 0; i < funcCallInst.getArgs().size(); ++i) {
-            VirtualRegister oldArgVreg = calleeFunc.getArgVRegList().get(i);
+            VirtualRegister oldArgVreg = calleeFunc.argVReg.get(i);
             VirtualRegister newArgVreg = oldArgVreg.copy();
-            funcCallInst.prependInst(new IRMove(funcCallInst.getParentBB(), newArgVreg, funcCallInst.getArgs().get(i)));
+
+            parent.addBeforeInst(iter, new Move(funcCallInst.getParent(), newArgVreg,
+                    funcCallInst.getArgs().get(i)));
             renameMap.put(oldArgVreg, newArgVreg);
         }
-        funcCallInst.remove();
+
+        parent.removeInst(iter);
+
         for (BasicBlock bb : reversePostOrder) {
-            if (!renameMap.containsKey(bb)) {
+            if (!renameMap.containsKey(bb))
                 renameMap.put(bb, new BasicBlock(callerFunc, bb.getName()));
-            }
         }
+
         for (BasicBlock oldBB : reversePostOrder) {
             BasicBlock newBB = (BasicBlock) renameMap.get(oldBB);
             if (oldBB.forNode != null) {
-                IRRoot.ForRecord forRec = ir.forRecMap.get(oldBB.forNode);
-                if (forRec.condBB == oldBB) forRec.condBB = newBB;
-                if (forRec.stepBB == oldBB) forRec.stepBB = newBB;
-                if (forRec.bodyBB == oldBB) forRec.bodyBB = newBB;
-                if (forRec.afterBB == oldBB) forRec.afterBB = newBB;
+                Root.ForRecord forRec = root.forRecMap.get(oldBB.forNode);
+                if (forRec.cond == oldBB)
+                    forRec.cond = newBB;
+                if (forRec.incr == oldBB)
+                    forRec.incr = newBB;
+                if (forRec.body == oldBB)
+                    forRec.body = newBB;
+                if (forRec.after == oldBB)
+                    forRec.after = newBB;
             }
-            for (IRInstruction inst = oldBB.getFirstInst(); inst != null; inst = inst.getNextInst()) {
-                for (RegValue usedRegValue : inst.getUsedRegValues()) {
+
+            iter = oldBB.getInsts().listIterator();
+            while (iter.hasNext()) {
+                Quad inst = iter.next();
+                for (RegValue usedRegValue : inst.usedRegValues) {
                     copyRegValue(renameMap, usedRegValue);
                 }
                 if (inst.getDefinedRegister() != null) {
                     copyRegValue(renameMap, inst.getDefinedRegister());
                 }
                 if (newBB == newEndBB) {
-                    if (!(inst instanceof IRReturn)) {
-                        newEndBBFisrtInst.prependInst(inst.copyRename(renameMap));
-                    }
+                    if (!(inst instanceof Return))
+                        // newEndBBFisrtInst.prependInst(inst.copyRename(renameMap));
+                        newEndBB.getInsts().addFirst(inst.copyRename(renameMap));
+
                 } else {
-                    if (inst instanceof IRJumpInstruction) {
-                        if (!(inst instanceof IRReturn)) {
-                            newBB.setJumpInst(((IRJumpInstruction) inst).copyRename(renameMap));
+                    if (inst instanceof JumpQuad) {
+                        if (!(inst instanceof Return)) {
+                            newBB.setJump((JumpQuad) ((JumpQuad) inst).copyRename(renameMap));
                         }
                     } else {
-                        newBB.addInst(inst.copyRename(renameMap));
+                        newBB.addLastInst(inst.copyRename(renameMap));
                     }
                 }
             }
         }
-        if (!funcCallInst.getParentBB().isHasJumpInst()) {
-            funcCallInst.getParentBB().setJumpInst(new IRJump(funcCallInst.getParentBB(), newEndBB));
+        if (!funcCallInst.getParent().hasJump()) {
+            funcCallInst.getParent().setJump(new Jump(funcCallInst.getParent(), newEndBB));
         }
-        IRReturn returnInst = calleeFunc.getRetInstList().get(0);
-        if (returnInst.getRetValue() != null) {
-            newEndBBFisrtInst.prependInst(new IRMove(newEndBB, funcCallInst.getDest(), (RegValue) renameMap.get(returnInst.getRetValue())));
-        }
+        Return returnInst = calleeFunc.returns.get(0);
+        if (returnInst.getReturnValue() != null) {
+            // newEndBBFisrtInst.prependInst(new IRMove(newEndBB, funcCallInst.getDest(),
+            //         (RegValue) renameMap.get(returnInst.getRetValue())));
+            newEndBB.getInsts().addFirst(new Move(newEndBB, funcCallInst.getDst(),
+                    (RegValue) renameMap.get(returnInst.getReturnValue())));
 
-        return newEndBB.getFirstInst();
+        }
+        return newEndBB.getInsts().listIterator(); /// may change iter
     }
 
     private void copyRegValue(Map<Object, Object> renameMap, RegValue regValue) {
-        if (!renameMap.containsKey(regValue)) 
+        if (!renameMap.containsKey(regValue))
             renameMap.put(regValue, regValue.copy());
     }
     // endregion

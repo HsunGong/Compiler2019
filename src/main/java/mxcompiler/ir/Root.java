@@ -20,8 +20,8 @@ public class Root {
         initBuiltInFunc();
     }
 
-    private Map<String, Function> builtInFuncs = new HashMap<>();
     // region builtinFun
+    private Map<String, Function> builtInFuncs = new HashMap<>();
 
     private void addFunc(String name, String label) {
         Function func;
@@ -65,8 +65,8 @@ public class Root {
     }
     // endregion
 
-    private Map<String, Function> funcs = new HashMap<>();
     // region funcs
+    private Map<String, Function> funcs = new HashMap<>();
 
     public Map<String, Function> getFunc() {
         return funcs;
@@ -86,11 +86,10 @@ public class Root {
     }
     // endregion
 
-    private Map<String, StaticString> staticStrs = new HashMap<>(); // Map<String,
-                                                                    // StaticString>
-    private List<StaticData> staticDataList = new ArrayList<>();
     // region static
-
+    private Map<String, StaticString> staticStrs = new HashMap<>(); 
+    private List<StaticData> staticDataList = new ArrayList<>();
+    
     public Map<String, StaticString> getStaticStr() {
         return staticStrs;
     }
@@ -127,26 +126,28 @@ public class Root {
     }
 
     public void updateCalleeSet() {
-        // Set<IRFunction> recursiveCalleeSet = new HashSet<>();
-        // for (IRFunction irFunction : funcs.values()) {
-        //     irFunction.recursiveCalleeSet.clear();
-        // }
-        // boolean changed = true;
-        // while (changed) {
-        //     changed = false;
-        //     for (IRFunction irFunction : funcs.values()) {
-        //         recursiveCalleeSet.clear();
-        //         recursiveCalleeSet.addAll(irFunction.calleeSet);
-        //         for (IRFunction calleeFunction : irFunction.calleeSet) {
-        //             recursiveCalleeSet.addAll(calleeFunction.recursiveCalleeSet);
-        //         }
-        //         if (!recursiveCalleeSet.equals(irFunction.recursiveCalleeSet)) {
-        //             irFunction.recursiveCalleeSet.clear();
-        //             irFunction.recursiveCalleeSet.addAll(recursiveCalleeSet);
-        //             changed = true;
-        //         }
-        //     }
-        // }
+        Set<Function> recursiveCalleeSet = new HashSet<>();
+        for (Function irFunc : funcs.values()) {
+            irFunc.recursiveCalleeSet.clear();
+        }
+
+
+        boolean changed;
+        do {
+            changed = false;
+            for (Function irFunc : funcs.values()) {
+                recursiveCalleeSet.clear();
+                recursiveCalleeSet.addAll(irFunc.calleeSet);
+                for (Function calleeFunction : irFunc.calleeSet) {
+                    recursiveCalleeSet.addAll(calleeFunction.recursiveCalleeSet);
+                }
+                if (!recursiveCalleeSet.equals(irFunc.recursiveCalleeSet)) {
+                    irFunc.recursiveCalleeSet.clear();
+                    irFunc.recursiveCalleeSet.addAll(recursiveCalleeSet);
+                    changed = true;
+                }
+            }
+        } while (changed);
     }
 
     public void accept(IRVisitor visitor) {

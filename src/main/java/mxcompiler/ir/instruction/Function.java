@@ -17,6 +17,10 @@ public class Function {
 
     public List<Return> returns = new ArrayList<>();
 
+    // public Function() {
+    //     entity = null;
+    // }
+
     public Function(String name, String builtInLabel) {
         this.name = name;
         this.builtInLabel = builtInLabel;
@@ -105,11 +109,11 @@ public class Function {
 
     public List<BasicBlock> getReversePreOrder() {
         if (reversePreOrder == null)
-            calcReversePreOrder();
+            initReversePreOrder();
         return reversePreOrder;
     }
 
-    public void calcReversePreOrder() {
+    public void initReversePreOrder() {
         reversePreOrder = new ArrayList<>();
 
         dfsVisited = new HashSet<>();

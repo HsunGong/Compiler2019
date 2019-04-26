@@ -36,11 +36,38 @@ public class HeapAlloc extends Quad {
 
     @Override
     public HeapAlloc copyRename(Map<Object, Object> renameMap) {
-        return new HeapAlloc(
-                (BasicBlock) renameMap.getOrDefault(parent, parent),
+        return new HeapAlloc((BasicBlock) renameMap.getOrDefault(parent, parent),
                 (Register) renameMap.getOrDefault(dst, dst),
-                (RegValue) renameMap.getOrDefault(allocSize, allocSize)
-        );
+                (RegValue) renameMap.getOrDefault(allocSize, allocSize));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void reloadUsedRegs() {
+        usedRegisters.clear();
+        usedRegValues.clear();
+        if (allocSize instanceof Register)
+            usedRegisters.add((Register) allocSize);
+        usedRegValues.add(allocSize);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUsedRegisters(Map<Register, Register> renameMap) {
+        if (allocSize instanceof Register)
+            allocSize = renameMap.get(allocSize);
+        reloadUsedRegs();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Register getDefinedRegister() {
+        return (Register) dst;
+    }
+
+    @Override
+    public void setDefinedRegister(Register vreg) {
+        dst = vreg;
     }
 
     public void _dump(Dump d) {

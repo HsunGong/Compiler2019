@@ -23,6 +23,8 @@ public class Bin extends Quad {
 
     public Bin(BasicBlock parent, RegValue destion, Op op, RegValue lhs, RegValue rhs) {
         super(parent);
+        if (!(destion instanceof Register))
+            throw new CompileError("Error init destion");
         this.dst = destion;
         this.lhs = lhs;
         this.rhs = rhs;
@@ -64,12 +66,48 @@ public class Bin extends Quad {
                 || op == Op.BIT_XOR;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Bin copyRename(Map<Object, Object> renameMap) {
         return new Bin((BasicBlock) renameMap.getOrDefault(parent, parent),
                 (Register) renameMap.getOrDefault(dst, dst), op,
                 (RegValue) renameMap.getOrDefault(lhs, lhs),
                 (RegValue) renameMap.getOrDefault(rhs, rhs));
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    protected void reloadUsedRegs() {
+        usedRegisters.clear();
+        usedRegValues.clear();
+        if (lhs instanceof Register)
+            usedRegisters.add((Register) lhs);
+        if (rhs instanceof Register)
+            usedRegisters.add((Register) rhs);
+        usedRegValues.add(lhs);
+        usedRegValues.add(rhs);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setUsedRegisters(Map<Register, Register> renameMap) {
+        if (lhs instanceof Register)
+            lhs = renameMap.get(lhs);
+        if (rhs instanceof Register)
+            rhs = renameMap.get(rhs);
+        reloadUsedRegs();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Register getDefinedRegister() {
+        return (Register) dst;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public void setDefinedRegister(Register vreg) {
+        dst = vreg;
     }
 
     public void accept(IRVisitor visitor) {
