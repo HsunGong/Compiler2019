@@ -1418,14 +1418,21 @@ public class IRBuilder extends Visitor {
 
     private void FuncInlineProcess() {
         // pre-resolve
+<<<<<<< HEAD
         for (Function irFunc : root.getFunc().values()) { // add func
             irFunc.isRecursiveCall = irFunc.recursiveCalleeSet.contains(irFunc);
             FuncInfo funcInfo = new FuncInfo();
 
+=======
+        for (Function irFunc : root.getFunc().values()) {
+            irFunc.isRecursiveCall = irFunc.recursiveCalleeSet.contains(irFunc);
+            FuncInfo funcInfo = new FuncInfo();
+>>>>>>> master
             funcInfo.recursiveCall = irFunc.isRecursiveCall;
             funcInfo.memFunc = irFunc.isMemFunc;
             funcInfoMap.put(irFunc, funcInfo);
         }
+<<<<<<< HEAD
         for (Function irFunc : root.getFunc().values()) { // add calleeInfo
             FuncInfo funcInfo = funcInfoMap.get(irFunc);
 
@@ -1437,10 +1444,22 @@ public class IRBuilder extends Visitor {
                         FuncInfo calleeInfo = funcInfoMap.get(((Funcall) inst).getFunc());
 
                         if (calleeInfo != null)
+=======
+        for (Function irFunc : root.getFunc().values()) {
+            FuncInfo funcInfo = funcInfoMap.get(irFunc);
+
+            for (BasicBlock bb : irFunc.getReversePostOrder()) 
+                for (Quad inst : bb.getInsts()) {
+                    ++funcInfo.numInst;
+                    
+                    if (inst instanceof Funcall) {
+                        FuncInfo calleeInfo = funcInfoMap.get(((Funcall) inst).getFunc());
+                        
+                        if (calleeInfo != null) 
+>>>>>>> master
                             ++calleeInfo.numCalled;
                     }
                 }
-            }
         }
 
         // region remove unused function
@@ -1453,8 +1472,15 @@ public class IRBuilder extends Visitor {
         do {
             changed = false;
             unCalledFuncs.clear();
+<<<<<<< HEAD
 
             for (Function irFunc : root.getFunc().values()) {
+=======
+            for (Function irFunc : ir.getFunc().values()) {
+                FuncInfo funcInfo = funcInfoMap.get(irFunc);
+                reversePostOrder.clear();
+                reversePostOrder.addAll(irFunc.getReversePostOrder());
+>>>>>>> master
                 thisFuncChanged = false;
 
                 FuncInfo funcInfo = funcInfoMap.get(irFunc);
@@ -1491,9 +1517,18 @@ public class IRBuilder extends Visitor {
                             unCalledFuncs.add(((Funcall) inst).getFunc().getName());
                     }
                 }
+<<<<<<< HEAD
 
                 if (thisFuncChanged)
                     irFunc.initReversePostOrder();
+=======
+                if (thisFuncChanged) {
+                    irFunc.calcReversePostOrder();
+                }
+            }
+            for (String funcName : unCalledFuncs) {
+                ir.removeFunc(funcName);
+>>>>>>> master
             }
 
             // del-func
@@ -1504,8 +1539,15 @@ public class IRBuilder extends Visitor {
         for (Function irFunc : root.getFunc().values()) {
             irFunc.updateCalleeSet();
         }
+<<<<<<< HEAD
         root.updateCalleeSet();
         // endregion
+=======
+        for (Function irFunc : ir.getFunc().values()) {
+            irFunc.updateCalleeSet();
+        }
+        ir.updateCalleeSet();
+>>>>>>> master
 
         // region inline recursive functions
         reversePostOrder = new ArrayList<>();
@@ -1515,6 +1557,7 @@ public class IRBuilder extends Visitor {
             changed = false;
 
             // bak up self recursive functions
+<<<<<<< HEAD
             funcBackUpMap.clear();
             for (Function irFunc : root.getFunc().values()) {
                 FuncInfo funcInfo = funcInfoMap.get(irFunc);
@@ -1524,6 +1567,16 @@ public class IRBuilder extends Visitor {
             }
 
             for (Function irFunc : root.getFunc().values()) {
+=======
+            funcBakUpMap.clear();
+            for (Function irFunc : ir.getFunc().values()) {
+                FuncInfo funcInfo = funcInfoMap.get(irFunc);
+                if (!funcInfo.recursiveCall) continue;
+                funcBakUpMap.put(irFunc, genBakUpFunc(irFunc));
+            }
+
+            for (Function irFunc : ir.getFunc().values()) {
+>>>>>>> master
                 FuncInfo funcInfo = funcInfoMap.get(irFunc);
                 reversePostOrder.clear();
                 reversePostOrder.addAll(irFunc.getReversePostOrder());
@@ -1553,6 +1606,19 @@ public class IRBuilder extends Visitor {
                         funcInfo.numInst += calleeInfo.numInst;
                     }
                 }
+<<<<<<< HEAD
+=======
+                if (thisFuncChanged) {
+                    irFunc.calcReversePostOrder();
+                }
+            }
+        }
+        for (Function irFunc : ir.getFunc().values()) {
+            irFunc.updateCalleeSet();
+        }
+        ir.updateCalleeSet();
+    }
+>>>>>>> master
 
                 if (thisFuncChanged)
                     irFunc.initReversePostOrder();
