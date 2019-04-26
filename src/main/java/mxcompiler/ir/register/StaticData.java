@@ -1,11 +1,11 @@
 package mxcompiler.ir.register;
 
-abstract public class StaticData extends RegValue {
-    private String name;
+abstract public class StaticData extends Register {
+    // private String name;
     private int size;
 
     public StaticData(String name, int size) {
-        this.name = name;
+        super(name);
         this.size = size;
     }
 

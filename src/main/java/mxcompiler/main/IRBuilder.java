@@ -99,6 +99,7 @@ public class IRBuilder extends Visitor {
 
         TwoRegOpTransformer();
         FuncInlineProcess();
+        StaticDataProcess();
     }
 
     // ----------------- global var func-init -----------------
@@ -1671,8 +1672,9 @@ public class IRBuilder extends Visitor {
         }
         Return returnInst = calleeFunc.returns.get(0);
         if (returnInst.getReturnValue() != null) {
-            // newEndBBFisrtInst.prependInst(new IRMove(newEndBB, funcCallInst.getDest(),
-            //         (RegValue) renameMap.get(returnInst.getRetValue())));
+            // newEndBBFisrtInst.prependInst(new IRMove(newEndBB,
+            // funcCallInst.getDest(),
+            // (RegValue) renameMap.get(returnInst.getRetValue())));
             newEndBB.getInsts().addFirst(new Move(newEndBB, funcCallInst.getDst(),
                     (RegValue) renameMap.get(returnInst.getReturnValue())));
 
@@ -1684,5 +1686,145 @@ public class IRBuilder extends Visitor {
         if (!renameMap.containsKey(regValue))
             renameMap.put(regValue, regValue.copy());
     }
+    // endregion
+
+    // region StaticData process
+    private class FuncDataInfo {
+        Set<StaticData> definedStaticData = new HashSet<>();
+        Set<StaticData> recursiveDefinedStaticData = new HashSet<>();
+        Set<StaticData> recursiveUsedStaticData = new HashSet<>();
+        Map<StaticData, VirtualRegister> staticDataVregMap = new HashMap<>();
+    }
+
+    private Map<Function, FuncDataInfo> funcDataInfoMap = new HashMap<>();
+
+    private boolean isStaticLoadStore(Quad inst) {
+        return (inst instanceof Load && ((Load) inst).isStaticData())
+                || (inst instanceof Store && ((Store) inst).isStaticData());
+    }
+
+    private VirtualRegister getStaticDataVreg(
+            Map<StaticData, VirtualRegister> staticDataVregMap, StaticData staticData) {
+        VirtualRegister vreg = staticDataVregMap.get(staticData);
+        if (vreg == null) {
+            vreg = new VirtualRegister(staticData.getName());
+            staticDataVregMap.put(staticData, vreg);
+        }
+        return vreg;
+    }
+
+    public void StaticDataProcess() {
+        for (Function Function : root.getFunc().values()) {
+            FuncDataInfo funcInfo = new FuncDataInfo();
+            funcDataInfoMap.put(Function, funcInfo);
+            Map<Register, Register> renameMap = new HashMap<>();
+            for (BasicBlock bb : Function.getReversePostOrder()) {
+                for (Quad inst: bb.getInsts()) {
+                    if (isStaticLoadStore(inst))
+                        continue;
+                    List<Register> usedRegisters = inst.usedRegisters;
+                    if (!usedRegisters.isEmpty()) {
+                        renameMap.clear();
+                        for (Register reg : usedRegisters) {
+                            if ((reg instanceof StaticData) && !(reg instanceof StaticString)) {
+                                renameMap.put(reg, getStaticDataVreg(
+                                        funcInfo.staticDataVregMap, (StaticData) reg));
+                            } else {
+                                renameMap.put(reg, reg);
+                            }
+                        }
+                        inst.setUsedRegisters(renameMap);
+                    }
+                    Register definedRegister = inst.getDefinedRegister();
+                    if (definedRegister != null && definedRegister instanceof StaticData) {
+                        VirtualRegister vreg = getStaticDataVreg(funcInfo.staticDataVregMap,
+                                (StaticData) definedRegister);
+                        inst.setDefinedRegister(vreg);
+                        funcInfo.definedStaticData.add((StaticData) definedRegister);
+                    }
+                }
+            }
+
+            // load static data at the beginning of function
+            BasicBlock startBB = Function.start;
+            Quad firtInst = startBB.getFirstInst();
+            funcInfo.staticDataVregMap.forEach((staticData, virtualRegister) -> firtInst
+                    .prependInst(new Load(startBB, virtualRegister, RegValue.RegSize,
+                            staticData, staticData instanceof StaticString)));
+        }
+
+        for (Function builtFunc : root.getBuiltInFunc().values()) {
+            funcDataInfoMap.put(builtFunc, new FuncDataInfo());
+        }
+        for (Function Function : root.getFunc().values()) {
+            FuncDataInfo funcInfo = funcDataInfoMap.get(Function);
+            funcInfo.recursiveUsedStaticData.addAll(funcInfo.staticDataVregMap.keySet());
+            funcInfo.recursiveDefinedStaticData.addAll(funcInfo.definedStaticData);
+            for (Function calleeFunc : Function.recursiveCalleeSet) {
+                FuncDataInfo calleeFuncInfo = funcDataInfoMap.get(calleeFunc);
+                funcInfo.recursiveUsedStaticData
+                        .addAll(calleeFuncInfo.staticDataVregMap.keySet());
+                funcInfo.recursiveDefinedStaticData.addAll(calleeFuncInfo.definedStaticData);
+            }
+        }
+
+        for (Function Function : root.getFunc().values()) {
+            FuncDataInfo funcInfo = funcDataInfoMap.get(Function);
+            Set<StaticData> usedStaticData = funcInfo.staticDataVregMap.keySet();
+            if (usedStaticData.isEmpty())
+                continue;
+            for (BasicBlock bb : Function.getReversePostOrder()) {
+                ListIterator<Quad> iter = bb.getInsts().listIterator();
+                while (iter.hasNext()) {
+                    Quad inst = iter.next();
+                    if (!(inst instanceof Funcall))
+                        continue;
+                    Function calleeFunc = ((Funcall) inst).getFunc();
+                    FuncDataInfo calleeFuncInfo = funcDataInfoMap.get(calleeFunc);
+                    // store defined static data before function call
+                    for (StaticData staticData : funcInfo.definedStaticData) {
+                        if (staticData instanceof StaticString)
+                            continue;
+                        if (calleeFuncInfo.recursiveUsedStaticData.contains(staticData)) {
+                            bb.addBeforeInst(iter,
+                                    new Store(bb, funcInfo.staticDataVregMap.get(staticData),
+                                            RegValue.RegSize, staticData));
+                        }
+                    }
+                    // load used static data after function call
+                    if (calleeFuncInfo.recursiveDefinedStaticData.isEmpty())
+                        continue;
+                    Set<StaticData> loadStaticDataSet = new HashSet<>();
+                    loadStaticDataSet.addAll(calleeFuncInfo.recursiveDefinedStaticData);
+                    loadStaticDataSet.retainAll(usedStaticData);
+                    for (StaticData staticData : loadStaticDataSet) {
+                        if (staticData instanceof StaticString)
+                            continue;
+                        bb.addBeforeInst(iter,
+                                new Load(bb, funcInfo.staticDataVregMap.get(staticData),
+                                        RegValue.RegSize, staticData,
+                                        staticData instanceof StaticString));
+                    }
+                }
+            }
+        }
+
+        for (Function Function : root.getFunc().values()) {
+            FuncDataInfo funcInfo = funcDataInfoMap.get(Function);
+
+            // store defined data at the end of function
+            Return retInst = Function.returns.get(0);
+            BasicBlock retBB = retInst.getParent();
+            retBB.delLastInst(retInst);
+
+            for (StaticData staticData : funcInfo.definedStaticData) {
+                retBB.addLastInst(new Store(retInst.getParent(),
+                        funcInfo.staticDataVregMap.get(staticData), RegValue.RegSize,
+                        staticData));
+            }
+            retBB.addLastInst(retInst);
+        }
+    }
+
     // endregion
 }
