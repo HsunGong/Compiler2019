@@ -1,5 +1,7 @@
 package mxcompiler.ir.instruction;
 
+import java.util.Map;
+
 import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
@@ -32,14 +34,14 @@ public class HeapAlloc extends Quad {
         return allocSize;
     }
 
-    // @Override
-    // public IRHeapAlloc copyRename(Map<Object, Object>
-    // renameMap) {
-    // return new IRHeapAlloc((BasicBlock)
-    // renameMap.getOrDefault(getParentBB(), getParentBB()),
-    // (IRRegister) renameMap.getOrDefault(dest, dest),
-    // (RegValue) renameMap.getOrDefault(allocSize, allocSize));
-    // }
+    @Override
+    public HeapAlloc copyRename(Map<Object, Object> renameMap) {
+        return new HeapAlloc(
+                (BasicBlock) renameMap.getOrDefault(parent, parent),
+                (Register) renameMap.getOrDefault(dst, dst),
+                (RegValue) renameMap.getOrDefault(allocSize, allocSize)
+        );
+    }
 
     public void _dump(Dump d) {
         d.println("alloc mme");

@@ -12,9 +12,11 @@ import mxcompiler.error.CompileError;
 public class BasicBlock {
     private Function func;
     private String name;
-    // private int ord
 
     public ForStmtNode forNode;
+
+    public int postOrder, preOrder; // get order of cfg
+
 
     public BasicBlock(Function func, String name) {
         this.func = func;
@@ -29,9 +31,7 @@ public class BasicBlock {
         return func;
     }
 
-    // region prev-next BB
-
-    // double direction
+    // region prev-next BB <-- double direction
     private Set<BasicBlock> prev = new HashSet<>();
     private Set<BasicBlock> next = new HashSet<>(); // may be linked-List
 
@@ -62,12 +62,9 @@ public class BasicBlock {
     public Set<BasicBlock> getNext() {
         return next;
     }
-
     // endregion
 
-    // FIX:??
-    // public int postOrderIdx, preOrderIdx;
-
+    // region insts
     private LinkedList<Quad> insts = new LinkedList<>();
     private boolean hasJump = false; // hasJumpInst
 
@@ -84,7 +81,7 @@ public class BasicBlock {
         insts.addLast(inst);
     }
 
-    /** 
+    /**
      * double check
      */
     public void delLastInst(Quad inst) {
@@ -96,7 +93,8 @@ public class BasicBlock {
             insts.removeLast();
     }
 
-    /** remove
+    /**
+     * remove
      * <p>
      * illigal: don't have iter.next() after origin
      * 
@@ -118,7 +116,8 @@ public class BasicBlock {
             iter.remove(); // remove inst
     }
 
-    /** append
+    /**
+     * append
      * <p>
      * illigal: don't have iter.next() after origin
      * 
@@ -134,7 +133,8 @@ public class BasicBlock {
         iter.add(newInst);
     }
 
-    /** prepend
+    /**
+     * prepend
      * <p>
      * illigal: don't have iter.next() before
      * 
@@ -155,7 +155,8 @@ public class BasicBlock {
         iter.next(); // get return_iter
     }
 
-    /** replace
+    /**
+     * replace
      * 
      * <pre>
      * // origin:  iter inst(will select) inst2
@@ -223,6 +224,8 @@ public class BasicBlock {
             func.returns.remove(x);
         }
     }
+    // endregion
+
     // endregion
 
     public void accept(IRVisitor visitor) {

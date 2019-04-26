@@ -1,8 +1,11 @@
 package mxcompiler.ir.instruction;
 
+import java.util.Map;
+
 import mxcompiler.ast.expression.BinaryOpExprNode.Op;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
+import mxcompiler.ir.register.Register;
 import mxcompiler.utils.Dump;
 
 
@@ -16,6 +19,17 @@ public class Cmp extends Bin {
     public Cmp(BasicBlock parent, RegValue destion, Op op, RegValue lhs, RegValue rhs) {
         super(parent, destion, op, lhs, rhs);
         // reloadUsedRegistersRegValues();
+    }
+
+    @Override
+    public Cmp copyRename(Map<Object, Object> renameMap) {
+        return new Cmp(
+                (BasicBlock) renameMap.getOrDefault(parent, parent),
+                (Register) renameMap.getOrDefault(dst, dst),
+                op,
+                (RegValue) renameMap.getOrDefault(lhs, lhs),
+                (RegValue) renameMap.getOrDefault(rhs, rhs)
+        );
     }
 
     @Override

@@ -1,5 +1,7 @@
 package mxcompiler.ir.instruction;
 
+import java.util.Map;
+
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.utils.Dump;
 
@@ -16,13 +18,11 @@ public class Jump extends JumpQuad {
         return target;
     }
 
-    // @Override
-    // public IRJump copyRename(Map<Object, Object> renameMap) {
-    // return new IRJump(
-    // (BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
-    // (BasicBlock) renameMap.getOrDefault(targetBB, targetBB)
-    // );
-    // }
+    @Override
+    public Jump copyRename(Map<Object, Object> renameMap) {
+        return new Jump((BasicBlock) renameMap.getOrDefault(parent, parent),
+                (BasicBlock) renameMap.getOrDefault(target, target));
+    }
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

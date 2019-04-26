@@ -1,9 +1,12 @@
 package mxcompiler.ir.instruction;
 
+import java.util.Map;
+
 import mxcompiler.ast.expression.BinaryOpExprNode.Op;
 import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
+import mxcompiler.ir.register.Register;
 import mxcompiler.utils.Dump;
 
 
@@ -61,17 +64,13 @@ public class Bin extends Quad {
                 || op == Op.BIT_XOR;
     }
 
-    // @Override
-    // public IRUnaryOperation copyRename(Map<Object, Object>
-    // renameMap) {
-    // return new IRUnaryOperation(
-    // (BasicBlock) renameMap.getOrDefault(getParentBB(),
-    // getParentBB()),
-    // (IRRegister) renameMap.getOrDefault(dest, dest),
-    // op,
-    // (RegValue) renameMap.getOrDefault(rhs, rhs)
-    // );
-    // }
+    @Override
+    public Bin copyRename(Map<Object, Object> renameMap) {
+        return new Bin((BasicBlock) renameMap.getOrDefault(parent, parent),
+                (Register) renameMap.getOrDefault(dst, dst), op,
+                (RegValue) renameMap.getOrDefault(lhs, lhs),
+                (RegValue) renameMap.getOrDefault(rhs, rhs));
+    }
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

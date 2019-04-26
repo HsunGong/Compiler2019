@@ -1,5 +1,7 @@
 package mxcompiler.ir.instruction;
 
+import java.util.Map;
+
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
 import mxcompiler.ir.register.StaticData;
@@ -13,7 +15,8 @@ public class Store extends Quad {
     private int offset;
     private boolean isStaticData;
 
-    public Store(BasicBlock parent, RegValue value, int size, RegValue baseAddr, int addrOffset) {
+    public Store(BasicBlock parent, RegValue value, int size, RegValue baseAddr,
+            int addrOffset) {
         super(parent);
         if (size == 0)
             System.err.println("bad size 0");
@@ -44,26 +47,18 @@ public class Store extends Quad {
         return isStaticData;
     }
 
-    // @Override
-    // public IRStore copyRename(Map<Object, Object> renameMap) {
-    //     if (isStaticData) {
-    //         return new IRStore(
-    //                 (BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
-    //                 (RegValue) renameMap.getOrDefault(value, value),
-    //                 size,
-    //                 (StaticData) renameMap.getOrDefault(addr, addr)
-    //         );
-    //     } else {
-    //         return new IRStore(
-    //                 (BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
-    //                 (RegValue) renameMap.getOrDefault(value, value),
-    //                 size,
-    //                 (RegValue) renameMap.getOrDefault(addr, addr),
-    //                 addrOffset
-    //         );
-    //     }
-    // }
-
+    @Override
+    public Store copyRename(Map<Object, Object> renameMap) {
+        if (isStaticData) {
+            return new Store((BasicBlock) renameMap.getOrDefault(parent, parent),
+                    (RegValue) renameMap.getOrDefault(value, value), size,
+                    (StaticData) renameMap.getOrDefault(baseAddr, baseAddr));
+        } else {
+            return new Store((BasicBlock) renameMap.getOrDefault(parent, parent),
+                    (RegValue) renameMap.getOrDefault(value, value), size,
+                    (RegValue) renameMap.getOrDefault(baseAddr, baseAddr), offset);
+        }
+    }
 
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

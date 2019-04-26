@@ -1,7 +1,10 @@
 package mxcompiler.ir.instruction;
 
+import java.util.Map;
+
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
+import mxcompiler.ir.register.Register;
 import mxcompiler.utils.Dump;
 
 
@@ -25,6 +28,13 @@ public class Move extends Quad {
 
     public RegValue getRhs() {
         return rhs;
+    }
+
+    @Override
+    public Move copyRename(Map<Object, Object> renameMap) {
+        return new Move((BasicBlock) renameMap.getOrDefault(parent, parent),
+                (Register) renameMap.getOrDefault(dst, dst),
+                (RegValue) renameMap.getOrDefault(rhs, rhs));
     }
 
     public void accept(IRVisitor visitor) {

@@ -1,10 +1,13 @@
 package mxcompiler.ir.instruction;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
+import mxcompiler.ir.register.VirtualRegister;
 import mxcompiler.utils.Dump;
 
 
@@ -36,20 +39,20 @@ public class Funcall extends Quad {
         return dst;
     }
 
-    // @Override
-    // public IRFunctionCall copyRename(Map<Object, Object> renameMap) {
-    // List<RegValue> copyArgs = new ArrayList<>();
-    // for (RegValue arg : args) {
-    // copyArgs.add((RegValue) renameMap.getOrDefault(arg, arg));
-    // }
-    // return new IRFunctionCall(
-    // (BasicBlock) renameMap.getOrDefault(getParentBB(), getParentBB()),
-    // func,
-    // copyArgs,
-    // (VirtualRegister) renameMap.getOrDefault(dest, dest)
-    // );
-    // }
 
+    @Override
+    public Funcall copyRename(Map<Object, Object> renameMap) {
+        List<RegValue> copyArgs = new ArrayList<>();
+        for (RegValue arg : args) {
+            copyArgs.add((RegValue) renameMap.getOrDefault(arg, arg));
+        }
+        return new Funcall(
+                (BasicBlock) renameMap.getOrDefault(parent, parent),
+                func,
+                copyArgs,
+                (VirtualRegister) renameMap.getOrDefault(dst, dst)
+        );
+    }
     
     public void accept(IRVisitor visitor) {
         visitor.visit(this);

@@ -1,12 +1,14 @@
 package mxcompiler.ir.instruction;
 
+import java.util.Map;
+
 import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.utils.Dump;
 
 /** IR-Instruction */
 abstract public class Quad {
-    private BasicBlock parent;
+    protected BasicBlock parent;
     private boolean removed = false;
 
     // public Set<VirtualRegister> liveIn = null, liveOut = null;
@@ -17,15 +19,16 @@ abstract public class Quad {
         this.parent = bb;
     }
 
-    // TODO: public abstract IRInstruction copyRename(Map<Object, Object>
-    // renameMap);
-
-    // prepend: pre -> new -> this -> next
-    // append: pre -> this -> new -> next
-
     public BasicBlock getParent() {
         return parent;
     }
+
+    public abstract Quad copyRename(Map<Object, Object> renameMap);
+
+
+
+
+
 
     abstract public void accept(IRVisitor visitor);
 
