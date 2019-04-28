@@ -18,7 +18,6 @@ import mxcompiler.utils.Dump;
 public class Cmp extends Bin {
     public Cmp(BasicBlock parent, RegValue destion, Op op, RegValue lhs, RegValue rhs) {
         super(parent, destion, op, lhs, rhs);
-        // reloadUsedRegistersRegValues();
     }
 
     @Override

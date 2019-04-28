@@ -68,6 +68,9 @@ public class Root {
     // region funcs
     private Map<String, Function> funcs = new HashMap<>();
 
+    /**
+     * attention: can not get {@code BuiltInFunc}
+     */
     public Map<String, Function> getFunc() {
         return funcs;
     }
@@ -87,9 +90,9 @@ public class Root {
     // endregion
 
     // region static
-    private Map<String, StaticString> staticStrs = new HashMap<>(); 
+    private Map<String, StaticString> staticStrs = new HashMap<>();
     private List<StaticData> staticDataList = new ArrayList<>();
-    
+
     public Map<String, StaticString> getStaticStr() {
         return staticStrs;
     }
@@ -125,12 +128,17 @@ public class Root {
         }
     }
 
+    /**
+     * @Usage update recursiveCallee
+     * @Usage Do {@link #Function.updateCalleeSet()} first
+     */
     public void updateCalleeSet() {
-        Set<Function> recursiveCalleeSet = new HashSet<>();
-        for (Function irFunc : funcs.values()) {
-            irFunc.recursiveCalleeSet.clear();
-        }
+        for (Function irFunc : funcs.values())
+            irFunc.updateCalleeSet();
 
+        Set<Function> recursiveCalleeSet = new HashSet<>();
+        for (Function irFunc : funcs.values())
+            irFunc.recursiveCalleeSet.clear();
 
         boolean changed;
         do {
@@ -138,9 +146,10 @@ public class Root {
             for (Function irFunc : funcs.values()) {
                 recursiveCalleeSet.clear();
                 recursiveCalleeSet.addAll(irFunc.calleeSet);
-                for (Function calleeFunction : irFunc.calleeSet) {
+
+                for (Function calleeFunction : irFunc.calleeSet)
                     recursiveCalleeSet.addAll(calleeFunction.recursiveCalleeSet);
-                }
+
                 if (!recursiveCalleeSet.equals(irFunc.recursiveCalleeSet)) {
                     irFunc.recursiveCalleeSet.clear();
                     irFunc.recursiveCalleeSet.addAll(recursiveCalleeSet);

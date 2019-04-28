@@ -12,6 +12,7 @@ public class Jump extends JumpQuad {
     public Jump(BasicBlock parent, BasicBlock target) {
         super(parent);
         this.target = target;
+        reloadUsedRegs();
     }
 
     public BasicBlock getTarget() {

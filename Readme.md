@@ -173,6 +173,10 @@ PPS: TODO: Using Lianmin Zheng's arch to run test by own!!!!!
 
 ## **TODO: CodeGen**
 
+null check is unnecessary before instanceof
+
+ListIterator of add, remove
+each ListIterator (after function-value-pass) return a value which do not change anything(oldIter) !!!!
 
 # -DTest=
 

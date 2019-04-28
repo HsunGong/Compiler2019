@@ -25,7 +25,7 @@ public class Funcall extends Quad {
         this.args = args;
         this.dst = destion;
 
-        // reloadUsedRegistersRegValues
+        reloadUsedRegs();
     }
 
     public Function getFunc() {

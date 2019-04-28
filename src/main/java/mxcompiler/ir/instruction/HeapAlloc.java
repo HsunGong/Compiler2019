@@ -23,7 +23,7 @@ public class HeapAlloc extends Quad {
             throw new CompileError("Error with register");
         this.dst = destion;
         this.allocSize = allocSize;
-        // reloadUsedRegistersRegValues
+        reloadUsedRegs();
     }
 
     public RegValue getDst() {

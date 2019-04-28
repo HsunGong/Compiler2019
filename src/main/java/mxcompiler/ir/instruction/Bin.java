@@ -29,7 +29,7 @@ public class Bin extends Quad {
         this.lhs = lhs;
         this.rhs = rhs;
         this.op = op;
-        // reloadUsedRegistersRegValues();
+        reloadUsedRegs();
     }
 
     public Op getOp() {

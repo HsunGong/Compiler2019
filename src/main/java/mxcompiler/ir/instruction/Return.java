@@ -15,7 +15,7 @@ public class Return extends JumpQuad {
     public Return(BasicBlock parent, RegValue value) {
         super(parent);
         this.val = value;
-        // reloadUsedRegistersRegValues
+        reloadUsedRegs();
     }
 
     public RegValue getReturnValue() {

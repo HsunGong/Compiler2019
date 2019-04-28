@@ -20,6 +20,7 @@ public class Uni extends Quad {
         this.dst = destion;
         this.rhs = object;
         this.op = op;
+        reloadUsedRegs();
     }
 
     public Op getOp() {
@@ -47,14 +48,16 @@ public class Uni extends Quad {
     public void reloadUsedRegs() {
         usedRegisters.clear();
         usedRegValues.clear();
-        if (rhs instanceof Register) usedRegisters.add((Register) rhs);
+        if (rhs instanceof Register)
+            usedRegisters.add((Register) rhs);
         usedRegValues.add(rhs);
     }
 
     /** {@inheritDoc} */
     @Override
     public void setUsedRegisters(Map<Register, Register> renameMap) {
-        if (rhs instanceof Register) rhs = renameMap.get(rhs);
+        if (rhs instanceof Register)
+            rhs = renameMap.get(rhs);
         reloadUsedRegs();
     }
 

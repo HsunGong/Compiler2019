@@ -71,7 +71,7 @@ public final class Compiler {
 			buildAST();
 			semanticAnalyze();
 
-			// buildIR();
+			buildIR();
 		} catch (Exception e) {
 			throw new Error(e);
 		}

@@ -18,6 +18,7 @@ public class CJump extends JumpQuad {
         this.cond = cond;
         this.thenBB = thenBB;
         this.elseBB = elseBB;
+        reloadUsedRegs();
     }
 
     public RegValue getCond() {

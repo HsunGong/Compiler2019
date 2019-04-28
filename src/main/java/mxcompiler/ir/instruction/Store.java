@@ -25,7 +25,7 @@ public class Store extends Quad {
         this.offset = addrOffset;
         this.size = size;
         this.isStaticData = false;
-        // reloadUsedRegistersRegValues();
+        reloadUsedRegs();
     }
 
     public Store(BasicBlock parent, RegValue value, int size, StaticData addr) {

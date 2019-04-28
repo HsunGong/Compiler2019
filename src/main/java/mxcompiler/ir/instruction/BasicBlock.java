@@ -17,7 +17,6 @@ public class BasicBlock {
 
     public int postOrder, preOrder; // get order of cfg
 
-
     public BasicBlock(Function func, String name) {
         this.func = func;
         this.name = name;
@@ -72,29 +71,24 @@ public class BasicBlock {
         return insts;
     }
 
-    // remove, add indx, del index implement with iter
-    // add, del with last
-    public void addLastInst(Quad inst) {
-        if (hasJump)
-            throw new CompileError("Block is finished");
-
-        insts.addLast(inst);
-    }
-
     /**
-     * double check
+     * Will delete last-Inst(Jump)
+     * 
+     * @can not delete: not the last inst
+     * @can not use: will using iter
      */
-    public void delLastInst(Quad inst) {
-        if (hasJump && inst == insts.getLast())
-            delJump();
-        else if (insts.getLast() != inst || inst instanceof JumpQuad) // FIX: Fine
-            throw new CompileError("Error when del Jump quad");
-        else
-            insts.removeLast();
+    public void delJump(Quad inst) {
+        if (!hasJump || insts.getLast() != inst)
+            throw new CompileError("Error when del Last");
+
+        insts.getLast().removed = true;
+
+        delJumpSideEffect();
+        insts.removeLast();
     }
 
     /**
-     * remove
+     * remove (support Last but not Jump Inst<Already Delete Jump>)
      * <p>
      * illigal: don't have iter.next() after origin
      * 
@@ -106,14 +100,27 @@ public class BasicBlock {
      * // after: iter (inst2)
      * </pre>
      */
-    public void removeInst(ListIterator<Quad> iter) {
-        Quad inst = iter.previous();
-        if (hasJump && inst == insts.getLast())
-            delJump();
-        else if (insts.getLast() != inst || inst instanceof JumpQuad) // FIX: Fine
-            throw new CompileError("Error when del Jump quad");
-        else
-            iter.remove(); // remove inst
+    public ListIterator<Quad> removeInst(ListIterator<Quad> iter) {
+        Quad inst = iter.previous(); // check if inst is removed ??
+        inst.removed = true;
+        if (inst == insts.getLast()) {
+            // only to make sure it is last
+            if (hasJump)
+                delJumpSideEffect();
+        }
+
+        iter.remove(); // remove inst
+        return iter;
+    }
+
+    // remove, add indx, del index implement with iter
+    // add, del with last
+    /** can not do what setJump() does */
+    public void addLastInst(Quad inst) {
+        if (hasJump || inst instanceof JumpQuad)
+            throw new CompileError("Block is finished or can not use this to add JUMP");
+
+        insts.addLast(inst);
     }
 
     /**
@@ -157,6 +164,8 @@ public class BasicBlock {
 
     /**
      * replace
+     * <p>
+     * check Jump outside
      * 
      * <pre>
      * // origin:  iter inst(will select) inst2
@@ -169,6 +178,7 @@ public class BasicBlock {
     public void replaceInst(ListIterator<Quad> iter, Quad newInst) {
         if (!iter.hasPrevious()) // check origin inst
             throw new CompileError("can not get iter.previous");
+
         iter.set(newInst);
     }
 
@@ -187,7 +197,6 @@ public class BasicBlock {
     public void setJump(JumpQuad inst) {
         if (hasJump)
             throw new CompileError("Already has jump");
-        addLastInst(inst);
         hasJump = true;
 
         if (inst instanceof CJump) { // 2 branch
@@ -201,15 +210,29 @@ public class BasicBlock {
             Return x = (Return) inst;
             func.returns.add(x);
         }
+
+        insts.addLast(inst);
     }
 
-    public void delJump() {
+    // /** check hasJump, getLast == inst */
+    // public void delJump() {
+    // delJumpSideEffect();
+    // insts.removeLast();
+    // }
+
+    /**
+     * check inst first and del Jump outside
+     * <p>
+     * check hasJump, getLast == inst
+     */
+    public void delJumpSideEffect() {
+        if (!hasJump)
+            throw new CompileError("hasJump has not changed");
         hasJump = false;
+
         Quad last = insts.getLast();
         if (!(last instanceof JumpQuad))
             throw new CompileError("invalid type of Remove Jump");
-
-        insts.removeLast();
 
         // del block or returns
         if (last instanceof CJump) {

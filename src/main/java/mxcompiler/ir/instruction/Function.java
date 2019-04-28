@@ -149,6 +149,9 @@ public class Function {
     public Set<Function> calleeSet = new HashSet<>();
     public Set<Function> recursiveCalleeSet = new HashSet<>();
 
+    /**
+     * @Usage: Update calleeSet
+     */
     public void updateCalleeSet() {
         calleeSet.clear();
         for (BasicBlock bb : getReversePostOrder()) {

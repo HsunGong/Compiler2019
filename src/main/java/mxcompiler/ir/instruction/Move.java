@@ -8,7 +8,7 @@ import mxcompiler.ir.register.Register;
 import mxcompiler.utils.Dump;
 
 
-public class Move extends Quad {
+public class Move extends MemQuad {
     private RegValue dst; // lhs
     private RegValue rhs;
 
@@ -16,6 +16,7 @@ public class Move extends Quad {
         super(parent);
         this.dst = destion;
         this.rhs = rhs;
+        reloadUsedRegs();
     }
 
     public RegValue getDst() {

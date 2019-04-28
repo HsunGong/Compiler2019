@@ -49,8 +49,9 @@ public class IRBuilder extends Visitor {
 
     private boolean isFuncArgDecl = false;
 
-    /** only when {@link #visit(AssignExprNode) }, {@code assignLhs = true;} */
-    private boolean assignLhs = false;
+    // /** only when {@link #visit(AssignExprNode) }, {@code assignLhs = true;}
+    // */
+    // private boolean assignLhs = false;
 
     /** only when {@link #visit(IdentifierExprNode)} */
     private boolean uselessStatic = false;
@@ -93,8 +94,6 @@ public class IRBuilder extends Visitor {
             if (!(decl instanceof VarDeclNode))
                 visit(decl);
 
-        for (Function irFunc : root.getFunc().values())
-            irFunc.updateCalleeSet();
         root.updateCalleeSet();
 
         TwoRegOpTransformer();
@@ -248,7 +247,7 @@ public class IRBuilder extends Visitor {
             for (Return ret : retList) {
                 BasicBlock beforeRet = ret.getParent();
 
-                beforeRet.delLastInst(ret);
+                beforeRet.delJump(ret);
                 if (ret.getReturnValue() != null) { // add move to reg
                     Move tmpInst = new Move(beforeRet, retReg, ret.getReturnValue());
                     beforeRet.addLastInst(tmpInst);
@@ -832,7 +831,7 @@ public class IRBuilder extends Visitor {
         curWantAddr = false;
 
         visit(node.getExpr());
-        assignLhs = false;
+        // assignLhs = false;
 
         curWantAddr = tmpWantAddr;
 
@@ -865,7 +864,7 @@ public class IRBuilder extends Visitor {
         if (uselessStatic)
             return;
 
-        assignLhs = false;
+        // assignLhs = false;
         visit(node.getIndex());
 
         curWantAddr = tmpWantAddr;
@@ -1087,12 +1086,12 @@ public class IRBuilder extends Visitor {
     public void visit(AssignExprNode node) {
         boolean needMemOp = needMemoryAccess(node.getLhs());
         curWantAddr = needMemOp;
-        assignLhs = true;
+        // assignLhs = true;
         uselessStatic = false;
 
         visit(node.getLhs());
 
-        assignLhs = false;
+        // assignLhs = false;
         curWantAddr = false;
 
         if (uselessStatic) {
@@ -1479,9 +1478,8 @@ public class IRBuilder extends Visitor {
                                 || calleeInfo.numInst + funcInfo.numInst > MAX_FUNC_INST)
                             continue;
 
-                        ListIterator<Quad> newIter = bb.getInsts()
-                                .listIterator(iter.previousIndex());
-                        iter = inlineFuncall(newIter); // iter has to point to next
+                        iter.previous();
+                        iter = inlineFuncall(iter);
 
                         changed = true;
                         thisFuncChanged = true;
@@ -1502,9 +1500,6 @@ public class IRBuilder extends Visitor {
                 root.delFunc(funcName);
         } while (changed);
 
-        for (Function irFunc : root.getFunc().values()) {
-            irFunc.updateCalleeSet();
-        }
         root.updateCalleeSet();
         // endregion
 
@@ -1548,7 +1543,7 @@ public class IRBuilder extends Visitor {
 
                         ListIterator<Quad> newIter = bb.getInsts()
                                 .listIterator(iter.previousIndex());
-                        iter = inlineFuncall(newIter); // iter has to point to next
+                        iter = inlineFuncall(newIter);
                         changed = true;
                         thisFuncChanged = true;
                         funcInfo.numInst += calleeInfo.numInst;
@@ -1560,8 +1555,6 @@ public class IRBuilder extends Visitor {
             }
         }
 
-        for (Function irFunc : root.getFunc().values())
-            irFunc.updateCalleeSet();
         root.updateCalleeSet();
         // endregion
     }
@@ -1575,31 +1568,31 @@ public class IRBuilder extends Visitor {
      * <pre>
      * // before: inst(selected) iter inst2
      * // before: newIter inst(selected) inst2
-     * inlineFuncall(iter)
+     * iter = inlineFuncall(iter)
      * </pre>
+     * 
+     * @Return newIter of newEnd's FirstInst
      */
     private ListIterator<Quad> inlineFuncall(ListIterator<Quad> iter) {
         Funcall funcCallInst = (Funcall) iter.next();
-        BasicBlock parent = funcCallInst.getParent();
+        BasicBlock parent = funcCallInst.getParent(); // or newStartBB
 
-        Function callerFunc = funcCallInst.getParent().getFunc();
+        Function callerFunc = parent.getFunc();
         Function calleeFunc = funcBackUpMap.getOrDefault(funcCallInst.getFunc(),
                 funcCallInst.getFunc());
-        List<BasicBlock> reversePostOrder = calleeFunc.getReversePostOrder();
+        List<BasicBlock> inlineBBpostOrder = calleeFunc.getReversePostOrder();
 
         Map<Object, Object> renameMap = new HashMap<>();
         BasicBlock oldEndBB = calleeFunc.end;
         BasicBlock newEndBB = new BasicBlock(callerFunc, oldEndBB.getName());
         renameMap.put(oldEndBB, newEndBB);
-        renameMap.put(calleeFunc.start, funcCallInst.getParent());
+        renameMap.put(calleeFunc.start, parent);
 
-        // FIX: ???
-        if (oldEndBB == funcCallInst.getParent()) {
+        if (oldEndBB == parent)
             oldEndBB = newEndBB;
-        }
 
-        Map<Object, Object> callBBRenameMap = Collections
-                .singletonMap(funcCallInst.getParent(), newEndBB);
+        // add after-funcall insts into new end(first)
+        Map<Object, Object> callBBRenameMap = Collections.singletonMap(parent, newEndBB);
         while (iter.hasNext()) {
             Quad inst = iter.next();
 
@@ -1611,25 +1604,26 @@ public class IRBuilder extends Visitor {
             parent.removeInst(iter);
         }
 
-        Quad newEndBBFisrtInst = newEndBB.getInsts().getFirst();
+        // add args
         for (int i = 0; i < funcCallInst.getArgs().size(); ++i) {
             VirtualRegister oldArgVreg = calleeFunc.argVReg.get(i);
             VirtualRegister newArgVreg = oldArgVreg.copy();
 
-            parent.addBeforeInst(iter, new Move(funcCallInst.getParent(), newArgVreg,
-                    funcCallInst.getArgs().get(i)));
+            parent.addBeforeInst(iter,
+                    new Move(parent, newArgVreg, funcCallInst.getArgs().get(i)));
             renameMap.put(oldArgVreg, newArgVreg);
         }
-
         parent.removeInst(iter);
 
-        for (BasicBlock bb : reversePostOrder) {
+        // copy funcall-block into parent(cause may have args move)
+        for (BasicBlock bb : inlineBBpostOrder) { // put BB-rename
             if (!renameMap.containsKey(bb))
                 renameMap.put(bb, new BasicBlock(callerFunc, bb.getName()));
         }
-
-        for (BasicBlock oldBB : reversePostOrder) {
+        for (BasicBlock oldBB : inlineBBpostOrder) { // add inst
             BasicBlock newBB = (BasicBlock) renameMap.get(oldBB);
+
+            // change forRecord
             if (oldBB.forNode != null) {
                 Root.ForRecord forRec = root.forRecMap.get(oldBB.forNode);
                 if (forRec.cond == oldBB)
@@ -1642,46 +1636,47 @@ public class IRBuilder extends Visitor {
                     forRec.after = newBB;
             }
 
+            // change for insts(include regs)
             iter = oldBB.getInsts().listIterator();
             while (iter.hasNext()) {
                 Quad inst = iter.next();
-                for (RegValue usedRegValue : inst.usedRegValues) {
-                    copyRegValue(renameMap, usedRegValue);
-                }
-                if (inst.getDefinedRegister() != null) {
-                    copyRegValue(renameMap, inst.getDefinedRegister());
-                }
-                if (newBB == newEndBB) {
-                    if (!(inst instanceof Return))
-                        // newEndBBFisrtInst.prependInst(inst.copyRename(renameMap));
-                        newEndBB.getInsts().addFirst(inst.copyRename(renameMap));
 
-                } else {
+                // add new regValue(copy) into renameMap
+                for (RegValue usedRegValue : inst.usedRegValues)
+                    copyRegValue(renameMap, usedRegValue);
+                if (inst.getDefinedRegister() != null)
+                    copyRegValue(renameMap, inst.getDefinedRegister());
+
+                // add insts
+                if (newBB != newEndBB) { // normall BB
                     if (inst instanceof JumpQuad) {
                         if (!(inst instanceof Return)) {
-                            newBB.setJump((JumpQuad) ((JumpQuad) inst).copyRename(renameMap));
+                            newBB.setJump((JumpQuad) inst.copyRename(renameMap));
                         }
-                    } else {
+                    } else
                         newBB.addLastInst(inst.copyRename(renameMap));
-                    }
+
+                } else { // last BB -- add insts(second)
+                    if (!(inst instanceof Return))
+                        newEndBB.getInsts().addFirst(inst.copyRename(renameMap));
                 }
             }
         }
-        if (!funcCallInst.getParent().hasJump()) {
-            funcCallInst.getParent().setJump(new Jump(funcCallInst.getParent(), newEndBB));
-        }
+
+        // newStartBB(parent) ->(Jump) newEndBB
+        if (!parent.hasJump())
+            parent.setJump(new Jump(parent, newEndBB));
+
         Return returnInst = calleeFunc.returns.get(0);
         if (returnInst.getReturnValue() != null) {
-            // newEndBBFisrtInst.prependInst(new IRMove(newEndBB,
-            // funcCallInst.getDest(),
-            // (RegValue) renameMap.get(returnInst.getRetValue())));
             newEndBB.getInsts().addFirst(new Move(newEndBB, funcCallInst.getDst(),
                     (RegValue) renameMap.get(returnInst.getReturnValue())));
-
         }
-        return newEndBB.getInsts().listIterator(); /// may change iter
+
+        return newEndBB.getInsts().listIterator();
     }
 
+    /** put regvalue(copy) into renameMap */
     private void copyRegValue(Map<Object, Object> renameMap, RegValue regValue) {
         if (!renameMap.containsKey(regValue))
             renameMap.put(regValue, regValue.copy());
@@ -1690,118 +1685,143 @@ public class IRBuilder extends Visitor {
 
     // region StaticData process
     private class FuncDataInfo {
-        Set<StaticData> definedStaticData = new HashSet<>();
-        Set<StaticData> recursiveDefinedStaticData = new HashSet<>();
-        Set<StaticData> recursiveUsedStaticData = new HashSet<>();
-        Map<StaticData, VirtualRegister> staticDataVregMap = new HashMap<>();
+        Set<StaticData> definedData = new HashSet<>();
+        /** use more than 1 time in caller and callee */
+        Set<StaticData> mutliDefinedData = new HashSet<>(); // recursiveDefinedData
+        /** use more than 1 time in caller and callee */
+        Set<StaticData> mutliUsedData = new HashSet<>(); // recursiveUsedData
+        /** a staticData(of vreg) map, set in {@link #getStaticDataVreg} */
+        Map<StaticData, VirtualRegister> dataVregMap = new HashMap<>();
     }
 
     private Map<Function, FuncDataInfo> funcDataInfoMap = new HashMap<>();
 
-    private boolean isStaticLoadStore(Quad inst) {
+    private boolean isMemWithStatic(Quad inst) {
         return (inst instanceof Load && ((Load) inst).isStaticData())
                 || (inst instanceof Store && ((Store) inst).isStaticData());
     }
 
-    private VirtualRegister getStaticDataVreg(
-            Map<StaticData, VirtualRegister> staticDataVregMap, StaticData staticData) {
-        VirtualRegister vreg = staticDataVregMap.get(staticData);
+    /**
+     * init with a copy-name only register
+     * <p>
+     * put into a dataVregMap
+     * <p>
+     * and return this copy
+     */
+    private VirtualRegister getStaticDataVreg(Map<StaticData, VirtualRegister> dataVregMap,
+            RegValue data) {
+        StaticData staticData = (StaticData) data;
+        VirtualRegister vreg = dataVregMap.get(staticData);
+
         if (vreg == null) {
             vreg = new VirtualRegister(staticData.getName());
-            staticDataVregMap.put(staticData, vreg);
+            dataVregMap.put(staticData, vreg);
         }
         return vreg;
     }
 
-    public void StaticDataProcess() {
-        for (Function Function : root.getFunc().values()) {
+    private void StaticDataProcess() {
+        // init dataVregMap
+        for (Function irFunc : root.getFunc().values()) {
             FuncDataInfo funcInfo = new FuncDataInfo();
-            funcDataInfoMap.put(Function, funcInfo);
+            funcDataInfoMap.put(irFunc, funcInfo);
+
             Map<Register, Register> renameMap = new HashMap<>();
-            for (BasicBlock bb : Function.getReversePostOrder()) {
-                for (Quad inst: bb.getInsts()) {
-                    if (isStaticLoadStore(inst))
+            for (BasicBlock bb : irFunc.getReversePostOrder()) {
+                for (Quad inst : bb.getInsts()) {
+                    if (isMemWithStatic(inst))
                         continue;
+
                     List<Register> usedRegisters = inst.usedRegisters;
                     if (!usedRegisters.isEmpty()) {
                         renameMap.clear();
-                        for (Register reg : usedRegisters) {
-                            if ((reg instanceof StaticData) && !(reg instanceof StaticString)) {
-                                renameMap.put(reg, getStaticDataVreg(
-                                        funcInfo.staticDataVregMap, (StaticData) reg));
-                            } else {
+                        for (Register reg : usedRegisters) { // sel can optim regs
+                            if (reg instanceof StaticData && !(reg instanceof StaticString))
+                                renameMap.put(reg,
+                                        getStaticDataVreg(funcInfo.dataVregMap, reg));
+                            else
                                 renameMap.put(reg, reg);
-                            }
                         }
                         inst.setUsedRegisters(renameMap);
                     }
+
                     Register definedRegister = inst.getDefinedRegister();
-                    if (definedRegister != null && definedRegister instanceof StaticData) {
-                        VirtualRegister vreg = getStaticDataVreg(funcInfo.staticDataVregMap,
-                                (StaticData) definedRegister);
+                    if (definedRegister instanceof StaticData) {
+                        VirtualRegister vreg = getStaticDataVreg(funcInfo.dataVregMap,
+                                definedRegister);
                         inst.setDefinedRegister(vreg);
-                        funcInfo.definedStaticData.add((StaticData) definedRegister);
+                        funcInfo.definedData.add((StaticData) definedRegister);
                     }
                 }
             }
 
-            // load static data at the beginning of function
-            BasicBlock startBB = Function.start;
-            Quad firtInst = startBB.getFirstInst();
-            funcInfo.staticDataVregMap.forEach((staticData, virtualRegister) -> firtInst
-                    .prependInst(new Load(startBB, virtualRegister, RegValue.RegSize,
-                            staticData, staticData instanceof StaticString)));
+            // load static data at the beginning of function--with a lambda
+            BasicBlock startBB = irFunc.start;
+            LinkedList<Quad> insts = startBB.getInsts();
+            funcInfo.dataVregMap.forEach((sData, vReg) -> {
+                insts.addFirst(new Load(startBB, vReg, RegValue.RegSize, sData,
+                        sData instanceof StaticString));
+            });
         }
 
-        for (Function builtFunc : root.getBuiltInFunc().values()) {
+        for (Function builtFunc : root.getBuiltInFunc().values())
             funcDataInfoMap.put(builtFunc, new FuncDataInfo());
-        }
-        for (Function Function : root.getFunc().values()) {
-            FuncDataInfo funcInfo = funcDataInfoMap.get(Function);
-            funcInfo.recursiveUsedStaticData.addAll(funcInfo.staticDataVregMap.keySet());
-            funcInfo.recursiveDefinedStaticData.addAll(funcInfo.definedStaticData);
-            for (Function calleeFunc : Function.recursiveCalleeSet) {
-                FuncDataInfo calleeFuncInfo = funcDataInfoMap.get(calleeFunc);
-                funcInfo.recursiveUsedStaticData
-                        .addAll(calleeFuncInfo.staticDataVregMap.keySet());
-                funcInfo.recursiveDefinedStaticData.addAll(calleeFuncInfo.definedStaticData);
+
+        // set mutli (used and defined) Data
+        for (Function irFunc : root.getFunc().values()) {
+            FuncDataInfo callerInfo = funcDataInfoMap.get(irFunc);
+
+            callerInfo.mutliUsedData.addAll(callerInfo.dataVregMap.keySet());
+            callerInfo.mutliDefinedData.addAll(callerInfo.definedData);
+
+            for (Function calleeFunc : irFunc.recursiveCalleeSet) {
+                FuncDataInfo calleeInfo = funcDataInfoMap.get(calleeFunc);
+                callerInfo.mutliUsedData.addAll(calleeInfo.dataVregMap.keySet());
+                callerInfo.mutliDefinedData.addAll(calleeInfo.definedData);
             }
         }
 
-        for (Function Function : root.getFunc().values()) {
-            FuncDataInfo funcInfo = funcDataInfoMap.get(Function);
-            Set<StaticData> usedStaticData = funcInfo.staticDataVregMap.keySet();
+        // deal data:::>>> calling--decrecase store and load data in funcall
+        for (Function irFunc : root.getFunc().values()) {
+            FuncDataInfo callerInfo = funcDataInfoMap.get(irFunc);
+            Set<StaticData> usedStaticData = callerInfo.dataVregMap.keySet();
             if (usedStaticData.isEmpty())
                 continue;
-            for (BasicBlock bb : Function.getReversePostOrder()) {
+
+            // deal funcall
+            for (BasicBlock bb : irFunc.getReversePostOrder()) {
                 ListIterator<Quad> iter = bb.getInsts().listIterator();
                 while (iter.hasNext()) {
                     Quad inst = iter.next();
                     if (!(inst instanceof Funcall))
                         continue;
+
                     Function calleeFunc = ((Funcall) inst).getFunc();
-                    FuncDataInfo calleeFuncInfo = funcDataInfoMap.get(calleeFunc);
+                    FuncDataInfo calleeInfo = funcDataInfoMap.get(calleeFunc);
+
                     // store defined static data before function call
-                    for (StaticData staticData : funcInfo.definedStaticData) {
+                    for (StaticData staticData : callerInfo.definedData) {
                         if (staticData instanceof StaticString)
                             continue;
-                        if (calleeFuncInfo.recursiveUsedStaticData.contains(staticData)) {
+                        if (calleeInfo.mutliUsedData.contains(staticData)) {
                             bb.addBeforeInst(iter,
-                                    new Store(bb, funcInfo.staticDataVregMap.get(staticData),
+                                    new Store(bb, callerInfo.dataVregMap.get(staticData),
                                             RegValue.RegSize, staticData));
                         }
                     }
+
                     // load used static data after function call
-                    if (calleeFuncInfo.recursiveDefinedStaticData.isEmpty())
+                    // callee.mutliDefinedData + callerInfo.dataVregMap
+                    if (calleeInfo.mutliDefinedData.isEmpty())
                         continue;
                     Set<StaticData> loadStaticDataSet = new HashSet<>();
-                    loadStaticDataSet.addAll(calleeFuncInfo.recursiveDefinedStaticData);
-                    loadStaticDataSet.retainAll(usedStaticData);
+                    loadStaticDataSet.addAll(calleeInfo.mutliDefinedData);
+                    loadStaticDataSet.retainAll(usedStaticData); // callerInfo.dataVregMap.key
                     for (StaticData staticData : loadStaticDataSet) {
                         if (staticData instanceof StaticString)
                             continue;
-                        bb.addBeforeInst(iter,
-                                new Load(bb, funcInfo.staticDataVregMap.get(staticData),
+                        bb.addAfterInst(iter, // FIX:here
+                                new Load(bb, callerInfo.dataVregMap.get(staticData),
                                         RegValue.RegSize, staticData,
                                         staticData instanceof StaticString));
                     }
@@ -1809,20 +1829,18 @@ public class IRBuilder extends Visitor {
             }
         }
 
-        for (Function Function : root.getFunc().values()) {
-            FuncDataInfo funcInfo = funcDataInfoMap.get(Function);
-
-            // store defined data at the end of function
-            Return retInst = Function.returns.get(0);
+        // store defined data at the end of function
+        for (Function irFunc : root.getFunc().values()) {
+            FuncDataInfo funcInfo = funcDataInfoMap.get(irFunc);
+            Return retInst = irFunc.returns.get(0);
             BasicBlock retBB = retInst.getParent();
-            retBB.delLastInst(retInst);
 
-            for (StaticData staticData : funcInfo.definedStaticData) {
+            retBB.delJump(retInst);
+            for (StaticData staticData : funcInfo.definedData) {
                 retBB.addLastInst(new Store(retInst.getParent(),
-                        funcInfo.staticDataVregMap.get(staticData), RegValue.RegSize,
-                        staticData));
+                        funcInfo.dataVregMap.get(staticData), RegValue.RegSize, staticData));
             }
-            retBB.addLastInst(retInst);
+            retBB.setJump(retInst);
         }
     }
 

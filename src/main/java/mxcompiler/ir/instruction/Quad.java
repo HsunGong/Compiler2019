@@ -14,7 +14,7 @@ import mxcompiler.utils.Dump;
 /** IR-Instruction */
 abstract public class Quad {
     protected BasicBlock parent;
-    private boolean removed = false;
+    public boolean removed = false;
 
     public Quad(BasicBlock bb) {
         this.parent = bb;
@@ -24,6 +24,11 @@ abstract public class Quad {
         return parent;
     }
 
+    /**
+     * get a copy of cur inst
+     * <p>
+     * change everything(BB, regValue) if has in renameMap
+     */
     public abstract Quad copyRename(Map<Object, Object> renameMap);
 
     // public Set<VirtualRegister> liveIn = null, liveOut = null;
@@ -38,19 +43,23 @@ abstract public class Quad {
 
     /**
      * normally get destion(if has) or get null
+     * <p>
+     * For each inst, can only have 1 Defined register
      */
     public Register getDefinedRegister() {
         return null;
     }
 
     /**
-     * normally reset all used regs
+     * reset all used Registers(in usedRegisters)
+     * <p>
+     * normally as RegValues(rather than DefinedRegisters)
      */
     public void setUsedRegisters(Map<Register, Register> renameMap) {
     }
 
     /**
-     * reload all regs: Register or RegValue(after setUsedRegs)
+     * reload all reg-List: usedRegValues, usedRegisters
      */
     protected void reloadUsedRegs() {
     }

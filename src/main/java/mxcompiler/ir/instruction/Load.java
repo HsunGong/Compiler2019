@@ -10,29 +10,29 @@ import mxcompiler.ir.register.StaticData;
 import mxcompiler.utils.Dump;
 
 
-public class Load extends Quad {
+public class Load extends MemQuad {
     private RegValue dst; // Register
     private int size;
     private boolean isStaticData, isLoadAddr;
     public RegValue addr;
     public int offset;
 
-    public Load(BasicBlock parent, RegValue dstion, int size, RegValue addr, int addrOffset) {
+    public Load(BasicBlock parent, RegValue destion, int size, RegValue addr, int addrOffset) {
         super(parent);
         if (size == 0)
             System.err.println("oh bad size 0");
 
-        this.dst = dstion;
+        this.dst = destion;
         this.addr = addr;
         this.offset = addrOffset;
         this.size = size;
         this.isStaticData = false;
-        // reloadUsedRegistersRegValues();
+        reloadUsedRegs();
     }
 
-    public Load(BasicBlock parent, RegValue dstion, int size, StaticData addr,
+    public Load(BasicBlock parent, RegValue destion, int size, StaticData addr,
             boolean isLoadAddr) {
-        this(parent, dstion, size, addr, 0);
+        this(parent, destion, size, addr, 0);
 
         this.isStaticData = true;
         this.isLoadAddr = isLoadAddr;
