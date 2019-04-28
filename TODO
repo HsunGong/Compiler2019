@@ -207,7 +207,7 @@ TypeResolve:
         ✘ new TwoRegOpTransformer(ir).run(); @cancelled(04-06 10)
         ✘ if (Configuration.isEnableFunctionInline()) new FunctionInlineProcessor(ir).run(); @cancelled(04-06 10)
         ✘ if (irOutS != null) new IRPrinter(irOutS).visit(ir); @cancelled(04-06 10)
-        new StaticDataProcessor(ir).run();
+        ✘ new StaticDataProcessor(ir).run(); @cancelled(04-28 20)
         new RegisterPreprocessor(ir).run();
         new RegLivelinessAnalysis(ir).run();
         new RegisterAllocator(ir).run();
@@ -217,4 +217,17 @@ TypeResolve:
 		
 
 	
-ReturnInst.java	Pass Simple Function Call	11 months ago
+
+		R0  R1  R2  R3  R4  R5  R6  R7  R8  R9  R10  R11  R12  R13  R14  R15
+RAX RCX RDX RBX RSP RBP RSI RDI
+
+These are the basic forms of addressing:
+
+[ number ]
+[ reg ]
+[ reg + reg*scale ]      scale is 1, 2, 4, or 8 only
+[ reg + number ]
+[ reg + reg*scale + number ]
+
+
+

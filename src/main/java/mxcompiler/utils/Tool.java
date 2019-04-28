@@ -1,8 +1,6 @@
 package mxcompiler.utils;
 
-import mxcompiler.utils.scope.Scope;
-
-
+/** a static class to store String */
 public class Tool {
     // region builtIn
     // class

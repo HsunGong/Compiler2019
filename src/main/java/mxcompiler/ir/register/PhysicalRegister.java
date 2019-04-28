@@ -5,18 +5,37 @@ import mxcompiler.utils.Dump;
 
 
 public class PhysicalRegister extends Register {
+    private final boolean isGeneral, isCallerSave, isCalleeSave;
+    private final int argIdx;
 
-    public PhysicalRegister(String name) {
+    public PhysicalRegister(String name, boolean isGeneral, boolean isCallerSave, boolean isCalleeSave, int argIdx) {
         super(name);
+        this.isGeneral = isGeneral;
+        this.isCallerSave = isCallerSave;
+        this.isCalleeSave = isCalleeSave;
+        this.argIdx = argIdx;
     }
 
-    // public abstract String getName();
-    // public abstract boolean isGeneral();
-    // public abstract boolean isCallerSave();
-    // public abstract boolean isCalleeSave();
-    // public abstract boolean isArg6();
-    // public abstract int getArg6Idx();
-    
+    public boolean isGeneral() {
+        return isGeneral;
+    }
+
+    public boolean isCallerSave() {
+        return isCallerSave;
+    }
+
+    public boolean isCalleeSave() {
+        return isCalleeSave;
+    }
+
+    // special for args
+    public boolean isArg() {
+        return argIdx != -1;
+    }
+
+    public int getArgIdx() {
+        return argIdx;
+    }
 
     public void _dump(Dump d) {
         d.println("physical Reigst");
