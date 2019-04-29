@@ -1,13 +1,12 @@
 package mxcompiler.ir.instruction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
 import mxcompiler.ir.register.Register;
+import mxcompiler.ir.register.VirtualRegister;
 import mxcompiler.utils.Dump;
 
 
@@ -15,6 +14,8 @@ import mxcompiler.utils.Dump;
 abstract public class Quad {
     protected BasicBlock parent;
     public boolean removed = false;
+
+    public Set<VirtualRegister> liveIn = new HashSet<>(), liveOut = new HashSet<>();
 
     public Quad(BasicBlock bb) {
         this.parent = bb;

@@ -1,5 +1,7 @@
 package mxcompiler.main;
 
+import static mxcompiler.asm.x86_64RegisterSet.*;
+
 import mxcompiler.ir.*;
 import mxcompiler.ir.instruction.*;
 import mxcompiler.ir.register.*;
@@ -12,16 +14,17 @@ public class RegisterAllocator {
 
     public RegisterAllocator(Root root) {
         this.root = root;
+        AllocateArgs();
     }
 
     public void execute() throws Error {
-        PreProcess();
         LifeCycleAnalysis();
         this.physicalRegs = new ArrayList<>(NASMRegisterSet.generalRegs);
         for (Function func : root.getFuncs().values()) {
             if (func.getArgVRegList().size() > root.getMaxNumFuncArgs())
                 root.setMaxNumFuncArgs(func.getArgVRegList().size());
         }
+
         if (root.getMaxNumFuncArgs() >= 5)
             physicalRegs.remove(r8);
         if (root.getMaxNumFuncArgs() >= 6)
@@ -42,67 +45,78 @@ public class RegisterAllocator {
         Allocate();
     }
 
-    // region pre process
-    public void PreProcess() {
+    public void AllocateArgs() {
         for (Function func : root.getFunc().values()) {
-            List<Quad> insts = func.start.getInsts();
+            LinkedList<Quad> insts = func.start.getInsts();
+            BasicBlock parent = func.start;
+            int size = func.argVregs.size();
 
-            for (int i = 6; i < func.getArgVRegList().size(); ++i) {
-                VirtualRegister argVreg = func.getArgVRegList().get(i);
-                StackSlot argSlot = new StackSlot(func, "arg" + i, true);
-                func.getArgsStackSlotMap().put(argVreg, argSlot);
-                firtInst.prependInst(new IRLoad(firtInst.getParentBB(), argVreg,
-                        Configuration.getRegSize(), argSlot, 0));
+            for (int i = 6; i < size; ++i) {
+                VirtualRegister argVreg = func.argVregs.get(i);
+
+                StackSlot argSlot = new StackSlot("arg" + Integer.toString(i), func, true);
+                func.argsMap.put(argVreg, argSlot);
+
+                insts.addFirst(new Load(parent, argVreg, RegValue.RegSize, argSlot, 0));
             }
 
-            if (func.getArgVRegList().size() > 0)
-                func.getArgVRegList().get(0).setForcedPhysicalRegister(NASMRegisterSet.rdi);
-            if (func.getArgVRegList().size() > 1)
-                func.getArgVRegList().get(1).setForcedPhysicalRegister(NASMRegisterSet.rsi);
-            if (func.getArgVRegList().size() > 2)
-                func.getArgVRegList().get(2).setForcedPhysicalRegister(NASMRegisterSet.rdx);
-            if (func.getArgVRegList().size() > 3)
-                func.getArgVRegList().get(3).setForcedPhysicalRegister(NASMRegisterSet.rcx);
-            if (func.getArgVRegList().size() > 4)
-                func.getArgVRegList().get(4).setForcedPhysicalRegister(NASMRegisterSet.r8);
-            if (func.getArgVRegList().size() > 5)
-                func.getArgVRegList().get(5).setForcedPhysicalRegister(NASMRegisterSet.r9);
-
+            if (size > 0)
+                func.argVregs.get(0).forcedPhysicalRegister = rdi;
+            if (size > 1)
+                func.argVregs.get(1).forcedPhysicalRegister = rsi;
+            if (size > 2)
+                func.argVregs.get(2).forcedPhysicalRegister = rdx;
+            if (size > 3)
+                func.argVregs.get(3).forcedPhysicalRegister = rcx;
+            if (size > 4)
+                func.argVregs.get(4).forcedPhysicalRegister = r8;
+            if (size > 5)
+                func.argVregs.get(5).forcedPhysicalRegister = r9;
         }
     }
-    // endregion
 
     // region reg-live
     private boolean eliminationChanged;
 
-    private void livelinessAnalysis(IRFunction irFunction) {
-        List<BasicBlock> reversePreOrder = irFunction.getReversePreOrder();
+    public void LifeCycleAnalysis() {
+        for (Function irFunc : root.getFunc().values())
+            livelinessAnalysis(irFunc);
+
+        do {
+            eliminationChanged = false;
+            for (Function irFunc : root.getFunc().values()) {
+                if (irFunc.isBuiltIn())
+                    continue;
+
+                tryEliminate(irFunc);
+                removeBlankBB(irFunc);
+                livelinessAnalysis(irFunc);
+            }
+        } while (eliminationChanged);
+    }
+
+    private void livelinessAnalysis(Function func) {
+        List<BasicBlock> reversePreOrder = func.getReversePreOrder();
+
         for (BasicBlock bb : reversePreOrder) {
-            // init basic block
-            for (IRInstruction inst = bb.getFirstInst(); inst != null; inst = inst
-                    .getNextInst()) {
-                if (inst.liveIn == null)
-                    inst.liveIn = new HashSet<>();
-                else
-                    inst.liveIn.clear();
-                if (inst.liveOut == null)
-                    inst.liveOut = new HashSet<>();
-                else
-                    inst.liveOut.clear();
+            for (Quad inst : bb.getInsts()) {
+                inst.liveIn.clear();
+                inst.liveOut.clear();
             }
         }
+
         Set<VirtualRegister> liveIn = new HashSet<>();
         Set<VirtualRegister> liveOut = new HashSet<>();
 
         // iterations to solve liveliness equation
-        boolean converged = false;
-        while (!converged) {
+        boolean converged;
+        do {
             converged = true;
             for (BasicBlock bb : reversePreOrder) {
-                for (IRInstruction inst = bb.getLastInst(); inst != null; inst = inst
-                        .getPrevInst()) {
+                for (Quad inst = bb.getLastInst(); inst != null; inst = inst.getPrevInst()) {
                     liveIn.clear();
                     liveOut.clear();
+
                     if (inst instanceof IRJumpInstruction) {
                         if (inst instanceof IRJump) {
                             liveOut.addAll(
@@ -118,11 +132,11 @@ public class RegisterAllocator {
                             liveOut.addAll(inst.getNextInst().liveIn);
                     }
                     liveIn.addAll(liveOut);
-                    IRRegister definedReg = inst.getDefinedRegister();
+                    Register definedReg = inst.getDefinedRegister();
                     if (definedReg instanceof VirtualRegister) {
                         liveIn.remove(definedReg);
                     }
-                    for (IRRegister usedReg : inst.getUsedRegisters()) {
+                    for (Register usedReg : inst.getUsedRegisters()) {
                         if (usedReg instanceof VirtualRegister) {
                             liveIn.add((VirtualRegister) usedReg);
                         }
@@ -139,19 +153,21 @@ public class RegisterAllocator {
                     }
                 }
             }
-        }
+        } while (!converged);
     }
 
-    void tryEliminate(IRFunction func) {
+    private void tryEliminate(Function func) {
         List<BasicBlock> reversePreOrder = func.getReversePreOrder();
         for (BasicBlock bb : reversePreOrder) {
-            for (IRInstruction inst = bb
-                    .getLastInst(), prevInst; inst != null; inst = prevInst) {
-                prevInst = inst.getPrevInst();
-                if (inst instanceof IRBinaryOperation || inst instanceof IRComparison
-                        || inst instanceof IRLoad || inst instanceof IRMove
-                        || inst instanceof IRUnaryOperation || inst instanceof IRHeapAlloc) {
-                    IRRegister dest = inst.getDefinedRegister();
+            ListIterator<Quad> iter = bb.getInsts().listIterator(bb.getInsts().size());
+            while (iter.hasNext()) {
+                Quad inst = iter.previous();
+
+                if (inst instanceof Bin || inst instanceof Cmp || inst instanceof Load
+                        || inst instanceof Move || inst instanceof Uni
+                        || inst instanceof HeapAlloc) {
+                    Register dest = inst.getDefinedRegister();
+
                     if (dest == null || !inst.liveOut.contains(dest)) {
                         eliminationChanged = true;
                         inst.remove();
@@ -172,10 +188,10 @@ public class RegisterAllocator {
             bbList.add(forRec.stepBB);
             bbList.add(forRec.bodyBB);
             bbList.add(forRec.afterBB);
-            IRInstruction afterFirstInst = forRec.afterBB.getFirstInst();
+            Quad afterFirstInst = forRec.afterBB.getFirstInst();
             for (int i = 0; i < 3; ++i) {
-                for (IRInstruction inst = bbList.get(i)
-                        .getFirstInst(); inst != null; inst = inst.getNextInst()) {
+                for (Quad inst = bbList.get(i).getFirstInst(); inst != null; inst = inst
+                        .getNextInst()) {
                     if (inst instanceof IRFunctionCall) {
                         isFieldOutside = true;
                         continue;
@@ -227,11 +243,11 @@ public class RegisterAllocator {
         return ret;
     }
 
-    void removeBlankBB(IRFunction func) {
+    void removeBlankBB(Function func) {
         jumpTargetBBMap.clear();
         for (BasicBlock bb : func.getReversePostOrder()) {
             if (bb.getFirstInst() == bb.getLastInst()) {
-                IRInstruction inst = bb.getFirstInst();
+                Quad inst = bb.getFirstInst();
                 if (inst instanceof IRJump) {
                     jumpTargetBBMap.put(bb, ((IRJump) inst).getTargetBB());
                 }
@@ -251,23 +267,6 @@ public class RegisterAllocator {
             }
         }
     }
-
-    public void LifeCycleAnalysis() {
-        for (IRFunction irFunction : root.getFuncs().values()) {
-            livelinessAnalysis(irFunction);
-        }
-        eliminationChanged = true;
-        while (eliminationChanged) {
-            eliminationChanged = false;
-            for (IRFunction irFunction : root.getFuncs().values()) {
-                if (irFunction.isBuiltIn())
-                    continue;
-                tryEliminate(irFunction);
-                removeBlankBB(irFunction);
-                livelinessAnalysis(irFunction);
-            }
-        }
-    }
     // endregion
 
     // region allocate
@@ -278,7 +277,7 @@ public class RegisterAllocator {
     private class VirtualRegInfo {
         Set<VirtualRegister> neighbours = new HashSet<>();
         boolean removed = false;
-        IRRegister color = null;
+        Register color = null;
         int degree = 0;
         Set<VirtualRegister> suggestSameVRegs = new HashSet<>();
     }
@@ -298,7 +297,7 @@ public class RegisterAllocator {
     private Set<VirtualRegister> vregNodes = new HashSet<>();
     private Set<VirtualRegister> degreeSmallVregNodes = new HashSet<>();
 
-    private Map<IRRegister, IRRegister> renameMap = new HashMap<>();
+    private Map<Register, Register> renameMap = new HashMap<>();
 
     private void addEdge(VirtualRegister x, VirtualRegister y) {
         getVregInfo(x).neighbours.add(y);
@@ -322,17 +321,17 @@ public class RegisterAllocator {
     }
 
     public void Allocate() {
-        for (Function irFunction : root.getFuncs().values()) {
+        for (Function func : root.getFuncs().values()) {
             vregInfoMap.clear();
             vregNodes.clear();
             degreeSmallVregNodes.clear();
 
-            for (VirtualRegister argVreg : irFunction.getArgVRegList()) {
+            for (VirtualRegister argVreg : func.getArgVRegList()) {
                 getVregInfo(argVreg);
             }
-            for (BasicBlock bb : irFunction.getReversePreOrder()) {
+            for (BasicBlock bb : func.getReversePreOrder()) {
                 for (Quad inst = bb.getFirstInst(); inst != null; inst = inst.getNextInst()) {
-                    IRRegister definedReg = inst.getDefinedRegister();
+                    Register definedReg = inst.getDefinedRegister();
                     if (!(definedReg instanceof VirtualRegister))
                         continue;
                     VirtualRegInfo vregInfo = getVregInfo((VirtualRegister) definedReg);
@@ -404,7 +403,7 @@ public class RegisterAllocator {
                     vregInfo.color = forcedPhysicalRegister;
                 } else {
                     for (VirtualRegister suggestSameVreg : vregInfo.suggestSameVRegs) {
-                        IRRegister color = getVregInfo(suggestSameVreg).color;
+                        Register color = getVregInfo(suggestSameVreg).color;
                         if (color instanceof PhysicalRegister && !usedColors.contains(color)) {
                             vregInfo.color = color;
                             break;
@@ -418,16 +417,15 @@ public class RegisterAllocator {
                             }
                         }
                         if (vregInfo.color == null) {
-                            vregInfo.color = irFunction.getArgsStackSlotMap().get(vreg);
+                            vregInfo.color = func.getArgsStackSlotMap().get(vreg);
                             if (vregInfo.color == null)
-                                vregInfo.color = new StackSlot(irFunction, vreg.getName(),
-                                        false);
+                                vregInfo.color = new StackSlot(func, vreg.getName(), false);
                         }
                     }
                 }
             }
 
-            updateInstruction(irFunction);
+            updateInstruction(func);
         }
     }
 
@@ -442,13 +440,13 @@ public class RegisterAllocator {
                         }
                     }
                 } else {
-                    Collection<IRRegister> usedRegisters = inst.getUsedRegisters();
+                    Collection<Register> usedRegisters = inst.getUsedRegisters();
                     if (!usedRegisters.isEmpty()) {
                         boolean usedPreg0 = false;
                         renameMap.clear();
-                        for (IRRegister reg : usedRegisters) {
+                        for (Register reg : usedRegisters) {
                             if (reg instanceof VirtualRegister) {
-                                IRRegister color = vregInfoMap.get(reg).color;
+                                Register color = vregInfoMap.get(reg).color;
                                 if (color instanceof StackSlot) {
                                     PhysicalRegister preg;
                                     if (usedPreg0) {
@@ -473,9 +471,9 @@ public class RegisterAllocator {
                         inst.setUsedRegisters(renameMap);
                     }
                 }
-                IRRegister definedReg = inst.getDefinedRegister();
+                Register definedReg = inst.getDefinedRegister();
                 if (definedReg instanceof VirtualRegister) {
-                    IRRegister color = vregInfoMap.get(definedReg).color;
+                    Register color = vregInfoMap.get(definedReg).color;
                     if (color instanceof StackSlot) {
                         inst.setDefinedRegister(preg0);
                         inst.appendInst(

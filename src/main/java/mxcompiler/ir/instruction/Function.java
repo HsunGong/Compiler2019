@@ -58,11 +58,10 @@ public class Function {
     public final boolean isMemFunc = false; // FIX: waht is this ??
     public boolean isRecursiveCall = false;
 
-    // getStackSLots
+    // args and stackslot
+    public List<VirtualRegister> argVregs = new ArrayList<>(); // argVRegList
     public List<StackSlot> stackSlots = new ArrayList<>();
-    // getArgsStackSlotMap
     public Map<VirtualRegister, StackSlot> argsMap = new HashMap<>(); // argsStackSlotMap
-    public List<VirtualRegister> argVReg = new ArrayList<>(); // argVRegList
 
     public Set<PhysicalRegister> usedPhysicalGeneralRegs = new HashSet<>();
     // endregion

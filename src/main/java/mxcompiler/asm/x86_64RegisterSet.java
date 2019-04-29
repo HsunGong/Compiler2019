@@ -43,13 +43,14 @@ public class x86_64RegisterSet {
     public static final Collection<PhysicalRegister> callerSaveRegs;
     public static final Collection<PhysicalRegister> calleeSaveRegs;
     // 6 args for rdi, rsi, rdx, rcx, r8, and r9
-    public static final List<PhysicalRegister> arg6;
+    public static final Collection<PhysicalRegister> argRegs; // arg6
 
     static {
         List<PhysicalRegister> all = new ArrayList<>();
         List<PhysicalRegister> general = new ArrayList<>();
         List<PhysicalRegister> callerSave = new ArrayList<>();
         List<PhysicalRegister> calleeSave = new ArrayList<>();
+        List<PhysicalRegister> arg6 = new ArrayList<>();
         
         rdi = new PhysicalRegister("rdi", false, true, false, 0);
         rsi = new PhysicalRegister("rsi", false, true, false, 1);
@@ -73,7 +74,6 @@ public class x86_64RegisterSet {
         r14 = new PhysicalRegister("r14", true, false, true, -1);
         r15 = new PhysicalRegister("r15", true, false, true, -1);
 
-        arg6 = new ArrayList<>();
         arg6.add(rdi);
         arg6.add(rsi);
         arg6.add(rdx);
@@ -103,9 +103,10 @@ public class x86_64RegisterSet {
         all.stream().filter(PhysicalRegister::isCalleeSave).forEach(calleeSave::add);
 
         // keep still
-        allRegs = Collections.unmodifiableCollection(all);
-        generalRegs = Collections.unmodifiableCollection(general);
+        allRegs = Collections.unmodifiableList(all);
+        generalRegs = Collections.unmodifiableList(general);
         callerSaveRegs = Collections.unmodifiableList(callerSave);
         calleeSaveRegs = Collections.unmodifiableList(calleeSave);
+        argRegs = Collections.unmodifiableList(arg6);
     }
 }

@@ -156,7 +156,7 @@ public class IRBuilder extends Visitor {
             entity.register = vreg;
 
             if (isFuncArgDecl)
-                curFunc.argVReg.add(vreg);
+                curFunc.argVregs.add(vreg);
 
             if (node.getInit() == null) {
                 if (!isFuncArgDecl) { // init with 0
@@ -202,7 +202,7 @@ public class IRBuilder extends Visitor {
 
             VirtualRegister vreg = new VirtualRegister(Scope.BuiltIn.THIS.toString());
             entity.register = vreg;
-            curFunc.argVReg.add(vreg);
+            curFunc.argVregs.add(vreg);
         }
 
         isFuncArgDecl = true; // deal other param
@@ -1412,7 +1412,7 @@ public class IRBuilder extends Visitor {
 
         bakFunc.start = (BasicBlock) bbRenameMap.get(func.start);
         bakFunc.end = (BasicBlock) bbRenameMap.get(func.end);
-        bakFunc.argVReg = func.argVReg;
+        bakFunc.argVregs = func.argVregs;
         return bakFunc;
     }
 
@@ -1606,7 +1606,7 @@ public class IRBuilder extends Visitor {
 
         // add args
         for (int i = 0; i < funcCallInst.getArgs().size(); ++i) {
-            VirtualRegister oldArgVreg = calleeFunc.argVReg.get(i);
+            VirtualRegister oldArgVreg = calleeFunc.argVregs.get(i);
             VirtualRegister newArgVreg = oldArgVreg.copy();
 
             parent.addBeforeInst(iter,
