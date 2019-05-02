@@ -7,7 +7,7 @@ import mxcompiler.utils.Dump;
 
 
 public class Jump extends JumpQuad {
-    public BasicBlock target; // reference is fine to change value
+    private BasicBlock target; // reference is fine to change value
 
     public Jump(BasicBlock parent, BasicBlock target) {
         super(parent);
@@ -17,6 +17,10 @@ public class Jump extends JumpQuad {
 
     public BasicBlock getTarget() {
         return target;
+    }
+
+    public void setTarget(BasicBlock bb) {
+        this.target = bb;
     }
 
     @Override

@@ -11,7 +11,7 @@ import mxcompiler.utils.Dump;
 /** branch */
 public class CJump extends JumpQuad {
     private RegValue cond;
-    public BasicBlock thenBB, elseBB;
+    private BasicBlock thenBB, elseBB;
 
     public CJump(BasicBlock parent, RegValue cond, BasicBlock thenBB, BasicBlock elseBB) {
         super(parent);
@@ -27,6 +27,14 @@ public class CJump extends JumpQuad {
 
     public BasicBlock getThen() {
         return thenBB;
+    }
+
+    public void setThen(BasicBlock bb) {
+        this.thenBB = bb;
+    }
+
+    public void setElse(BasicBlock bb) {
+        this.elseBB = bb;
     }
 
     public BasicBlock getElse() {

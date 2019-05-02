@@ -218,6 +218,8 @@ each ListIterator (after function-value-pass) return a value which do not change
 retainAll -> remove others
 stream.filter -> still have others
 
+https://www.zhihu.com/question/29355187
+
 # -DTest=
 
 [register-web]: https://www.cs.uaf.edu/2017/fall/cs301/reference/x86_64.html

@@ -5,16 +5,16 @@ import java.util.*;
 import mxcompiler.ast.statement.StmtNode;
 import mxcompiler.ir.instruction.BasicBlock;
 import mxcompiler.ir.instruction.Function;
-import mxcompiler.ir.register.StaticData;
-import mxcompiler.ir.register.StaticString;
+import mxcompiler.ir.register.*;
 // import mxcompiler.utils.scope.Scope;
 import mxcompiler.utils.scope.Scope.BuiltIn;
 
 
 public class Root {
     public boolean hasDivShiftInst = false;
-    public int maxNumFuncArgs = 3;
-    // public PhysicalRegister preg0, preg1;
+
+    // pregs
+    public PhysicalRegister preg0, preg1;
 
     public Root() {
         initBuiltInFunc();
@@ -118,7 +118,7 @@ public class Root {
 
     public static class ForRecord {
         public BasicBlock cond, incr, body, after;
-        public boolean proccessed = false;
+        public boolean processed = false;
 
         public ForRecord(BasicBlock cond, BasicBlock incr, BasicBlock body, BasicBlock after) {
             this.cond = cond;

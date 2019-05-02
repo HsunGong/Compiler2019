@@ -90,7 +90,7 @@ public class BasicBlock {
     /**
      * remove (support Last but not Jump Inst<Already Delete Jump>)
      * <p>
-     * illigal: don't have iter.next() after origin
+     * 
      * 
      * <pre>
      * // origin: iter inst(select) (inst2)
@@ -99,9 +99,42 @@ public class BasicBlock {
      * delInst(iter)
      * // after: iter (inst2)
      * </pre>
+     * 
+     * @illigal don't have iter.next() after origin
+     *          <p>
+     *          can't use iter.previous() to replace iter.next()
      */
     public ListIterator<Quad> removeInst(ListIterator<Quad> iter) {
         Quad inst = iter.previous(); // check if inst is removed ??
+        inst.removed = true;
+        if (inst == insts.getLast()) {
+            // only to make sure it is last
+            if (hasJump)
+                delJumpSideEffect();
+        }
+
+        iter.remove(); // remove inst
+        return iter;
+    }
+
+    /**
+     * remove (support Last but not Jump Inst<Already Delete Jump>)
+     * <p>
+     * 
+     * <pre>
+     * // origin: (inst2) iter inst(select)
+     * iter.next(); inst ...
+     * // before: (inst2) inst(select) iter
+     * delInst(iter)
+     * // after: iter (inst2)
+     * </pre>
+     * 
+     * @illigal don't have iter.previous() after origin
+     *          <p>
+     *          can't use iter.next() to replace iter.previous()
+     */
+    public ListIterator<Quad> removeInstFromPrevious(ListIterator<Quad> iter) {
+        Quad inst = iter.next(); // check if inst is removed ??
         inst.removed = true;
         if (inst == insts.getLast()) {
             // only to make sure it is last

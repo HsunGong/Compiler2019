@@ -60,8 +60,8 @@ public class Function {
 
     // args and stackslot
     public List<VirtualRegister> argVregs = new ArrayList<>(); // argVRegList
+    public Map<VirtualRegister, StackSlot> argsToStackSlot = new HashMap<>(); // argsStackSlotMap
     public List<StackSlot> stackSlots = new ArrayList<>();
-    public Map<VirtualRegister, StackSlot> argsMap = new HashMap<>(); // argsStackSlotMap
 
     public Set<PhysicalRegister> usedPhysicalGeneralRegs = new HashSet<>();
     // endregion

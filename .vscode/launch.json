@@ -13,12 +13,6 @@
 			"projectName": "mxc"
 		},
 		{
-			"type": "java",
-			"name": "Debug (Launch) - Current File",
-			"request": "launch",
-			"mainClass": "${file}"
-		},
-		{
 			"name": "Debug ANTLR4 grammar",
 			"type": "antlr-debug",
 			"request": "launch",
