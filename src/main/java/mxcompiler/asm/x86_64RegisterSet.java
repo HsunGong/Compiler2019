@@ -38,12 +38,13 @@ public class x86_64RegisterSet {
     // r12 r13 r14 r15
 
     // reg-sets
-    public static final Collection<PhysicalRegister> allRegs;
-    public static final Collection<PhysicalRegister> generalRegs;
-    public static final Collection<PhysicalRegister> callerSaveRegs;
-    public static final Collection<PhysicalRegister> calleeSaveRegs;
+    public static final List<PhysicalRegister> allRegs;
+    public static final List<PhysicalRegister> generalRegs;
+    public static final List<PhysicalRegister> callerSaveRegs;
+    public static final List<PhysicalRegister> calleeSaveRegs;
     // 6 args for rdi, rsi, rdx, rcx, r8, and r9
-    public static final Collection<PhysicalRegister> argRegs; // arg6
+    public static final List<PhysicalRegister> argRegs; // arg6
+    public static final int Arg_Num = 6;
 
     static {
         List<PhysicalRegister> all = new ArrayList<>();
@@ -57,18 +58,18 @@ public class x86_64RegisterSet {
         rdx = new PhysicalRegister("rdx", false, true, false, 2);
         rcx = new PhysicalRegister("rcx", false, true, false, 3);
         
-        r8 = new PhysicalRegister("r8", true, true, false, 4);
-        r9 = new PhysicalRegister("r9", true, true, false, 5);
-
+        
         rax = new PhysicalRegister("rax", false, true, false, -1);
         rbx = new PhysicalRegister("rbx", false, false, true, -1);
         rsp = new PhysicalRegister("rsp", false, true, false, -1);
         rbp = new PhysicalRegister("rbp", false, false, true, -1);
-
+        
         // r8 and r9 are actually general registers
+        r8 = new PhysicalRegister("r8", true, true, false, 4);
+        r9 = new PhysicalRegister("r9", true, true, false, 5);
+
         r10 = new PhysicalRegister("r10", true, true, false, -1);
         r11 = new PhysicalRegister("r11", true, true, false, -1);
-
         r12 = new PhysicalRegister("r12", true, false, true, -1);
         r13 = new PhysicalRegister("r13", true, false, true, -1);
         r14 = new PhysicalRegister("r14", true, false, true, -1);

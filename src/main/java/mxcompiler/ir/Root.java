@@ -13,7 +13,7 @@ import mxcompiler.utils.scope.Scope.BuiltIn;
 public class Root {
     public boolean hasDivShiftInst = false;
 
-    // pregs
+    /** pregs -> used for stack slot (defined once) */
     public PhysicalRegister preg0, preg1;
 
     public Root() {

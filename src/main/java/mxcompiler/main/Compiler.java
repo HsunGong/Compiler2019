@@ -72,17 +72,16 @@ public final class Compiler {
 			semanticAnalyze();
 
 			buildIR();
-			codeGenerate();
+			generateAssembly();
 
 		} catch (Exception e) {
 			throw new Error(e);
 		}
 	}
 
-	private void codeGenerate() throws Error{
+	private void generateAssembly() throws Error{
 		RegisterAllocator allocator = new RegisterAllocator(irRoot);
 		allocator.execute();
-
 	}
 
 	private void buildIR() throws Error {

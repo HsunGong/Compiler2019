@@ -36,8 +36,8 @@ public class Bin extends Quad {
         return op;
     }
 
-    public RegValue getDst() {
-        return dst;
+    public Register getDst() {
+        return (Register) dst;
     }
 
     public RegValue getRhs() {

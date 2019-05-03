@@ -1,13 +1,14 @@
 package mxcompiler.main;
 
 import static mxcompiler.asm.x86_64RegisterSet.*;
+import static mxcompiler.ir.register.RegValue.RegSize;
 // import mxcompiler.asm.x86_64RegisterSet;
 
+import mxcompiler.ast.expression.BinaryOpExprNode;
 import mxcompiler.error.CompileError;
 import mxcompiler.ir.*;
 import mxcompiler.ir.instruction.*;
 import mxcompiler.ir.register.*;
-
 import java.util.*;
 
 
@@ -17,12 +18,20 @@ public class RegisterAllocator {
 
     public RegisterAllocator(Root root) {
         this.root = root;
-        // pre analysis
-        AllocateArgs();
-        LifeCycleAnalysis();
+
     }
 
-    private void AllocateArgs() {
+    public void execute() throws Error {
+        // pre analysis
+        AllocateNaiveArgs();
+        LifeCycleAnalysis();
+
+        PaintColors();
+
+        dealFuncall();
+    }
+
+    private void AllocateNaiveArgs() {
         for (Function func : root.getFunc().values()) {
             LinkedList<Quad> insts = func.start.getInsts();
             BasicBlock parent = func.start;
@@ -34,7 +43,7 @@ public class RegisterAllocator {
                 StackSlot argSlot = new StackSlot("arg" + Integer.toString(i), func, true);
                 func.argsToStackSlot.put(argVreg, argSlot);
 
-                insts.addFirst(new Load(parent, argVreg, RegValue.RegSize, argSlot, 0));
+                insts.addFirst(new Load(parent, argVreg, RegSize, argSlot, 0));
             }
 
             if (size > 0)
@@ -290,11 +299,11 @@ public class RegisterAllocator {
     // endregion
 
     // region allocate-graph
-    private List<PhysicalRegister> physicalRegs;
-    private PhysicalRegister preg0, preg1;
+    private List<PhysicalRegister> physicalRegs; // general regs not r**
+    private PhysicalRegister preg0, preg1; // used for stack slot
     private int numColors; // can defined once
 
-    public void execute() throws Error {
+    private void PaintColors() {
         // pre analysis-getConclusion
         this.physicalRegs = new ArrayList<>(generalRegs);
 
@@ -311,7 +320,7 @@ public class RegisterAllocator {
             preg1 = physicalRegs.get(0);
         }
 
-        root.preg0 = preg0;
+        root.preg0 = preg0; // will error ??
         root.preg1 = preg1;
         this.physicalRegs.remove(preg0);
         this.physicalRegs.remove(preg1);
@@ -326,10 +335,10 @@ public class RegisterAllocator {
     private class VregInfo {
         Set<VirtualRegister> neighbours = new HashSet<>();
         boolean removed = false;
-        Register color = null;
+        Register color = null; // neither Physical or StackSlot
         int degree = 0;
 
-        Set<VirtualRegister> suggestSameVRegs = new HashSet<>();
+        Set<VirtualRegister> moveVregs = new HashSet<>();
     }
 
     // put before get
@@ -388,11 +397,12 @@ public class RegisterAllocator {
 
                 VregInfo vregInfo = pgVregInfo((VirtualRegister) definedReg);
 
+                // add edge and suggestReg
                 if (inst instanceof Move) {
-                    RegValue rhs = ((Move) inst).getRhs();
+                    RegValue rhs = ((Move) inst).getRhs(); // add same Vreg
                     if (rhs instanceof VirtualRegister) {
-                        vregInfo.suggestSameVRegs.add((VirtualRegister) rhs);
-                        pgVregInfo((VirtualRegister) rhs).suggestSameVRegs
+                        vregInfo.moveVregs.add((VirtualRegister) rhs);
+                        pgVregInfo((VirtualRegister) rhs).moveVregs
                                 .add((VirtualRegister) definedReg);
                     }
 
@@ -458,31 +468,32 @@ public class RegisterAllocator {
 
             // paint
             PhysicalRegister allocatedPreg = vreg.forcedPhysicalRegister;
-            if (allocatedPreg != null) { // args
+            if (allocatedPreg != null) { // forced-Pregs: args
                 if (usedColors.contains(allocatedPreg))
                     throw new CompileError("forced physical register has been used");
 
                 vregInfo.color = allocatedPreg;
             } else {
-                // paint same color
-                for (VirtualRegister suggestSameVreg : vregInfo.suggestSameVRegs) {
-                    Register color = pgVregInfo(suggestSameVreg).color;
+                // paint same color from move-inst
+                for (VirtualRegister moveVreg : vregInfo.moveVregs) {
+                    Register color = pgVregInfo(moveVreg).color; // may changed move-vreg
+
                     if (color instanceof PhysicalRegister && !usedColors.contains(color)) {
-                        vregInfo.color = color;
+                        vregInfo.color = color; // changed vreg
                         break;
                     }
                 }
 
                 // real paint color
                 if (vregInfo.color == null) {
-                    // allocate by order
-                    for (PhysicalRegister Preg : physicalRegs)
-                        if (!usedColors.contains(Preg)) {
-                            vregInfo.color = Preg;
+                    // allocate preg by order
+                    for (PhysicalRegister preg : physicalRegs)
+                        if (!usedColors.contains(preg)) {
+                            vregInfo.color = preg;
                             break;
                         }
 
-                    // no Preg can be used
+                    // no preg can be used -- > memory
                     if (vregInfo.color == null) {
                         // already have stack ?
                         vregInfo.color = func.argsToStackSlot.get(vreg);
@@ -496,30 +507,28 @@ public class RegisterAllocator {
 
         for (BasicBlock bb : func.getReversePreOrder()) {
             ListIterator<Quad> iter = bb.getInsts().listIterator();
-            while (iter.hasNext()) {
+            while (iter.hasNext())
                 updateInstruction(func, iter);
-            }
         }
     }
-
-    private Map<Register, Register> renameMap = new HashMap<>();
 
     private void updateInstruction(Function func, ListIterator<Quad> iter) {
         Quad inst = iter.next();
         BasicBlock bb = inst.getParent();
 
-        // deal used Regs
+        // set Physical Regs
+        // deal used regs
         if (inst instanceof Funcall) {
             List<RegValue> args = ((Funcall) inst).getArgs();
             for (int i = 0; i < args.size(); ++i) {
                 if (args.get(i) instanceof VirtualRegister)
                     args.set(i, vregInfoMap.get(args.get(i)).color);
             }
-        } else { // deal used Regs
+        } else { // rename used registers
             List<Register> usedRegs = inst.usedRegisters;
             if (!usedRegs.isEmpty()) {
                 boolean usedPreg0 = false;
-                renameMap.clear();
+                Map<Register, Register> renameMap = new HashMap<>();
 
                 for (Register reg : usedRegs) {
                     if (reg instanceof VirtualRegister) {
@@ -534,36 +543,325 @@ public class RegisterAllocator {
                                 usedPreg0 = true;
                             }
 
-                            bb.addBeforeInst(iter,
-                                    new Load(bb, preg, RegValue.RegSize, color, 0));
+                            bb.addBeforeInst(iter, new Load(bb, preg, RegSize, color, 0));
                             color = preg;
                         }
 
                         renameMap.put(reg, color);
                         func.usedPhysicalGeneralRegs.add((PhysicalRegister) color);
-                    } else
+                    } else {
                         renameMap.put(reg, reg);
+                    }
                 }
 
                 inst.setUsedRegisters(renameMap);
             }
         }
 
-        // del defined Reg
+        // del defined Regs
         Register definedReg = inst.getDefinedRegister();
         if (definedReg instanceof VirtualRegister) {
             Register color = vregInfoMap.get(definedReg).color;
             if (color instanceof StackSlot) {
-                bb.addAfterInst(iter, new Store(bb, preg0, RegValue.RegSize, color, 0));
+                bb.addAfterInst(iter, new Store(bb, preg0, RegSize, color, 0));
                 color = preg0;
             }
+            // TODO: with div ???
 
             inst.setDefinedRegister(color);
             func.usedPhysicalGeneralRegs.add((PhysicalRegister) color);
-
         }
 
     }
 
+    // endregion
+
+    // region deal Funcall
+    /** Info of Regs */
+    private class FuncInfo {
+        List<PhysicalRegister> usedCallerSaveRegs = new ArrayList<>();
+        List<PhysicalRegister> usedCalleeSaveRegs = new ArrayList<>();
+        Set<PhysicalRegister> recursiveUsedRegs = new HashSet<>();
+        Map<StackSlot, Integer> stackOffsetMap = new HashMap<>();
+        int numExtraArgs; // for before frame
+        int numStackSlot = 0; // for frame
+    }
+
+    private Map<Function, FuncInfo> funcInfoMap = new HashMap<>();
+
+    private void dealFuncall() {
+        // add funcInfo
+        for (Function func : root.getFunc().values()) {
+            FuncInfo info = new FuncInfo();
+
+            // add used regs
+            for (PhysicalRegister preg : func.usedPhysicalGeneralRegs) {
+                if (preg.isCalleeSave())
+                    info.usedCalleeSaveRegs.add(preg);
+                if (preg.isCallerSave())
+                    info.usedCallerSaveRegs.add(preg);
+            }
+            info.usedCalleeSaveRegs.add(rbx); // TODO: rbx ???
+            info.usedCalleeSaveRegs.add(rbp);
+
+            // stackSlot
+            info.numStackSlot = func.stackSlots.size();
+            for (int i = 0; i < info.numStackSlot; ++i)
+                info.stackOffsetMap.put(func.stackSlots.get(i), i * RegSize);
+            if ((info.usedCalleeSaveRegs.size() + info.numStackSlot) % 2 == 0)
+                ++info.numStackSlot;
+            // return need 1 : info.usedCalleeSaveRegs.size() + info.numStackSlot + 1
+
+            // set stack Offset Map
+            int argOffset = (info.usedCalleeSaveRegs.size() + info.numStackSlot + 1) * RegSize;
+            for (int i = 6; i < func.argVregs.size(); ++i) {
+                info.stackOffsetMap.put(func.argsToStackSlot.get(func.argVregs.get(i)),
+                        argOffset);
+                argOffset += RegSize;
+            }
+
+            // deal extra args
+            info.numExtraArgs = func.argVregs.size() - Arg_Num;
+            if (info.numExtraArgs < 0)
+                info.numExtraArgs = 0;
+
+            funcInfoMap.put(func, info);
+        }
+
+        root.getBuiltInFunc().values().forEach(func -> funcInfoMap.put(func, new FuncInfo()));
+
+        // add recursive used regs from func's used-preg-general
+        for (Function func : funcInfoMap.keySet()) {
+            FuncInfo info = funcInfoMap.get(func);
+
+            info.recursiveUsedRegs.addAll(func.usedPhysicalGeneralRegs);
+            for (Function calleeFunc : func.recursiveCalleeSet)
+                info.recursiveUsedRegs.addAll(calleeFunc.usedPhysicalGeneralRegs);
+        }
+
+        for (Function func : root.getFunc().values()) {
+            FuncInfo info = funcInfoMap.get(func);
+            int argSize = func.argVregs.size();
+            BasicBlock entryBB = func.start;
+            LinkedList<Quad> insts = entryBB.getInsts();
+
+            // transform function entry
+            info.usedCalleeSaveRegs.forEach(preg -> insts.addFirst(new Push(entryBB, preg)));
+
+            // figure out stack size and check out stack
+            if (info.numStackSlot > 0)
+                insts.addFirst(new Bin(entryBB, rsp, BinaryOpExprNode.Op.SUB, rsp,
+                        new IntImm(info.numStackSlot * RegSize)));
+            insts.addFirst(new Move(entryBB, rbp, rsp));
+
+            for (BasicBlock bb : func.getReversePostOrder()) {
+                ListIterator<Quad> iter = bb.getInsts().listIterator();
+                while (iter.hasNext()) {
+                    Quad inst = iter.next();
+                    // funcall : caller-args stored and push callee-args to reg
+                    if (inst instanceof Funcall) {
+                        Function calleeFunc = ((Funcall) inst).getFunc();
+                        FuncInfo calleeInfo = funcInfoMap.get(calleeFunc);
+
+                        // region push-regs
+                        int numPushCallerSave = 0;
+
+                        // push caller save registers which would be changed by callee
+                        for (PhysicalRegister preg : info.usedCallerSaveRegs) {
+                            // preg is arg and idx is aviliable
+                            if (preg.isArg() && preg.getArgIdx() < argSize)
+                                continue;
+
+                            // preg is used in callee func
+                            if (calleeInfo.recursiveUsedRegs.contains(preg)) {
+                                ++numPushCallerSave;
+                                bb.addBeforeInst(iter, new Push(bb, preg));
+                            }
+                        }
+
+                        int numPushArg6Regs = argSize <= 6 ? argSize : 6;
+                        // push argument registers
+                        for (int i = 0; i < numPushArg6Regs; ++i)
+                            bb.addBeforeInst(iter, new Push(bb, argRegs.get(i)));
+                        numPushCallerSave += numPushArg6Regs;
+                        // endregion
+
+                        // set arguments
+                        boolean extraPush = false;
+                        List<RegValue> args = ((Funcall) inst).getArgs();
+                        List<Integer> arg6BakOffset = new ArrayList<>();
+                        Map<PhysicalRegister, Integer> arg6BakOffsetMap = new HashMap<>();
+
+                        // for rsp alignment
+                        if ((numPushCallerSave + calleeInfo.numExtraArgs) % 2 == 1) {
+                            extraPush = true;
+                            bb.addBeforeInst(iter, new Push(bb, new IntImm(0)));
+                        }
+
+                        for (int i = args.size() - 1; i > 5; --i) {
+                            if (args.get(i) instanceof StackSlot) {
+                                inst.prependInst(new Load(inst.getParentBB(), rax,
+                                        Configuration.getRegSize(), rbp,
+                                        funcInfo.stackOffsetMap.get(args.get(i))));
+                                inst.prependInst(new IRPush(inst.getParentBB(), rax));
+                            } else {
+                                inst.prependInst(new IRPush(inst.getParentBB(), args.get(i)));
+                            }
+                        }
+
+                        int bakOffset = 0;
+                        for (int i = 0; i < 6; ++i) {
+                            if (args.size() <= i)
+                                break;
+                            if (args.get(i) instanceof PhysicalRegister
+                                    && ((PhysicalRegister) args.get(i)).isArg6()
+                                    && ((PhysicalRegister) args.get(i)).getArg6Idx() < args
+                                            .size()) {
+                                PhysicalRegister preg = (PhysicalRegister) args.get(i);
+                                if (arg6BakOffsetMap.containsKey(preg)) {
+                                    arg6BakOffset.add(arg6BakOffsetMap.get(preg));
+                                } else {
+                                    arg6BakOffset.add(bakOffset);
+                                    arg6BakOffsetMap.put(preg, bakOffset);
+                                    inst.prependInst(new IRPush(inst.getParentBB(), preg));
+                                    ++bakOffset;
+                                }
+                            } else {
+                                arg6BakOffset.add(-1);
+                            }
+                        }
+
+                        for (int i = 0; i < 6; ++i) {
+                            if (args.size() <= i)
+                                break;
+                            if (arg6BakOffset.get(i) == -1) {
+                                if (args.get(i) instanceof StackSlot) {
+                                    inst.prependInst(new Load(inst.getParentBB(), rax,
+                                            Configuration.getRegSize(), rbp,
+                                            funcInfo.stackOffsetMap.get(args.get(i))));
+                                    inst.prependInst(
+                                            new Move(inst.getParentBB(), arg6.get(i), rax));
+                                } else {
+                                    inst.prependInst(new Move(inst.getParentBB(), arg6.get(i),
+                                            args.get(i)));
+                                }
+                            } else {
+                                inst.prependInst(new Load(inst.getParentBB(), arg6.get(i),
+                                        Configuration.getRegSize(), rsp,
+                                        Configuration.getRegSize()
+                                                * (bakOffset - arg6BakOffset.get(i) - 1)));
+                            }
+                        }
+
+                        if (bakOffset > 0) {
+                            inst.prependInst(new IRBinaryOperation(inst.getParentBB(), rsp,
+                                    IRBinaryOperation.IRBinaryOp.ADD, rsp,
+                                    new IntImmediate(bakOffset * Configuration.getRegSize())));
+                        }
+
+                        // get return value
+                        if (((FunctionCall) inst).getDest() != null) {
+                            inst.appendInst(new Move(inst.getParentBB(),
+                                    ((FunctionCall) inst).getDest(), rax));
+                        }
+
+                        // restore caller save registers
+                        for (PhysicalRegister preg : funcInfo.usedCallerSaveRegs) {
+                            if (preg.isArg6()
+                                    && preg.getArg6Idx() < func.getArgVRegList().size())
+                                continue;
+                            if (calleeInfo.recursiveUsedRegs.contains(preg)) {
+                                inst.appendInst(new IRPop(inst.getParentBB(), preg));
+                            }
+                        }
+
+                        // restore argument registers
+                        for (int i = 0; i < numPushArg6Regs; ++i) {
+                            inst.appendInst(new IRPop(inst.getParentBB(), arg6.get(i)));
+                        }
+
+                        // remove extra arguments
+                        if (calleeInfo.numExtraArgs > 0 || extraPush) {
+                            int numPushArg = extraPush ? calleeInfo.numExtraArgs + 1
+                                    : calleeInfo.numExtraArgs;
+                            inst.appendInst(new IRBinaryOperation(inst.getParentBB(), rsp,
+                                    IRBinaryOperation.IRBinaryOp.ADD, rsp, new IntImmediate(
+                                            numPushArg * Configuration.getRegSize())));
+                        }
+                    } else if (inst instanceof HeapAlloc) {
+                        // push caller save registers which would be changed by callee
+                        int numPushCallerSave = 0;
+                        for (PhysicalRegister preg : funcInfo.usedCallerSaveRegs) {
+                            ++numPushCallerSave;
+                            // could be optimized known which reg would not be changed by
+                            // malloc
+                            inst.prependInst(new IRPush(inst.getParentBB(), preg));
+                        }
+                        // set arg
+                        inst.prependInst(new Move(inst.getParentBB(), rdi,
+                                ((HeapAlloc) inst).getAllocSize()));
+                        // for rsp alignment
+                        if (numPushCallerSave % 2 == 1) {
+                            inst.prependInst(
+                                    new IRPush(inst.getParentBB(), new IntImmediate(0)));
+                        }
+                        // get return value
+                        inst.appendInst(new Move(inst.getParentBB(),
+                                ((HeapAlloc) inst).getDest(), rax));
+                        // restore caller save registers
+                        for (PhysicalRegister preg : funcInfo.usedCallerSaveRegs) {
+                            // could be optimized known which reg would not be changed by
+                            // malloc
+                            inst.appendInst(new IRPop(inst.getParentBB(), preg));
+                        }
+                        // restore rsp
+                        if (numPushCallerSave % 2 == 1) {
+                            inst.appendInst(new IRBinaryOperation(inst.getParentBB(), rsp,
+                                    IRBinaryOperation.IRBinaryOp.ADD, rsp,
+                                    new IntImmediate(Configuration.getRegSize())));
+                        }
+
+                    } else if (inst instanceof Load) {
+                        if (((Load) inst).getAddr() instanceof StackSlot) {
+                            ((Load) inst).setAddrOffset(
+                                    funcInfo.stackOffsetMap.get(((Load) inst).getAddr()));
+                            ((Load) inst).setAddr(rbp);
+                        }
+                    } else if (inst instanceof Store) {
+                        if (((Store) inst).getAddr() instanceof StackSlot) {
+                            ((Store) inst).setAddrOffset(
+                                    funcInfo.stackOffsetMap.get(((Store) inst).getAddr()));
+                            ((Store) inst).setAddr(rbp);
+                        }
+                    } else if (inst instanceof Move) {
+                        // remove useless move: a <- a
+                        if (((Move) inst).getLhs() == ((Move) inst).getRhs()) {
+                            inst.remove();
+                        }
+                    }
+                }
+            }
+
+            Return retInst = func.returns.get(0);
+            if (retInst.getReturnValue() != null) {
+                retInst.prependInst(
+                        new Move(retInst.getParentBB(), rax, retInst.getRetValue()));
+            }
+
+            // transform function exit
+            BasicBlock exitBB = func.end;
+            ListIterator<Quad> iter = exitBB.getInsts()
+                    .listIterator(exitBB.getInsts().size() - 1);
+            iter.next();
+            
+            // last.prepend
+            if (info.numStackSlot > 0)
+                exitBB.addBeforeInst(iter, new Bin(exitBB, rsp, BinaryOpExprNode.Op.ADD, rsp,
+                        new IntImm(info.numStackSlot * RegSize)));
+            for (int i = info.usedCalleeSaveRegs.size() - 1; i >= 0; --i) {
+                exitBB.addBeforeInst(iter, new Pop(entryBB, info.usedCalleeSaveRegs.get(i)));
+            }
+        }
+    }
     // endregion
 }

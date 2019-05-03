@@ -38,8 +38,8 @@ public class Load extends MemQuad {
         this.isLoadAddr = isLoadAddr;
     }
 
-    public RegValue getDst() {
-        return dst;
+    public Register getDst() {
+        return (Register) dst;
     }
 
     public int getSize() {

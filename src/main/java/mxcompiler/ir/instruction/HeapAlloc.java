@@ -26,8 +26,8 @@ public class HeapAlloc extends Quad {
         reloadUsedRegs();
     }
 
-    public RegValue getDst() {
-        return dst;
+    public Register getDst() {
+        return (Register) dst;
     }
 
     public RegValue getAllocSize() {

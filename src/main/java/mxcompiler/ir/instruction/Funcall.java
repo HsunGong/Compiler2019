@@ -36,8 +36,8 @@ public class Funcall extends Quad {
         return args;
     }
 
-    public RegValue getDst() {
-        return dst;
+    public Register getDst() {
+        return (Register) dst;
     }
 
     /** {@inheritDoc} */
