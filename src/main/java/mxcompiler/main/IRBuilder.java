@@ -1182,7 +1182,7 @@ public class IRBuilder extends Visitor {
         curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, vreg,
                 new IntImm(RegValue.RegSize)));
 
-        curBB.addLastInst(new HeapAlloc(curBB, vreg, vreg));
+        curBB.addLastInst(new HeapAlloc(curBB, vreg, vreg)); // FIX: what is this ?
         curBB.addLastInst(new Store(curBB, dim.regValue, RegValue.RegSize, vreg, 0));
 
         // has more idx -> need loop-alloc

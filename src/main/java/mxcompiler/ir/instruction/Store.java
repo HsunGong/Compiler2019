@@ -10,8 +10,8 @@ import mxcompiler.utils.Dump;
 public class Store extends Quad {
     private RegValue value;
     private int size;
-    private RegValue baseAddr;
-    private int offset;
+    public RegValue baseAddr;
+    public int offset;
     private boolean isStaticData;
 
     public Store(BasicBlock parent, RegValue value, int size, RegValue baseAddr,

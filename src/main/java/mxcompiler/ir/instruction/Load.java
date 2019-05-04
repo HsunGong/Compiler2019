@@ -14,25 +14,25 @@ public class Load extends MemQuad {
     private RegValue dst; // Register
     private int size;
     private boolean isStaticData, isLoadAddr;
-    public RegValue addr;
+    public RegValue baseAddr;
     public int offset;
 
-    public Load(BasicBlock parent, RegValue destion, int size, RegValue addr, int addrOffset) {
+    public Load(BasicBlock parent, RegValue destion, int size, RegValue baseAddr, int addrOffset) {
         super(parent);
         if (size == 0)
             System.err.println("oh bad size 0");
 
         this.dst = destion;
-        this.addr = addr;
+        this.baseAddr = baseAddr;
         this.offset = addrOffset;
         this.size = size;
         this.isStaticData = false;
         reloadUsedRegs();
     }
 
-    public Load(BasicBlock parent, RegValue destion, int size, StaticData addr,
+    public Load(BasicBlock parent, RegValue destion, int size, StaticData baseAddr,
             boolean isLoadAddr) {
-        this(parent, destion, size, addr, 0);
+        this(parent, destion, size, baseAddr, 0);
 
         this.isStaticData = true;
         this.isLoadAddr = isLoadAddr;
@@ -55,11 +55,11 @@ public class Load extends MemQuad {
         if (isStaticData) {
             return new Load((BasicBlock) renameMap.getOrDefault(parent, parent),
                     (Register) renameMap.getOrDefault(dst, dst), size,
-                    (StaticData) renameMap.getOrDefault(addr, addr), isLoadAddr);
+                    (StaticData) renameMap.getOrDefault(baseAddr, baseAddr), isLoadAddr);
         } else {
             return new Load((BasicBlock) renameMap.getOrDefault(parent, parent),
                     (Register) renameMap.getOrDefault(dst, dst), size,
-                    (RegValue) renameMap.getOrDefault(addr, addr), offset);
+                    (RegValue) renameMap.getOrDefault(baseAddr, baseAddr), offset);
         }
     }
 
@@ -68,16 +68,16 @@ public class Load extends MemQuad {
     public void reloadUsedRegs() {
         usedRegisters.clear();
         usedRegValues.clear();
-        if (addr instanceof Register && !(addr instanceof StackSlot))
-            usedRegisters.add((Register) addr);
-        usedRegValues.add(addr);
+        if (baseAddr instanceof Register && !(baseAddr instanceof StackSlot))
+            usedRegisters.add((Register) baseAddr);
+        usedRegValues.add(baseAddr);
     }
 
     /** {@inheritDoc} */
     @Override
     public void setUsedRegisters(Map<Register, Register> renameMap) {
-        if (addr instanceof Register && !(addr instanceof StackSlot))
-            addr = renameMap.get(addr);
+        if (baseAddr instanceof Register && !(baseAddr instanceof StackSlot))
+            baseAddr = renameMap.get(baseAddr);
         reloadUsedRegs();
     }
 

@@ -43,7 +43,8 @@ public class x86_64RegisterSet {
     public static final List<PhysicalRegister> callerSaveRegs;
     public static final List<PhysicalRegister> calleeSaveRegs;
     // 6 args for rdi, rsi, rdx, rcx, r8, and r9
-    public static final List<PhysicalRegister> argRegs; // arg6
+    /** arg6 */
+    public static final List<PhysicalRegister> argRegs; 
     public static final int Arg_Num = 6;
 
     static {

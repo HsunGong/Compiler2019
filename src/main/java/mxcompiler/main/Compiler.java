@@ -79,9 +79,19 @@ public final class Compiler {
 		}
 	}
 
-	private void generateAssembly() throws Error{
+	private void generateAssembly() throws Error {
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println("Generate asm begin");
+
 		RegisterAllocator allocator = new RegisterAllocator(irRoot);
 		allocator.execute();
+
+		Assembler assembler = new Assembler();
+		assembler.visit(irRoot);
+		assembler.print(fileOut);
+
+		if (opts.mode().equals(CompilerMode.Debug))
+			System.out.println(">>> Generate asm end");
 	}
 
 	private void buildIR() throws Error {
@@ -95,8 +105,6 @@ public final class Compiler {
 		treeIrBuilder.visit(astRoot);
 
 		irRoot = treeIrBuilder.root;
-
-
 
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> IR Builder end");
