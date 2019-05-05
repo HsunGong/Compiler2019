@@ -1,11 +1,12 @@
 package mxcompiler.ast.expression;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 /** Maybe for Nullliteral?? */
 public class NullExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<NullExprNode> %s\n", location.toString());
 
 	}

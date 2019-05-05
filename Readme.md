@@ -184,25 +184,28 @@ each ListIterator (after function-value-pass) return a value which do not change
 <details>
 <summary>register table</summary>
 
-| Name | Notes                                                                                                         | Type      | 64-bitlong | 32-bitint | 16-bitshort | 8-bitchar |
-|------|---------------------------------------------------------------------------------------------------------------|-----------|------------|-----------|-------------|-----------|
-| rax  | Values are returned from functions in this register.                                                          | scratch   | rax        | eax       | ax          | ah and al |
-| rcx  | Typical scratch register.  Some instructions also use it as a counter.                                        | scratch   | rcx        | ecx       | cx          | ch and cl |
-| rdx  | Scratch register.                                                                                             | scratch   | rdx        | edx       | dx          | dh and dl |
-| rbx  | Preserved register: don't use it without saving it!                                                           | preserved | rbx        | ebx       | bx          | bh and bl |
-| rsp  | The stack pointer.  Points to the top of the stack (details coming soon!)                                     | preserved | rsp        | esp       | sp          | spl       |
-| rbp  | Preserved register.  Sometimes used to store the old value of the stack pointer, or the "base".               | preserved | rbp        | ebp       | bp          | bpl       |
-| rsi  | Scratch register used to pass function argument #2 in 64-bit Linux.  In 64-bit Windows, a preserved register. | scratch   | rsi        | esi       | si          | sil       |
-| rdi  | Scratch register and function argument #1 in 64-bit Linux.  In 64-bit Windows, a preserved register.          | scratch   | rdi        | edi       | di          | dil       |
-| r8   | Scratch register.  These were added in 64-bit mode, so they have numbers, not names.                          | scratch   | r8         | r8d       | r8w         | r8b       |
-| r9   | Scratch register.                                                                                             | scratch   | r9         | r9d       | r9w         | r9b       |
-| r10  | Scratch register.                                                                                             | scratch   | r10        | r10d      | r10w        | r10b      |
-| r11  | Scratch register.                                                                                             | scratch   | r11        | r11d      | r11w        | r11b      |
-| r12  | Preserved register.  You can use it, but you need to save and restore it.                                     | preserved | r12        | r12d      | r12w        | r12b      |
-| r13  | Preserved register.                                                                                           | preserved | r13        | r13d      | r13w        | r13b      |
-| r14  | Preserved register.                                                                                           | preserved | r14        | r14d      | r14w        | r14b      |
-| r15  | Preserved register.                                                                                           | preserved | r15        | r15d      | r15w        | r15b      |
+| Name | Notes | Type | Register Usage |  Preserved across function calls |
+|------|---------------------------------------------------------------------------------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------|----------------------------------|
+| rax | Values are returned from functions in this register.   | scratch | temporary register; with variable argumentspasses information about the number of vectorregisters used; 1st return register | NO |
+| rcx | Typical scratch register.  Some instructions also use it as a counter. | scratch |  used to pass 4th integer argument to functions  | YES |
+| rdx | Scratch register. | scratch |used to pass 3rd argument to functions; 2nd returnRegister| NO |
+| rbx | Preserved register: don't use it without saving it! | preserved | callee-saved register | NO |
+| rsp | The stack pointer.  Points to the top of the stack (details coming soon!) | preserved | stack pointer | YES |
+| rbp | Preserved register.  Sometimes used to store the old value of the stack pointer, or the "base". | preserved | callee-saved register; optionally used as framePointer | YES |
+| rsi | Scratch register used to pass function argument #2 in 64-bit Linux.  In 64-bit Windows, a preserved register. | scratch | used to pass 2nd argument to functions  | NO |
+| rdi | Scratch register and function argument #1 in 64-bit Linux.  In 64-bit Windows, a preserved register. | scratch | used to pass 1st argument to functions | NO |
+| r8 | Scratch register.  These were added in 64-bit mode, so they have numbers, not names. | scratch | used to pass 5th argument to functions | NO |
+| r9 | Scratch register. | scratch | used to pass 6th argument to functions | NO |
+| r10 | Scratch register. | scratch | temporary register, used for passing a function’sstatic chain pointer | NO |
+| r11 | Scratch register. | scratch | temporary register, used for passing a function’s static chain pointer | NO |
+| r12 | Preserved register.  You can use it, but you need to save and restore it. | preserved | callee-saved registers | YES |
+| r13 | Preserved register. | preserved | callee-saved registers | YES |
+| r14 | Preserved register. | preserved | callee-saved registers | YES |
+| r15 | Preserved register. | preserved | callee-saved register; optionally used as GOTbase pointer | YES |
+
 [Refer][register-web]
+[Refer2](https://www.uclibc.org/docs/psABI-x86_64.pdf)
+[Refer3](https://www.tablesgenerator.com/markdown_tables)
 </details>
 
 > 64 bit linux machine: rdi, rsi, rdx, rcx, r8, and r9. Any additional parameters get pushed on the stack.

@@ -7,12 +7,7 @@ import mxcompiler.ir.register.*;
 import mxcompiler.utils.Dump;
 
 
-public class Store extends Quad {
-    private RegValue value;
-    private int size;
-    public RegValue baseAddr;
-    public int offset;
-    private boolean isStaticData;
+public class Store extends MemQuad {
 
     public Store(BasicBlock parent, RegValue value, int size, RegValue baseAddr,
             int addrOffset) {
@@ -34,17 +29,6 @@ public class Store extends Quad {
         this.isStaticData = true;
     }
 
-    public RegValue getValue() {
-        return value;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public boolean isStaticData() {
-        return isStaticData;
-    }
 
     /** {@inheritDoc} */
     @Override

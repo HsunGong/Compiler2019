@@ -3,6 +3,7 @@ package mxcompiler.ir.instruction;
 import java.util.Map;
 
 import mxcompiler.ast.expression.unary.PrefixExprNode.Op;
+import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
 import mxcompiler.ir.register.Register;
@@ -17,6 +18,8 @@ public class Uni extends Quad {
 
     public Uni(BasicBlock parent, RegValue destion, Op op, RegValue object) {
         super(parent);
+        if (!(destion instanceof Register))
+            throw new CompileError("Error uni");
         this.dst = destion;
         this.rhs = object;
         this.op = op;

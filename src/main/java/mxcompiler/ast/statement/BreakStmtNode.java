@@ -1,10 +1,11 @@
 package mxcompiler.ast.statement;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 public class BreakStmtNode extends StmtNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<BreakStmtNode> %s\n", location.toString());
 
 	}

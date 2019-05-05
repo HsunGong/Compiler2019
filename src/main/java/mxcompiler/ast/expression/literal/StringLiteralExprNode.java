@@ -3,10 +3,11 @@ package mxcompiler.ast.expression.literal;
 import mxcompiler.ast.expression.ExprNode;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 public class StringLiteralExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<StringLiteralNode> %s\n", location.toString());
 		d.printf(" value: %s\n", getValue());
 	}

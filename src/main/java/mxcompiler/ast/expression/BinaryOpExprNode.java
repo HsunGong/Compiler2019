@@ -3,10 +3,11 @@ package mxcompiler.ast.expression;
 import java.util.HashMap;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 public class BinaryOpExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<BinaryOpExprNode> %s\n", location.toString());
 		d.printf(" op: %s\n", getOp().toString());
 	}

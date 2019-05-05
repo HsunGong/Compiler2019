@@ -2,6 +2,7 @@ package mxcompiler.ast.statement;
 
 import java.util.ArrayList;
 import java.util.List;
+import mxcompiler.utils.Dump;
 
 import mxcompiler.ast.*;
 import mxcompiler.ast.declaration.VarDeclListNode;
@@ -10,7 +11,7 @@ import mxcompiler.ast.expression.ExprNode;
 
 public class ForStmtNode extends StmtNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<ForStmtNode> %s\n", location.toString());
 	}
 

@@ -3,14 +3,13 @@ package mxcompiler.ast.statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import mxcompiler.ast.declaration.VarDeclListNode;
-import mxcompiler.ast.declaration.VarDeclNode;
 import mxcompiler.utils.scope.LocalScope;
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 public class BlockStmtNode extends StmtNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<BlockStmtNode> %s\n", location.toString());
 	}
 

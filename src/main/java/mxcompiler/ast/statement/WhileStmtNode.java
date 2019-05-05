@@ -2,10 +2,11 @@ package mxcompiler.ast.statement;
 
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 public class WhileStmtNode extends StmtNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<WhileStmtNode> %s\n", location.toString());
 	}
 

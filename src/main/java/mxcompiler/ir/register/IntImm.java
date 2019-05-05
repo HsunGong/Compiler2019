@@ -24,6 +24,7 @@ public class IntImm extends RegValue {
     }
 
     public IntImm copy() {
+        // FIX: return this ???
         return new IntImm(val);
     }
 }

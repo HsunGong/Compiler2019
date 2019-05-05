@@ -10,7 +10,11 @@ import mxcompiler.ir.register.VirtualRegister;
 import mxcompiler.utils.Dump;
 
 
-/** IR-Instruction */
+/**
+ * IR-Instruction
+ * <p>
+ * mother class
+ */
 abstract public class Quad {
     protected BasicBlock parent;
     public boolean removed = false;
@@ -46,6 +50,8 @@ abstract public class Quad {
      * normally get destion(if has) or get null
      * <p>
      * For each inst, can only have 1 Defined register
+     * <p>
+     * FIX: throw error ??
      */
     public Register getDefinedRegister() {
         return null;

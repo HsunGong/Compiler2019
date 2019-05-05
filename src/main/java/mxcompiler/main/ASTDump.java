@@ -1,16 +1,18 @@
-package mxcompiler.ast;
+package mxcompiler.main;
 
 import java.io.PrintStream;
 import java.util.List;
 
 import mxcompiler.ast.statement.*;
+import mxcompiler.utils.Dump;
+import mxcompiler.ast.*;
 import mxcompiler.ast.declaration.*;
 import mxcompiler.ast.expression.*;
 import mxcompiler.ast.expression.literal.*;
 import mxcompiler.ast.expression.lhs.*;
 import mxcompiler.ast.expression.unary.*;
 
-public class ASTDump extends Visitor {
+public class ASTDump extends Visitor implements Dump {
 	private PrintStream os;
 	// private int tab; // tabSize
 	private final String t = "\t";
@@ -22,17 +24,17 @@ public class ASTDump extends Visitor {
 		tab = new StringBuilder();
 	}
 
-	private void addTab() {
+	public void addTab() {
 		// ++tab;
 		tab.append(t);
 	}
 
-	private void delTab() {
+	public void delTab() {
 		// --tab;
 		tab.delete(tab.length() - t.length(), tab.length());
 	}
 
-	private String getTab() {
+	public String getTab() {
 		// return t.repeat(tab);
 		return tab.toString();
 	}

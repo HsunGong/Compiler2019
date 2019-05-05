@@ -1,14 +1,14 @@
 package mxcompiler.ast;
 
 import mxcompiler.utils.type.Type;
-
+import mxcompiler.utils.Dump;
 /**
  * This class {@code TypeNode} is important cause, it connect astNodes with
  * inbuild types which details are in {@linkplain mxcompiler.utils.type.Type }
  */
 public class TypeNode extends Node {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<TypeNode> %s\n", location.toString());
 		d.printf(" type: %s\n", getType().toString());
 	}

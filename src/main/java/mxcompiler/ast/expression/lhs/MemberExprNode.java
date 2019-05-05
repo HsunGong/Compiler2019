@@ -3,6 +3,7 @@ package mxcompiler.ast.expression.lhs;
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
 
+import mxcompiler.utils.Dump;
 
 /**
  * MemberExpr is Member Access Node of '.' IN book file,
@@ -10,7 +11,7 @@ import mxcompiler.ast.*;
  */
 public class MemberExprNode extends LhsExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<MemberExprNode> %s\n", location.toString());
 		d.printf(" member: %s\n", member);
 	}

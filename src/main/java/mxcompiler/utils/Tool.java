@@ -5,7 +5,7 @@ public class Tool {
     // region builtIn
     // class
 
-    public static final String STRING = "string";
+    public static final String STRING = "string"; // string x;
     public static final String ARRAY = "_array";
     public static final String THIS = "__this";
     public static final String DOMAIN = ".";

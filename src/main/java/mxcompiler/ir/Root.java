@@ -2,12 +2,12 @@ package mxcompiler.ir;
 
 import java.util.*;
 
+import mxcompiler.asm.x86_64RegisterSet;
 import mxcompiler.ast.statement.StmtNode;
 import mxcompiler.ir.instruction.BasicBlock;
 import mxcompiler.ir.instruction.Function;
 import mxcompiler.ir.register.*;
-// import mxcompiler.utils.scope.Scope;
-import mxcompiler.utils.scope.Scope.BuiltIn;
+import static mxcompiler.utils.Tool.*;
 
 
 public class Root {
@@ -26,34 +26,28 @@ public class Root {
     private void addFunc(String name, String label) {
         Function func;
         func = new Function(name, label);
-        // func.getUsedPhysicalGeneralRegs().addAll(NASMRegisterSet.generalRegs);
+        func.usedPhysicalGeneralRegs.addAll(x86_64RegisterSet.generalRegs);
         builtInFuncs.put(func.getName(), func);
     }
 
-    // domin = "."
-    static public final String BUILTIN_STRING_LENGTH_FUNC_NAME = BuiltIn.STRING.toDomain()
-            + "length";
-    static public final String BUILTIN_ARRAY_SIZE_FUNC_NAME = BuiltIn.ARRAY.toDomain()
-            + "size";
-
     public void initBuiltInFunc() {
-        addFunc("print", "_Z5_printPc");
-        addFunc("println", "_Z7_printlnPc");
-        addFunc("printInt", "_Z8_printInti");
-        addFunc("printlnInt", "_Z10_printlnInti");
-        addFunc("getString", "_Z9_getStringv");
-        addFunc("getInt", "_Z6_getIntv");
-        addFunc("toString", "_Z8_toStringi");
+        addFunc(PRINT_KEY, "_Z5_printPc");
+        addFunc(PRINTLN_KEY, "_Z7_printlnPc");
+        addFunc(PRINTINT_KEY, "_Z8_printInti");
+        addFunc(PRINTLNINT_KEY, "_Z10_printlnInti");
+        addFunc(GETSTRING_KEY, "_Z9_getStringv");
+        addFunc(GETINT_KEY, "_Z6_getIntv");
+        addFunc(TOSTRING_KEY, "_Z8_toStringi");
 
-        addFunc(BuiltIn.STRING.toDomain() + "substring", "_Z27_string_substringPcii");
-        addFunc(BuiltIn.STRING.toDomain() + "parseInt", "_Z26_string_parseIntPc");
-        addFunc(BuiltIn.STRING.toDomain() + "ord", "_Z21_string_ordPci");
+        addFunc(SUBSTRING_KEY, "_Z27_string_substringPcii");
+        addFunc(PARSEINT_KEY, "_Z26_string_parseIntPc");
+        addFunc(ORD_KEY, "_Z21_string_ordPci");
 
-        addFunc(BuiltIn.STRING.toDomain() + "concat", "__builtin_string_concat");
-        addFunc(BuiltIn.STRING.toDomain() + "equal", "__builtin_string_equal");
-        addFunc(BuiltIn.STRING.toDomain() + "inequal", "__builtin_string_inequal");
-        addFunc(BuiltIn.STRING.toDomain() + "less", "__builtin_string_less");
-        addFunc(BuiltIn.STRING.toDomain() + "less_equal", "__builtin_string_less_equal");
+        addFunc(STRING_CONCAT_KEY, "__builtin_string_concat");
+        addFunc(STRING_EQUAL_KEY, "__builtin_string_equal");
+        addFunc(STRING_INEQUAL_KEY, "__builtin_string_inequal");
+        addFunc(STRING_LESS_KEY, "__builtin_string_less");
+        addFunc(STRING_LESS_EQUAL_KEY, "__builtin_string_less_equal");
     }
 
     public Map<String, Function> getBuiltInFunc() {

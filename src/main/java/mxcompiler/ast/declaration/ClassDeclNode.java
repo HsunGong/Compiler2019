@@ -3,10 +3,11 @@ package mxcompiler.ast.declaration;
 import java.util.ArrayList;
 import java.util.List;
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 public class ClassDeclNode extends DeclNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<ClassDeclNode> %s\n", location.toString());
 		d.printf(" name: %s\n", getName());
 	}

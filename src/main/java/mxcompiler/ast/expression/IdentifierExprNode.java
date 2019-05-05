@@ -2,6 +2,7 @@ package mxcompiler.ast.expression;
 
 import mxcompiler.ast.*;
 import mxcompiler.utils.entity.VarEntity;
+import mxcompiler.utils.Dump;
 
 /**
  * For variable identifier in primary expr Or maybe called nameExprNode is
@@ -9,7 +10,7 @@ import mxcompiler.utils.entity.VarEntity;
  */
 public class IdentifierExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<IdentifierExprNode> %s\n", location.toString());
 		d.printf("identifier: %s\n", getIdentifier());
 	}

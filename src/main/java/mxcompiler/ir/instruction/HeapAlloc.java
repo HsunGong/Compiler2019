@@ -18,7 +18,6 @@ public class HeapAlloc extends Quad {
 
     public HeapAlloc(BasicBlock parent, RegValue destion, RegValue allocSize) {
         super(parent);
-        // TOOD: copy to
         if (!(destion instanceof Register))
             throw new CompileError("Error with register");
         this.dst = destion;

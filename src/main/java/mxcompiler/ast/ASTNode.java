@@ -5,6 +5,7 @@ import java.util.List;
 
 import mxcompiler.ast.declaration.DeclNode;
 import mxcompiler.utils.scope.ToplevelScope;
+import mxcompiler.utils.Dump;
 
 /**
  * {@code AST} is the root or socalled pragram root Rewrite from down to top For
@@ -12,7 +13,7 @@ import mxcompiler.utils.scope.ToplevelScope;
  */
 public class ASTNode extends Node {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<ASTNode> %s\n", location.toString());
 	}
 

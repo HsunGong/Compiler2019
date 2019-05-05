@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import mxcompiler.ast.*;
 
+import mxcompiler.utils.Dump;
 
 /**
  * No longer support UnaryArithmeticOpNode. It is included
@@ -15,7 +16,7 @@ import mxcompiler.ast.*;
  */
 public class SuffixExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<SuffixExprNode> %s\n", location.toString());
 		d.printf(" op: %s\n", getOp().toString());
 	}

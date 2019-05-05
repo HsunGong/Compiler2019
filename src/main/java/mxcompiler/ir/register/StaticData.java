@@ -1,5 +1,6 @@
 package mxcompiler.ir.register;
 
+/** father of {@link StaticString} and {@link StaticVar} */
 abstract public class StaticData extends Register {
     // private String name;
     private int size;

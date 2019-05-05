@@ -5,6 +5,7 @@ import mxcompiler.ast.expression.ExprNode;
 import java.util.HashMap;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 
 /**
@@ -15,7 +16,7 @@ import mxcompiler.ast.*;
  */
 public class PrefixExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<PrefixExprNode> %s\n", location.toString());
 		d.printf(" op: %s\n", getOp().toString());
 	}

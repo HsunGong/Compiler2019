@@ -5,12 +5,13 @@ import java.util.List;
 
 import mxcompiler.ast.*;
 import mxcompiler.utils.entity.FuncEntity;
+import mxcompiler.utils.Dump;
 
 
 /** Also for class method */
 public class FuncallExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<FuncallExprNode> %s\n", location.toString());
 	}
 

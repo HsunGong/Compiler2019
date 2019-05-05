@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 /**
  * Current No use for AST maybe can transfer all List<varNode> into this class
@@ -12,7 +13,7 @@ import mxcompiler.ast.*;
  */
 public class VarDeclListNode extends Node {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		for (VarDeclNode decl : varList) {
 			decl._dump(d);
 		}

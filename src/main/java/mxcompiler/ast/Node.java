@@ -1,8 +1,6 @@
 package mxcompiler.ast;
 
-import java.io.PrintStream;
-
-import org.antlr.v4.runtime.ParserRuleContext;
+import mxcompiler.utils.Dump;
 
 /**
  * A {@code Node} is the abstract Abstract Syntax Tree abstract Node
@@ -11,7 +9,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
  * <p>
  * The {@linkplain mxcompiler.ast.ASTNode} is root Node
  * <p>
- * AST dump is realized in {@linkplain mxcompiler.ast.ASTDump}
+ * AST dump is realized in {@linkplain mxcompiler.main.ASTDump}
  * 
  * @author Xun
  * @since 1.0
@@ -30,7 +28,7 @@ abstract public class Node {
 
 	// abstract void visit(ASTVisitor visitor);
 
-	abstract public void _dump(ASTDump d);
+	abstract public void _dump(Dump d);
 
 	abstract public void accept(ASTVisitor visitor);
 }

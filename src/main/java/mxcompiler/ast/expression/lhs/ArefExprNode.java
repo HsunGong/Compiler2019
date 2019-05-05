@@ -3,6 +3,7 @@ package mxcompiler.ast.expression.lhs;
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
 
+import mxcompiler.utils.Dump;
 
 /**
  * This is the array index node -- subscript
@@ -11,7 +12,7 @@ import mxcompiler.ast.*;
  */
 public class ArefExprNode extends LhsExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<ArrayrefExprNode> %s:\n", location.toString());
 	}
 

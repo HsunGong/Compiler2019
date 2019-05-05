@@ -183,7 +183,6 @@ public class ResolverAndChecker extends Visitor {
 		scopeStack.remove();
 		if (!scopeStack.isEmpty())
 			throw new CompileError("Scope stack err");
-
 	}
 
 	/** class scope */

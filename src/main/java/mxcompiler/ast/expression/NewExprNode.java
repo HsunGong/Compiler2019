@@ -3,11 +3,12 @@ package mxcompiler.ast.expression;
 import java.util.List;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 /** for creator */
 public class NewExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<NewExprNode> %s\n", location.toString());
 		d.printf(" numDim: %d\n", num);
 	}

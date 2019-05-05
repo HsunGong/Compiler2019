@@ -1,17 +1,10 @@
-package mxcompiler.utils.scope;
+package mxcompiler.main;
 
 import java.io.PrintStream;
-import java.util.List;
 
 import mxcompiler.ast.*;
 
-import mxcompiler.ast.statement.*;
 import mxcompiler.utils.Dump;
-import mxcompiler.ast.declaration.*;
-import mxcompiler.ast.expression.*;
-import mxcompiler.ast.expression.literal.*;
-import mxcompiler.ast.expression.lhs.*;
-import mxcompiler.ast.expression.unary.*;
 
 public class ScopeDump implements Dump {
 	private PrintStream os;

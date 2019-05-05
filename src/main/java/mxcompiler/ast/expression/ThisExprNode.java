@@ -1,6 +1,7 @@
 package mxcompiler.ast.expression;
 
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 
 /**
@@ -15,7 +16,7 @@ import mxcompiler.ast.*;
  */
 public class ThisExprNode extends ExprNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<ThisExprNode> %s\n", location.toString());
 
 	}

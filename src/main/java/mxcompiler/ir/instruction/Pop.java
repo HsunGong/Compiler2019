@@ -14,12 +14,16 @@ public class Pop extends Quad {
 
     public Pop(BasicBlock parent, RegValue preg) {
         super(parent);
+
+        if (!(preg instanceof PhysicalRegister))
+            throw new CompileError("error pop");
         this.val = preg;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Quad copyRename(Map<Object, Object> renameMap) {
-        return null;
+        return null; // FIX: throw error ??
     }
 
     public PhysicalRegister getValue() {

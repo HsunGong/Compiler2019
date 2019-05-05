@@ -1,5 +1,6 @@
 package mxcompiler.ir.register;
 
+import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.utils.Dump;
 
@@ -8,7 +9,8 @@ public class PhysicalRegister extends Register {
     private final boolean isGeneral, isCallerSave, isCalleeSave;
     private final int argIdx;
 
-    public PhysicalRegister(String name, boolean isGeneral, boolean isCallerSave, boolean isCalleeSave, int argIdx) {
+    public PhysicalRegister(String name, boolean isGeneral, boolean isCallerSave,
+            boolean isCalleeSave, int argIdx) {
         super(name);
         this.isGeneral = isGeneral;
         this.isCallerSave = isCallerSave;
@@ -46,6 +48,6 @@ public class PhysicalRegister extends Register {
     }
 
     public PhysicalRegister copy() {
-        return null;
+        throw new CompileError("error copy Physical register");
     }
 }

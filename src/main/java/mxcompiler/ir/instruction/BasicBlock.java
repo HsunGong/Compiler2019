@@ -189,6 +189,8 @@ public class BasicBlock {
     public void addBeforeInst(ListIterator<Quad> iter, Quad newInst) {
         if (!iter.hasPrevious()) // check origin inst
             throw new CompileError("Error add-before inst");
+        if (newInst instanceof JumpQuad)
+            throw new CompileError("can not add before with jump");
 
         iter.previous(); // get inst1
         iter.add(newInst); // get origin_iter

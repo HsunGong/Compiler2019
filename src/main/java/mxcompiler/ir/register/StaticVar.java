@@ -3,6 +3,7 @@ package mxcompiler.ir.register;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.utils.Dump;
 
+/** global Vars */
 public class StaticVar extends StaticData {
     public StaticVar(String name, int size) {
         super(name, size);

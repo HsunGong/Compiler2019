@@ -2,6 +2,7 @@ package mxcompiler.ir.instruction;
 
 import java.util.Map;
 
+import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
 import mxcompiler.ir.register.RegValue;
 import mxcompiler.ir.register.Register;
@@ -14,6 +15,8 @@ public class Move extends MemQuad {
 
     public Move(BasicBlock parent, RegValue destion, RegValue rhs) {
         super(parent);
+        if (!(destion instanceof Register))
+            throw new CompileError("error move");
         this.dst = destion;
         this.rhs = rhs;
         reloadUsedRegs();

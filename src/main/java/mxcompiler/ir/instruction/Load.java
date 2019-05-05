@@ -2,27 +2,23 @@ package mxcompiler.ir.instruction;
 
 import java.util.Map;
 
+import mxcompiler.error.CompileError;
 import mxcompiler.ir.IRVisitor;
-import mxcompiler.ir.register.RegValue;
-import mxcompiler.ir.register.Register;
-import mxcompiler.ir.register.StackSlot;
-import mxcompiler.ir.register.StaticData;
+import mxcompiler.ir.register.*;
 import mxcompiler.utils.Dump;
 
 
 public class Load extends MemQuad {
-    private RegValue dst; // Register
-    private int size;
-    private boolean isStaticData, isLoadAddr;
-    public RegValue baseAddr;
-    public int offset;
+    private boolean isLoadAddr;
 
     public Load(BasicBlock parent, RegValue destion, int size, RegValue baseAddr, int addrOffset) {
         super(parent);
         if (size == 0)
             System.err.println("oh bad size 0");
 
-        this.dst = destion;
+        if (!(destion instanceof Register))
+            throw new CompileError("Error with load not reigster");
+        this.value = destion;
         this.baseAddr = baseAddr;
         this.offset = addrOffset;
         this.size = size;
@@ -38,27 +34,20 @@ public class Load extends MemQuad {
         this.isLoadAddr = isLoadAddr;
     }
 
+    /** seen at {@link #MemQuad.getValue()} */
     public Register getDst() {
-        return (Register) dst;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public boolean isStaticData() {
-        return isStaticData;
+        return (Register) getValue();
     }
 
     @Override
     public Load copyRename(Map<Object, Object> renameMap) {
         if (isStaticData) {
             return new Load((BasicBlock) renameMap.getOrDefault(parent, parent),
-                    (Register) renameMap.getOrDefault(dst, dst), size,
+                    (Register) renameMap.getOrDefault(value, value), size,
                     (StaticData) renameMap.getOrDefault(baseAddr, baseAddr), isLoadAddr);
         } else {
             return new Load((BasicBlock) renameMap.getOrDefault(parent, parent),
-                    (Register) renameMap.getOrDefault(dst, dst), size,
+                    (Register) renameMap.getOrDefault(value, value), size,
                     (RegValue) renameMap.getOrDefault(baseAddr, baseAddr), offset);
         }
     }
@@ -84,13 +73,13 @@ public class Load extends MemQuad {
     /** {@inheritDoc} */
     @Override
     public Register getDefinedRegister() {
-        return (Register) dst;
+        return (Register) value;
     }
 
     /** {@inheritDoc} */
     @Override
     public void setDefinedRegister(Register vreg) {
-        dst = vreg;
+        value = vreg;
     }
 
     public void accept(IRVisitor visitor) {

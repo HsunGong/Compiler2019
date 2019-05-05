@@ -7,6 +7,7 @@ import mxcompiler.ast.statement.BlockStmtNode;
 import mxcompiler.utils.type.NullType;
 import mxcompiler.utils.type.Type;
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 /** no need to judge if return type is null
  * no need to judge if return type is construct
@@ -14,7 +15,7 @@ import mxcompiler.ast.*;
  */
 public class FuncDeclNode extends DeclNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<FuncDeclNode> %s\n", location.toString());
 		d.printf(" name: %s\n", getName());
 		d.printf(" hasReturn: %b\n", hasReturn());

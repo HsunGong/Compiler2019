@@ -2,10 +2,11 @@ package mxcompiler.ast.statement;
 
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 public class ReturnStmtNode extends StmtNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<ReturnStmtNode> %s\n", location.toString());
 	}
 

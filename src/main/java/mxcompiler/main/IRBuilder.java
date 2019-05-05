@@ -27,7 +27,7 @@ import mxcompiler.ir.register.*;
  */
 public class IRBuilder extends Visitor {
 
-    public final Root root = new Root();
+    private final Root root = new Root();
 
     private ToplevelScope toplevelScope;
     private List<GlobalVarInit> globalInitList = new ArrayList<>();
@@ -55,6 +55,16 @@ public class IRBuilder extends Visitor {
 
     /** only when {@link #visit(IdentifierExprNode)} */
     private boolean uselessStatic = false;
+
+    public Root build(ASTNode node) {
+        visit(node);
+
+        TwoRegOpTransformer();
+        FuncInlineProcess();
+        StaticDataProcess();
+
+        return root;
+    }
 
     // region visit decl
 
@@ -95,10 +105,6 @@ public class IRBuilder extends Visitor {
                 visit(decl);
 
         root.updateCalleeSet();
-
-        TwoRegOpTransformer();
-        FuncInlineProcess();
-        StaticDataProcess();
     }
 
     // ----------------- global var func-init -----------------
@@ -1603,8 +1609,10 @@ public class IRBuilder extends Visitor {
             }
             parent.removeInst(iter);
         }
+        ListIterator<Quad> newEndFirstIter = newEndBB.getInsts().listIterator();
+        newEndFirstIter.next();
 
-        // add args
+        // add before-args
         for (int i = 0; i < funcCallInst.getArgs().size(); ++i) {
             VirtualRegister oldArgVreg = calleeFunc.argVregs.get(i);
             VirtualRegister newArgVreg = oldArgVreg.copy();
@@ -1613,6 +1621,7 @@ public class IRBuilder extends Visitor {
                     new Move(parent, newArgVreg, funcCallInst.getArgs().get(i)));
             renameMap.put(oldArgVreg, newArgVreg);
         }
+
         parent.removeInst(iter);
 
         // copy funcall-block into parent(cause may have args move)
@@ -1620,6 +1629,7 @@ public class IRBuilder extends Visitor {
             if (!renameMap.containsKey(bb))
                 renameMap.put(bb, new BasicBlock(callerFunc, bb.getName()));
         }
+
         for (BasicBlock oldBB : inlineBBpostOrder) { // add inst
             BasicBlock newBB = (BasicBlock) renameMap.get(oldBB);
 
@@ -1658,7 +1668,7 @@ public class IRBuilder extends Visitor {
 
                 } else { // last BB -- add insts(second)
                     if (!(inst instanceof Return))
-                        newEndBB.getInsts().addFirst(inst.copyRename(renameMap));
+                        newEndBB.addBeforeInst(newEndFirstIter, inst.copyRename(renameMap));
                 }
             }
         }
@@ -1669,7 +1679,7 @@ public class IRBuilder extends Visitor {
 
         Return returnInst = calleeFunc.returns.get(0);
         if (returnInst.getReturnValue() != null) {
-            newEndBB.getInsts().addFirst(new Move(newEndBB, funcCallInst.getDst(),
+            newEndBB.addBeforeInst(newEndFirstIter, new Move(newEndBB, funcCallInst.getDst(),
                     (RegValue) renameMap.get(returnInst.getReturnValue())));
         }
 
@@ -1697,8 +1707,7 @@ public class IRBuilder extends Visitor {
     private Map<Function, FuncDataInfo> funcDataInfoMap = new HashMap<>();
 
     private boolean isMemWithStatic(Quad inst) {
-        return (inst instanceof Load && ((Load) inst).isStaticData())
-                || (inst instanceof Store && ((Store) inst).isStaticData());
+        return (inst instanceof MemQuad && ((MemQuad) inst).isStaticData());
     }
 
     /**
@@ -1756,12 +1765,20 @@ public class IRBuilder extends Visitor {
             }
 
             // load static data at the beginning of function--with a lambda
+
             BasicBlock startBB = irFunc.start;
             LinkedList<Quad> insts = startBB.getInsts();
             funcInfo.dataVregMap.forEach((sData, vReg) -> {
                 insts.addFirst(new Load(startBB, vReg, RegValue.RegSize, sData,
                         sData instanceof StaticString));
-            });
+            }); // does this matter ?
+
+            // ListIterator<Quad> firstIter = startBB.getInsts().listIterator();
+            // firstIter.next();
+            // funcInfo.dataVregMap.forEach((sData, vReg) -> {
+            // startBB.addBeforeInst(firstIter, new Load(startBB, vReg,
+            // RegValue.RegSize, sData, sData instanceof StaticString));
+            // });
         }
 
         for (Function builtFunc : root.getBuiltInFunc().values())

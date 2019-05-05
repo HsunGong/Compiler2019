@@ -2,6 +2,7 @@ package mxcompiler.ast.declaration;
 
 import mxcompiler.ast.expression.ExprNode;
 import mxcompiler.ast.*;
+import mxcompiler.utils.Dump;
 
 /**
  * Will be used in declaration and statement Specially, change block-decl and
@@ -9,7 +10,7 @@ import mxcompiler.ast.*;
  */
 public class VarDeclNode extends DeclNode {
 	@Override
-	public void _dump(ASTDump d) {
+	public void _dump(Dump d) {
 		d.printf("<VarDeclNode> %s\n", location.toString());
 		d.printf(" name: %s\n", getName());
 	}

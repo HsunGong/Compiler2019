@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 import mxcompiler.parser.*;
-import mxcompiler.utils.scope.ScopeDump;
 import mxcompiler.error.*;
 import mxcompiler.ir.Root;
 import mxcompiler.main.CompilerMode.DumpMode;
@@ -86,9 +85,8 @@ public final class Compiler {
 		RegisterAllocator allocator = new RegisterAllocator(irRoot);
 		allocator.execute();
 
-		Assembler assembler = new Assembler();
-		assembler.visit(irRoot);
-		assembler.print(fileOut);
+		AssemblyDump asm = new AssemblyDump(irRoot, fileOut);
+		asm.dump();
 
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> Generate asm end");
@@ -102,9 +100,8 @@ public final class Compiler {
 		usagePreChecker.visit(astRoot);
 
 		IRBuilder treeIrBuilder = new IRBuilder();
-		treeIrBuilder.visit(astRoot);
+		irRoot = treeIrBuilder.build(astRoot);
 
-		irRoot = treeIrBuilder.root;
 
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> IR Builder end");
@@ -119,7 +116,8 @@ public final class Compiler {
 
 		if (opts.dumpMode().contains(DumpMode.ScopeDump)
 				|| opts.dumpMode().contains(DumpMode.AllDump)) {
-			new ScopeDump(dumpOut).visit(astRoot);
+			ScopeDump dump = new ScopeDump(dumpOut);
+			dump.visit(astRoot);
 		}
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> Resolver end");
@@ -142,7 +140,8 @@ public final class Compiler {
 
 		if (opts.dumpMode().contains(DumpMode.ASTDump)
 				|| opts.dumpMode().contains(DumpMode.AllDump)) {
-			new ASTDump(dumpOut).visit(astRoot);
+			ASTDump dump = new ASTDump(dumpOut);
+			dump.visit(astRoot);
 		}
 
 		if (opts.mode().equals(CompilerMode.Debug))
