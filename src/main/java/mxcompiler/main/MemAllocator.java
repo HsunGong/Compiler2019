@@ -12,11 +12,11 @@ import mxcompiler.ir.register.*;
 import java.util.*;
 
 
-public class RegisterAllocator {
+public class MemAllocator {
     private final Root root;
     int MaxNumFuncArgs = 3;
 
-    public RegisterAllocator(Root root) {
+    public MemAllocator(Root root) {
         this.root = root;
     }
 
@@ -27,6 +27,8 @@ public class RegisterAllocator {
 
         PaintColors();
 
+        // mem allocate and stack deal
+        dealFuncStack();
     }
 
     private void AllocateNaiveArgs() {
