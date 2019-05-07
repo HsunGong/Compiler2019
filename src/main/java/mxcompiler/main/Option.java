@@ -12,8 +12,8 @@ import mxcompiler.main.CompilerMode.DumpMode;
 public class Option {
 
 	/** only support 1 source file */
-	private InputStream src;
-	private String output = "./a.out";
+	private File src = null;
+	private File output = null;
 	private CompilerMode mode = null;
 	private List<DumpMode> dumpMode = new ArrayList<>();
 	private int level = 0;
@@ -39,9 +39,9 @@ public class Option {
 					// attention: dump to dump.out can not change
 					// is asm-out
 					if (args.hasNext()) {
-						output = args.next();
+						output = new File(args.next());
 					} else {
-						output = "./a.out";
+						output = new File("./a.out");
 					}
 				} else if (arg.startsWith("-O")) {
 					String type = arg.substring(2);
@@ -60,8 +60,8 @@ public class Option {
 				}
 			} else if (src == null) {
 				try {
-					src = new FileInputStream(arg);
-				} catch (FileNotFoundException e) {
+					src = new File(arg);
+				} catch (Exception e) {
 					throw new OptionError(e.getMessage());
 				}
 			} else {
@@ -69,20 +69,17 @@ public class Option {
 			}
 		}
 
-		if (src == null)
-			src = System.in;
-
 		if (mode == null) {
 			mode = CompilerMode.Default;
 		}
 	}
 
-	public InputStream sourceFile() {
+	public File sourceFile() {
 		return src;
 	}
 
 	// TODO: may support output to system.out
-	public String outputFile() {
+	public File outputFile() {
 		return output;
 	}
 

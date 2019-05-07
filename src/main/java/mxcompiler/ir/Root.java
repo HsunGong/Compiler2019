@@ -32,17 +32,17 @@ public class Root {
     }
 
     public void initBuiltInFunc() {
-        addFunc(PRINT_KEY, "_Z5_printPc");
-        addFunc(PRINTLN_KEY, "_Z7_printlnPc");
-        addFunc(PRINTINT_KEY, "_Z8_printInti");
-        addFunc(PRINTLNINT_KEY, "_Z10_printlnInti");
-        addFunc(GETSTRING_KEY, "_Z9_getStringv");
-        addFunc(GETINT_KEY, "_Z6_getIntv");
-        addFunc(TOSTRING_KEY, "_Z8_toStringi");
+        addFunc(PRINT_KEY, "_Z5printPc");
+        addFunc(PRINTLN_KEY, "_Z7printlnPc");
+        addFunc(PRINTINT_KEY, "_Z8printInti");
+        addFunc(PRINTLNINT_KEY, "_Z10printlnInti");
+        addFunc(GETSTRING_KEY, "_Z9getStringv");
+        addFunc(GETINT_KEY, "_Z6getIntv");
+        addFunc(TOSTRING_KEY, "_Z8toStringi");
 
-        addFunc(SUBSTRING_KEY, "_Z27_string_substringPcii");
-        addFunc(PARSEINT_KEY, "_Z26_string_parseIntPc");
-        addFunc(ORD_KEY, "_Z21_string_ordPci");
+        addFunc(SUBSTRING_KEY, "_Z27__member___string_substringPcii");
+        addFunc(PARSEINT_KEY, "_Z26__member___string_parseIntPc");
+        addFunc(ORD_KEY, "_Z21__member___string_ordPci");
 
         addFunc(STRING_CONCAT_KEY, "__builtin_string_concat");
         addFunc(STRING_EQUAL_KEY, "__builtin_string_equal");
@@ -52,7 +52,7 @@ public class Root {
     }
 
     public Map<String, Function> getBuiltInFunc() {
-        return funcs;
+        return builtInFuncs;
     }
 
     public Function getBuiltInFunc(String name) {

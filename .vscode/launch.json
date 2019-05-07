@@ -6,14 +6,22 @@
 	"configurations": [
 		{
 			"type": "java",
-			"name": "CodeLens (Launch) - Compiler",
+			"name": "Debug",
 			"request": "launch",
 			"mainClass": "mxcompiler.main.Compiler",
-			"args": "--debug --dump-ir /home/xun/Documents/mxc/src/test/cases/tmp/test.in -o /home/xun/Documents/mxc/src/test/cases/tmp/test.asm",
+			"args": "--debug -O2 --dump-ir /home/xun/Documents/mxc/src/test/cases/tmp/test.in -o /home/xun/Documents/mxc/src/test/cases/tmp/test.asm",
 			"projectName": "mxc"
 		},
 		{
-			"name": "Debug ANTLR4 grammar",
+			"type": "java",
+			"name": "OutPut",
+			"request": "launch",
+			"mainClass": "mxcompiler.main.Compiler",
+			"args": "-C -O2 --dump-ir /home/xun/Documents/mxc/src/test/cases/tmp/test.in -o /home/xun/Documents/mxc/src/test/cases/tmp/test.asm",
+			"projectName": "mxc"
+		},
+		{
+			"name": "ANTLR4 grammar",
 			"type": "antlr-debug",
 			"request": "launch",
 			"input": "src/test/cases/tmp/test.in",
@@ -22,12 +30,5 @@
 			"printParseTree": true,
 			"visualParseTree": true,
 		},
-		{
-			"type": "java",
-			"name": "Debug (Attach)",
-			"request": "attach",
-			"hostName": "localhost",
-			"port": 8000
-		}
 	]
 }

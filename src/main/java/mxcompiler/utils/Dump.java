@@ -10,7 +10,7 @@ public interface Dump {
 
 	public void println(String x);
 
-	public void printf(String str, Object... args);
+	public void printf(String format, Object... args);
 
 	public void print(String str);
 }

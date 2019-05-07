@@ -7,7 +7,7 @@ public class StaticString extends StaticData {
     private String val;
 
     public StaticString(String value) {
-        super("static_string", RegSize);
+        super("sta_str", RegSize);
         this.val = value;
     }
 

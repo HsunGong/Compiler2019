@@ -2,8 +2,8 @@ package mxcompiler.utils;
 
 /** a static class to store String */
 public class Tool {
-    public static final String STATIC_DATA = "__static_data_";
-    public static final String BLOCK = "__block_";
+    public static final String STATIC_DATA = "__d_";
+    public static final String BLOCK = "__b_";//block
 
     // region builtIn
     // class

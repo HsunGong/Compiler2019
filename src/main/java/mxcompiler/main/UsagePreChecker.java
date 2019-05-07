@@ -100,9 +100,10 @@ public class UsagePreChecker extends Visitor {
 
     @Override
     public void visit(IdentifierExprNode node) {
-        VarEntity varEntity = (VarEntity) curScope.get(node.getIdentifier());
+        Entity entity = curScope.get(node.getIdentifier());
 
-        if (varEntity != null) {
+        if (entity != null && entity instanceof VarEntity) {
+            VarEntity varEntity = (VarEntity) entity;
             if (varEntity.getType() instanceof ArrayType || varEntity.isGlobal) {
                 if (inDefine)
                     unUsedStaticSet.add(varEntity);

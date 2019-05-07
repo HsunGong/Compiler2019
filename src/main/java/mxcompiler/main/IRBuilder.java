@@ -66,7 +66,7 @@ public class IRBuilder extends Visitor {
         visit(node);
 
         BinaryDstEqualLhs();
-        if (opts.OptimizationLevel() > 0 && opts.mode() != CompilerMode.Debug)
+        if (opts.OptimizationLevel() > 0)
             FuncInlineProcess();
         StaticDataProcess();
 
@@ -226,9 +226,8 @@ public class IRBuilder extends Visitor {
         // region add inst
         // global init func
         if (node.getName().equals("main")) {
-            VirtualRegister vreg = new VirtualRegister("main_func_return");
             curBB.addLastInst(
-                    new Funcall(curBB, root.getFunc(INIT_FUNC_NAME), new ArrayList<>(), vreg));
+                    new Funcall(curBB, root.getFunc(INIT_FUNC_NAME), new ArrayList<>(), null));
         }
 
         visit(node.getBody());
@@ -1401,7 +1400,7 @@ public class IRBuilder extends Visitor {
     private Map<Function, Function> funcBackUpMap = new HashMap<>();
 
     private Function genBackUpFunc(Function func) {
-        Function bakFunc = new Function(func.entity);
+        Function bakFunc = new Function(func.getEntity());
         Map<Object, Object> bbRenameMap = new HashMap<>();
         for (BasicBlock bb : func.getReversePostOrder())
             bbRenameMap.put(bb, new BasicBlock(bakFunc, bb.getName()));
@@ -1652,7 +1651,7 @@ public class IRBuilder extends Visitor {
                 Quad inst = iter.next();
 
                 // add new regValue(copy) into renameMap
-                for (RegValue usedRegValue : inst.usedRegValues)
+                for (RegValue usedRegValue : inst.getUsedRegValues())
                     copyRegValue(renameMap, usedRegValue);
                 if (inst.getDefinedRegister() != null)
                     copyRegValue(renameMap, inst.getDefinedRegister());
@@ -1741,7 +1740,7 @@ public class IRBuilder extends Visitor {
                     if (isMemWithStatic(inst))
                         continue;
 
-                    List<Register> usedRegisters = inst.usedRegisters;
+                    List<Register> usedRegisters = inst.getUsedRegisters();
                     if (!usedRegisters.isEmpty()) {
                         renameMap.clear();
                         for (Register reg : usedRegisters) { // sel can optim regs

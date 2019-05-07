@@ -225,6 +225,30 @@ https://www.zhihu.com/question/29355187
 
 # -DTest=
 
+# Configs
+
+<details>
+		{
+			"type": "java",
+			"name": "CodeLens (Launch) - Compiler",
+			"request": "launch",
+			"mainClass": "mxcompiler.main.Compiler",
+			"args": "--debug -O2 --dump-ir /home/xun/Documents/mxc/src/test/cases/tmp/test.in -o /home/xun/Documents/mxc/src/test/cases/tmp/test.asm",
+			"projectName": "mxc"
+		},
+		{
+			"name": "Debug ANTLR4 grammar",
+			"type": "antlr-debug",
+			"request": "launch",
+			"input": "src/test/cases/tmp/test.in",
+			"grammar": "src/main/java/mxcompiler/parser/grammar/Mx.g4",
+			"startRule": "compilationUnit",
+			"printParseTree": true,
+			"visualParseTree": true,
+		},
+</details>
+
+
 [register-web]: https://www.cs.uaf.edu/2017/fall/cs301/reference/x86_64.html
 [C.g4]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/C.g4
 [1]: https://github.com/antlr/codebuff/blob/master/corpus/antlr4/training/java.g4

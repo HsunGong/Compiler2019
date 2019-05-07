@@ -47,7 +47,7 @@ public class Bin extends Quad {
     }
 
     public RegValue getLhs() {
-        return rhs;
+        return lhs;
     }
 
     public void setLhs(RegValue lhs) {

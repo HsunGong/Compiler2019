@@ -274,6 +274,8 @@ public class IRDump implements IRVisitor, Dump {
     }
 
     public String visit(Register node) {
+                if (node == null)
+            return null;
         return node.accept(this);
     }
 

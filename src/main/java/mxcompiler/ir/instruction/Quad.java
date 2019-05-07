@@ -37,8 +37,8 @@ abstract public class Quad {
     public abstract Quad copyRename(Map<Object, Object> renameMap);
 
     // public Set<VirtualRegister> liveIn = null, liveOut = null;
-    public List<Register> usedRegisters = new ArrayList<>();
-    public List<RegValue> usedRegValues = new ArrayList<>();
+    protected List<Register> usedRegisters = new ArrayList<>();
+    protected List<RegValue> usedRegValues = new ArrayList<>();
 
     /**
      * normally set vreg as destion(if has)
@@ -63,6 +63,14 @@ abstract public class Quad {
      * normally as RegValues(rather than DefinedRegisters)
      */
     public void setUsedRegisters(Map<Register, Register> renameMap) {
+    }
+
+    public List<Register> getUsedRegisters() {
+        return usedRegisters;
+    }
+
+    public List<RegValue> getUsedRegValues() {
+        return usedRegValues;
     }
 
     /**

@@ -81,7 +81,7 @@ public class BasicBlock {
         if (!hasJump || insts.getLast() != inst)
             throw new CompileError("Error when del Last");
 
-        insts.getLast().removed = true;
+        // insts.getLast().removed = true;
 
         delJumpSideEffect();
         insts.removeLast();

@@ -4,11 +4,14 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.nio.file.Files;
 
 import mxcompiler.parser.*;
 import mxcompiler.error.*;
@@ -39,19 +42,22 @@ public final class Compiler {
 		opts = new Option(args);
 
 		try {
-			this.fileIn = opts.sourceFile();
-			try {
-				this.dumpOut = new PrintStream(
-						new FileOutputStream("./src/test/test.out", false));
-				fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
-			} catch (Exception e) {
-				// throw new Error(e);
-				fileOut = System.out;
-			}
+			this.fileIn = (opts.sourceFile() == null) ? System.in
+					: new FileInputStream(opts.sourceFile());
 
+			this.fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
+			
+			this.dumpOut = new PrintStream(new FileOutputStream(dumpFile, false));
+			
 			compile();
 
-		} catch (Error e) {
+			fileOut.close();
+			dumpOut.close();
+			
+			// if (opts.mode().equals(CompilerMode.Debug)) {
+			// 	Files.copy(opts.outputFile().toPath(), debugOut.toPath());
+			// }
+		} catch (Exception | Error e) {
 			if (opts.mode().equals(CompilerMode.Default))
 				System.out.println(e.getMessage());
 			else
@@ -60,16 +66,21 @@ public final class Compiler {
 
 	}
 
+	private File debugOut = new File("/home/xun/tmp");
+	private File dumpFile = new File("./src/test/test.out");
+
 	private InputStream fileIn;
 	private PrintStream fileOut;
-	private PrintStream errOut = System.out;
 	private PrintStream dumpOut;
+	private PrintStream errOut = System.out;
+
 	private ASTNode astRoot;
 	private Root irRoot;
 
 	// file compiler with errorHandler
 	private void compile() throws Error {
 		try {
+
 			buildAST();
 			semanticAnalyze();
 
@@ -81,8 +92,7 @@ public final class Compiler {
 		}
 	}
 
-    private static final String link_asm_name = "./src/main/java/mxcompiler/asm/BuiltIn.asm";
-
+	private static final String link_asm_name = "./src/main/java/mxcompiler/asm/BuiltIn.asm";
 
 	private void generateAssembly() throws Error {
 		if (opts.mode().equals(CompilerMode.Debug))
@@ -91,24 +101,29 @@ public final class Compiler {
 		RegisterAllocator allocator = new RegisterAllocator(irRoot);
 		allocator.execute();
 
-		AssemblyDump asm = new AssemblyDump(irRoot, fileOut);
-		asm.dump();
+		AssemblyDump asm = new AssemblyDump(fileOut, opts);
+		asm.dump(irRoot);
 
 		// append builtIn function
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(link_asm_name));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                fileOut.println(line);
-            }
-            reader.close();
-        } catch (IOException e) {
-            throw new CompileError("IO exception when reading builtin functions from file");
-        }
-
-		
-		if (opts.mode().equals(CompilerMode.Debug))
+		if (opts.mode() == CompilerMode.Debug) {
+			File check = new File(link_asm_name);
+			if (!check.exists())
+				throw new CompileError("Can not find builtIn.asm");
 			System.out.println(">>> Generate asm end");
+			return;
+		}
+
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(link_asm_name));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				fileOut.println(line);
+			}
+			reader.close();
+		} catch (IOException e) {
+			throw new CompileError("IO exception when reading builtin functions from file");
+		}
+
 	}
 
 	private void buildIR() throws Error {

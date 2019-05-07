@@ -11,7 +11,7 @@ import mxcompiler.utils.entity.FuncEntity;
 
 public class Function {
     // region normal
-    public final FuncEntity entity; // funcEntity
+    private final FuncEntity entity; // funcEntity
     private String name;
     private String builtInLabel = null; // builtInCallLabel if null ==> isBuiltIn = False
 

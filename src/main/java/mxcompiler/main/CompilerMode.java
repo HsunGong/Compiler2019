@@ -4,6 +4,13 @@ import java.util.Map;
 import java.util.HashMap;
 
 
+/**
+ * debug-mode: delete unuse builtin.asm, can not run asm
+ * <p>
+ * test-mode: run with least output warnings, no dump
+ * <p>
+ * default-mode: run normal, can dump out, can run asm
+ */
 enum CompilerMode {
 	Default("-C"), Debug("--debug"), Test("--test");
 

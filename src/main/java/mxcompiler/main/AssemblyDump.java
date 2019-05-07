@@ -16,15 +16,15 @@ import java.io.*;
 
 
 public class AssemblyDump implements IRVisitor {
-    private PrintStream os;
-    private final Root root;
+    private final PrintStream os;
+    private final Option opts;
 
-    public AssemblyDump(Root root, PrintStream x) {
-        this.root = root;
+    public AssemblyDump(PrintStream x, Option opts) {
         os = x;
+        this.opts = opts;
     }
 
-    public void dump() {
+    public void dump(Root root) {
         for (Function func : root.getFunc().values())
             for (BasicBlock bb : func.getReversePostOrder())
                 elimateMoveMemQuad(bb);
@@ -47,14 +47,19 @@ public class AssemblyDump implements IRVisitor {
         idMap.put(node.getFunc().get("main").start, "main");
 
         // define functions
-        printlnComment("Main Function");
+        printlnComment(" Main Function");
         println("global", "main");
         println("extern", "malloc");
         println("");
 
         // text
         println("section", ".text");
-        node.getFunc().values().forEach(func -> func.accept(this));
+        println("");
+        for (Map.Entry<String, Function> func : node.getFunc().entrySet())
+            if (!func.getKey().equals("main"))
+                visit(func.getValue());
+
+        visit(node.getFunc().get("main"));
         println("");
 
         // data
@@ -62,7 +67,7 @@ public class AssemblyDump implements IRVisitor {
             isDataSection = true;
 
             println("section", ".data");
-            node.getStaticStr().values().forEach(s -> s.accept(this));
+            node.getStaticStr().values().forEach(s -> visit(s));
             println("");
 
             isDataSection = false;
@@ -73,7 +78,7 @@ public class AssemblyDump implements IRVisitor {
             isBssSection = true;
 
             println("section", ".bss");
-            node.getStaticDataList().forEach(data -> data.accept(this));
+            node.getStaticDataList().forEach(data -> visit(data));
             println("");
 
             isBssSection = false;
@@ -81,8 +86,7 @@ public class AssemblyDump implements IRVisitor {
     }
 
     public void visit(Function node) {
-        printlnComment("function " + node.getName());
-        println("");
+        printlnComment(" function " + node.getName());
 
         int bbIdx = 0; // ???
         for (BasicBlock bb : node.getReversePostOrder()) {
@@ -429,7 +433,7 @@ public class AssemblyDump implements IRVisitor {
     }
 
     public void visit(Pop node) {
-        println("pop", node.getValue());
+        println("pop", visit(node.getValue()));
     }
 
     // endregion
@@ -541,16 +545,12 @@ public class AssemblyDump implements IRVisitor {
         os.print(str);
     }
 
-    public void printf(String str, Object... args) {
-        os.printf(str, args);
-    }
-
     /**
      * @Format Normal: {@code \t\t inst \t\t arg1, arg2, ...}
      */
     public void print(String inst, Object... args) {
-        String s = (inst.length() > 4) ? "\t\t%s\t%s" : "\t\t%s\t\t%s";
-
+        String s = "\t\t" + inst;
+        s += (inst.length() > 4) ? "\t%s" : "\t\t%s";
         s += (", %s").repeat(args.length - 1);
 
         os.printf(s, inst, args);
@@ -560,10 +560,11 @@ public class AssemblyDump implements IRVisitor {
      * @Format Normal: {@code \t\t inst \t\t arg1, arg2, ... \n}
      */
     public void println(String inst, Object... args) {
-        String s = (inst.length() > 4) ? "\t\t%s\t%s" : "\t\t%s\t\t%s";
+        String s = "\t\t" + inst;
+        s += (inst.length() > 4) ? "\t%s" : "\t\t%s";
         s += (", %s").repeat(args.length - 1);
 
-        os.printf(s + "\n", inst, args);
+        os.printf(s + "\n", args);
     }
 
     public void printLabel(String label) {

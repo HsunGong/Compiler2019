@@ -1,55 +1,17 @@
 Global static Data
 Global static string
-	@static_string ss
 >>>>>>>>>>>      Decl of functions      <<<<<<<<<<<<
-func test.name1
- argVregs:	$__this $x 
- blocks
-  %name1_entry:
-	funcall $vreg <- call test.name0
-	 args:  $__this
-	move $x <- 1
-	OP-ADD $x = 1 ADD 1
-	no return
-
-func test.name0
- argVregs:	$__this 
- blocks
-  %name0_entry:
-	no return
-
-func test2.name0
- argVregs:	$__this 
- blocks
-  %name0_entry_2:
-	no return
-
-func test.test
- argVregs:	$__this 
- blocks
-  %test_entry:
-	move $x <- @static_string ss
-	move $y <- 0
-	move $z <- 0
-	no return
-
 func main
  argVregs:	
  blocks
   %main_entry:
-	funcall $main_func_return <- call _init_func
-	 args: 
-	move $x <- 0
-	funcall $vreg <- call test.name0
-	 args:  $x
-	load $vreg_2 <- $x[0] <size 8>
-	funcall $vreg_3 <- call test2.name0
-	 args:  $vreg_2
-	return 0
+	jump %_init_func_entry
 
-func _init_func
- argVregs:	
- blocks
   %_init_func_entry:
-	no return
+	funcall $toString <- call toString
+	 args:  10
+	move $s <- $toString
+	funcall null <- call println
+	 args:  $s
+	return 0
 

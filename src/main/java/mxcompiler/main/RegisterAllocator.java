@@ -27,7 +27,6 @@ public class RegisterAllocator {
 
         PaintColors();
 
-        dealFuncStack();
     }
 
     private void AllocateNaiveArgs() {
@@ -79,6 +78,7 @@ public class RegisterAllocator {
 
         do {
             eliminationChanged = false;
+
             for (Function irFunc : root.getFunc().values()) {
                 if (irFunc.isBuiltIn())
                     continue;
@@ -137,7 +137,7 @@ public class RegisterAllocator {
 
                     // liveIn = use + (liveOut - def)
                     // use = use before assign found
-                    for (Register usedReg : inst.usedRegisters) {
+                    for (Register usedReg : inst.getUsedRegisters()) {
                         if (usedReg instanceof VirtualRegister)
                             liveIn.add((VirtualRegister) usedReg);
                     }
@@ -521,21 +521,29 @@ public class RegisterAllocator {
         }
     }
 
+    /** rename same name reg with colored reg */
     private void updateInstruction(Function func, ListIterator<Quad> iter) {
         Quad inst = iter.next();
         BasicBlock bb = inst.getParent();
 
         // set used Regs
         if (inst instanceof Funcall) { // set more args
-            // List<RegValue> args = ((Funcall) inst).getArgs();
-            List<Register> usedRegs = inst.usedRegisters;
-            for (int i = 0; i < usedRegs.size(); ++i) {
-                // can check args 1 to 6 is PhysicalRegister
-                if (usedRegs.get(i) instanceof VirtualRegister)
-                    usedRegs.set(i, vregInfoMap.get(usedRegs.get(i)).color);
+            List<RegValue> args = ((Funcall) inst).getArgs();
+            for (int i = 0; i < args.size(); ++i) {
+                if (args.get(i) instanceof VirtualRegister) {
+                    args.set(i, vregInfoMap.get(args.get(i)).color);
+                }
             }
+
+            // FIX: UGLY: why can not ??
+            // List<Register> usedRegs = inst.getUsedRegisters();
+            // for (int i = 0; i < usedRegs.size(); ++i) {
+            // // can check args 1 to 6 is PhysicalRegister
+            // if (usedRegs.get(i) instanceof VirtualRegister)
+            // usedRegs.set(i, vregInfoMap.get(usedRegs.get(i)).color);
+            // }
         } else { // rename used registers
-            List<Register> usedRegs = inst.usedRegisters;
+            List<Register> usedRegs = inst.getUsedRegisters();
             if (!usedRegs.isEmpty()) {
                 boolean usedPreg0 = false;
                 Map<Register, Register> renameMap = new HashMap<>();

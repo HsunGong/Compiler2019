@@ -1,23 +1,8 @@
-class test {
-    test() {
-        string x = "ss";
-        int y = 0;
-        test2 z;
-    }
-    void name0(){}
-    void name1(int x) {
-        name0();
-        ++x;
-    }
-    test2 ss;
-}
 
-class test2 {
-    void name0(){}
-}
+
+
 
 int main() {
-    test x;
-    x.name0();
-    x.ss.name0();
+    string s = toString(10);
+    println(s);
 }
