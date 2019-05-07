@@ -44,7 +44,8 @@ public class Function {
         return name;
     }
 
-    public BasicBlock initStart() { // genFirstBB
+    /** genFirstBB */ 
+    public BasicBlock initStart() {
         start = new BasicBlock(this, entity.getName() + "_entry");
         return start;
     }

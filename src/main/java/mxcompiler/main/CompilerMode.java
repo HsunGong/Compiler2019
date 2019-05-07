@@ -3,6 +3,7 @@ package mxcompiler.main;
 import java.util.Map;
 import java.util.HashMap;
 
+
 enum CompilerMode {
 	Default("-C"), Debug("--debug"), Test("--test");
 
@@ -37,13 +38,15 @@ enum CompilerMode {
 	}
 
 	enum DumpMode {
-		ASTDump("--dump-ast"), ScopeDump("--dump-scope"), AllDump("--dump-all");
+		ASTDump("--dump-ast"), ScopeDump("--dump-scope"), IRDump("--dump-ir"), AllDump(
+				"--dump-all");
 
 		static private Map<String, DumpMode> modes;
 		static {
 			modes = new HashMap<String, DumpMode>();
 			modes.put("--dump-all", AllDump); // not realized
 			modes.put("--dump-ast", ASTDump);
+			modes.put("--dump-ir", IRDump);
 			modes.put("--dump-scope", ScopeDump);
 		}
 

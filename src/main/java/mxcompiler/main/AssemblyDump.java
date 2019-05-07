@@ -2,11 +2,15 @@ package mxcompiler.main;
 
 import java.util.*;
 
+import mxcompiler.ast.expression.BinaryOpExprNode;
+// import mxcompiler.ast.expression.unary.PrefixExprNode;
+
+import mxcompiler.error.CompileError;
 import mxcompiler.ir.*;
 import mxcompiler.ir.register.*;
 import mxcompiler.ir.instruction.*;
 
-import mxcompiler.utils.Dump;
+import mxcompiler.utils.*;
 
 import java.io.*;
 
@@ -28,133 +32,406 @@ public class AssemblyDump implements IRVisitor {
         visit(root);
     }
 
+    /** name -> cnt */
     private Map<String, Integer> idCounter = new HashMap<>();
+    /** object -> id */
     private Map<Object, String> idMap = new HashMap<>();
     private PhysicalRegister preg0, preg1;
+    private boolean isBssSection, isDataSection;
 
+    /** only for user-functions(no builtIn func) */
     public void visit(Root node) {
         preg0 = node.preg0;
         preg1 = node.preg1;
 
-        idMap.put(node.getFuncs().get("main").getStartBB(), "main");
+        idMap.put(node.getFunc().get("main").start, "main");
 
-        out.println("\t\tglobal\tmain");
-        out.println();
+        // define functions
+        printlnComment("Main Function");
+        println("global", "main");
+        println("extern", "malloc");
+        println("");
 
-        out.println("\t\textern\tmalloc");
-        out.println();
+        // text
+        println("section", ".text");
+        node.getFunc().values().forEach(func -> func.accept(this));
+        println("");
 
-        if (node.getStaticDataList().size() > 0) {
-            isBssSection = true;
-            out.println("\t\tsection\t.bss");
-            for (StaticData staticData : node.getStaticDataList()) {
-                staticData.accept(this);
-            }
-            out.println();
-            isBssSection = false;
-        }
-
-        if (node.getStaticStrs().size() > 0) {
+        // data
+        if (node.getStaticStr().size() > 0) {
             isDataSection = true;
-            out.println("\t\tsection\t.data");
-            for (StaticString staticString : node.getStaticStrs().values()) {
-                staticString.accept(this);
-            }
-            out.println();
+
+            println("section", ".data");
+            node.getStaticStr().values().forEach(s -> s.accept(this));
+            println("");
+
             isDataSection = false;
         }
 
-        out.println("\t\tsection\t.text\n");
-        for (IRFunction irFunction : node.getFuncs().values()) {
-            irFunction.accept(this);
-        }
-        out.println();
+        // bss
+        if (node.getStaticDataList().size() > 0) {
+            isBssSection = true;
 
-        try {
-            BufferedReader bufferedReader = new BufferedReader(
-                    new FileReader("lib/builtin_functions.asm"));
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                out.println(line);
-            }
-        } catch (IOException e) {
-            throw new CompilerError("IO exception when reading builtin functions from file");
-        }
-    }
+            println("section", ".bss");
+            node.getStaticDataList().forEach(data -> data.accept(this));
+            println("");
 
-    public void visit(BasicBlock node) {
+            isBssSection = false;
+        }
     }
 
     public void visit(Function node) {
+        printlnComment("function " + node.getName());
+        println("");
+
+        int bbIdx = 0; // ???
+        for (BasicBlock bb : node.getReversePostOrder()) {
+            visit(bb);
+            ++bbIdx;
+        }
+
+        println("");
+    }
+
+    private String bbId(BasicBlock bb) {
+        String id = idMap.get(bb);
+        if (id == null) {
+            id = Tool.BLOCK + newId(bb.getName());
+            idMap.put(bb, id);
+        }
+
+        return id;
+    }
+
+    public void visit(BasicBlock node) {
+        printlnLabel(bbId(node));
+        node.getInsts().forEach(inst -> visit(inst));
+        // println("");
     }
 
     public void visit(Funcall node) {
+        if (node.getFunc().isBuiltIn())
+            println("call", node.getFunc().getBuiltInLabel());
+        else
+            println("call", bbId(node.getFunc().start));
     }
 
     public void visit(HeapAlloc node) {
+        println("call", "malloc");
     }
-
-    // region op
-    public void visit(Uni node) {
-    }
-
-    public void visit(Bin node) {
-    }
-
-    public void visit(Cmp node) {
-    }
-    // endregion
 
     // region jump
+    public void visit(Return node) {
+        println("\t\tret");
+    }
+
     public void visit(Jump node) {
+        // remove meaningless jump
+        if (node.getTarget().postOrder + 1 == node.getParent().postOrder)
+            return;
+
+        println("jmp", bbId(node.getTarget()));
     }
 
     public void visit(CJump node) {
-    }
+        if (node.getCond() instanceof IntImm) {
+            int isJump = ((IntImm) node.getCond()).getValue();
+            BasicBlock target = (isJump == 1) ? node.getThen() : node.getElse();
 
-    public void visit(Return node) {
-    }
-    // endregion
+            if (target.postOrder + 1 == node.getParent().postOrder)
+                return;
+            println("jmp", bbId(target));
+            return;
+        }
 
-    // region mem
-    public void visit(MemQuad node) {
-    }
+        println("cmp", visit(node.getCond()), "1");
+        println("je", bbId(node.getThen()));
 
-    public void visit(Load node) {
-    }
-
-    public void visit(Store node) {
-    }
-
-    public void visit(Move node) {
-    }
-
-    public void visit(Pop node) {
-    }
-
-    public void visit(Push node) {
+        // remove meaningless jump
+        if (node.getElse().postOrder + 1 == node.getParent().postOrder)
+            return;
+        println("jmp", bbId(node.getElse()));
     }
     // endregion
 
     // region regValues
-
-    public void visit(IntImm node) {
+    private String dataId(StaticData data) {
+        String id = idMap.get(data);
+        if (id == null) {
+            id = Tool.STATIC_DATA + newId(data.getName());
+            idMap.put(data, id);
+        }
+        return id;
     }
 
-    public void visit(PhysicalRegister node) {
+    public String visit(IntImm node) {
+        return Integer.toString(node.getValue());
     }
 
-    public void visit(StackSlot node) {
+    public String visit(PhysicalRegister node) {
+        return node.getName();
     }
 
-    public void visit(StaticString node) {
+    public String visit(VirtualRegister node) {
+        throw new CompileError("should not visit virtual register node in nasm");
     }
 
-    public void visit(StaticVar node) {
+    public String visit(StaticVar node) {
+        if (isBssSection) {
+            String op;
+            switch (node.getSize()) {
+            case 1:
+                op = "resb";
+                break;
+            case 2:
+                op = "resw";
+                break;
+            case 4:
+                op = "resd";
+                break;
+            case 8:
+                op = "resq";
+                break;
+            default:
+                throw new CompileError("invalid static data size");
+            }
+            printlnLabel(dataId(node));
+            println(op, "1");
+            return null;
+        } else
+            return dataId(node);
     }
 
-    public void visit(VirtualRegister node) {
+    private String staticStrTransfer(String str) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0, n = str.length(); i < n; ++i) {
+            char c = str.charAt(i);
+            sb.append((int) c);
+            sb.append(", ");
+        }
+        sb.append(0);
+        return sb.toString();
     }
+
+    public String visit(StaticString node) {
+        if (isDataSection) {
+            printlnLabel(dataId(node));
+            println("dq", Integer.toString(node.getValue().length()));
+            println("db", staticStrTransfer(node.getValue()));
+            return null;
+        } else {
+            return dataId(node);
+        }
+    }
+    // endregion
+
+    // region op
+    public void visit(Uni node) {
+        String op;
+        switch (node.getOp()) {
+        case BIT_NOT:
+            op = "not";
+            break;
+        case NEGA:
+            op = "neg";
+            break;
+        default:
+            throw new CompileError("impossible");
+        }
+
+        println("mov", visit(node.getDst()), visit(node.getRhs()));
+        println(op, visit(node.getDst()));
+    }
+
+    public void visit(Cmp node) {
+        if (node.getLhs() instanceof PhysicalRegister) {
+            println("and", visit(node.getLhs()), "-1");
+        }
+
+        if (node.getRhs() instanceof PhysicalRegister) {
+            println("and", visit(node.getRhs()), "-1");
+        }
+
+        // ZF or CF or SF
+        println("xor", "rax", "rax");
+        println("cmp", visit(node.getLhs()), visit(node.getRhs()));
+
+        String op;
+        switch (node.getOp()) {
+        case EQUAL:
+            op = "sete";
+            break;
+        case INEQUAL:
+            op = "setne";
+            break;
+        case LESS:
+            op = "setl";
+            break;
+        case LESS_EQUAL:
+            op = "setle";
+            break;
+        case GREATER:
+            op = "setg";
+            break;
+        case GREATER_EQUAL:
+            op = "setge";
+            break;
+        default:
+            throw new CompileError("impossible");
+        }
+
+        println(op, "al");
+        println("mov", visit(node.getDst()), "rax");
+    }
+
+    public void visit(Bin node) {
+        if (node instanceof Cmp) // UGLY:FIX:TODO: very important
+            visit((Cmp) node);
+
+        String op;
+        switch (node.getOp()) {
+        case DIV:
+        case MOD:
+            // to be optimized: not pushing rdx
+            println("mov", "rbx", visit(node.getRhs()));
+            println("mov", "rax", visit(node.getLhs()));
+            println("mov", preg0.getName(), "rdx");
+
+            println("\t\tcdq");
+            // <rdx:rax> / rbx store rax(quotient), rdx(remain)
+            println("idiv", "rbx");
+
+            println("mov", node.getDst(),
+                    (node.getOp() == BinaryOpExprNode.Op.DIV) ? "rax" : "rdx");
+            println("mov", "rdx", preg0.getName());
+
+            return;
+
+        case SH_L:
+        case SH_R:
+            println("mov", "rbx", "rcx");
+            println("mov", "rcx", visit(node.getRhs()));
+
+            op = (node.getOp() == BinaryOpExprNode.Op.SH_L) ? "sal" : "sar";
+            println(op, visit(node.getLhs()), "cl");
+
+            println("mov", "rcx", "rbx");
+            println("and", visit(node.getLhs()), "-1");
+            return;
+
+        case ADD:
+            if (node.getRhs() instanceof IntImm && ((IntImm) node.getRhs()).getValue() == 1) {
+                println("inc", visit(node.getLhs()));
+                return;
+            }
+            op = "add";
+            break;
+        case SUB:
+            if (node.getRhs() instanceof IntImm && ((IntImm) node.getRhs()).getValue() == 1) {
+                println("dec", visit(node.getLhs()));
+                return;
+            }
+            op = "sub";
+            break;
+        case MUL:
+            if (node.getRhs() instanceof IntImm && ((IntImm) node.getRhs()).getValue() == 1) {
+                return;
+            }
+            op = "imul";
+            break;
+        case BIT_OR:
+            op = "or";
+            break;
+        case BIT_XOR:
+            op = "xor";
+            break;
+        case BIT_AND:
+            op = "and";
+            break;
+        default:
+            throw new CompileError("impossible");
+        }
+
+        if (node.getDst() != node.getLhs())
+            throw new CompileError("binary operation should have same dest and lhs");
+
+        println(op, visit(node.getLhs()), visit(node.getRhs()));
+    }
+
+    // endregion
+
+    // region mem
+    public void visit(Move node) {
+        println("mov", visit(node.getDst()), visit(node.getRhs()));
+    }
+
+    private String sizeStr(int memSize) {
+        String sizeStr;
+        switch (memSize) {
+        case 1:
+            sizeStr = "byte";
+            break;
+        case 2:
+            sizeStr = "word";
+            break;
+        case 4:
+            sizeStr = "dword";
+            break;
+        case 8:
+            sizeStr = "qword";
+            break;
+        default:
+            throw new CompileError("invalid load size: " + memSize);
+        }
+
+        return sizeStr;
+    }
+
+    private String toAddr(MemQuad node) {
+        String addr = visit(node.baseAddr);
+
+        if (node.offset < 0) {
+            addr += node.offset;
+        } else if (node.offset > 0) {
+            addr += "+" + node.offset;
+        }
+
+        return "[" + addr + "]";
+    }
+
+    private void printMove(String inst, String size, String dst, String ori) {
+        if (inst != "mov")
+            throw new CompileError("impossible");
+
+        os.printf("\t\t%s\t\t%s %s, %s\n", inst, size, ori);
+    }
+
+    public void visit(Load node) {
+        if (node.baseAddr instanceof StaticString) {
+            printMove("mov", visit(node.getDst()), sizeStr(node.getSize()), visit(node.baseAddr));
+            return;
+        }
+
+        printMove("mov", visit(node.getDst()), sizeStr(node.getSize()), toAddr(node));
+    }
+
+    public void visit(Store node) {
+        if (node.baseAddr instanceof StaticString) {
+            printMove("mov", sizeStr(node.getSize()), visit(node.baseAddr), visit(node.getValue()));
+            return;
+        }
+
+        printMove("mov", sizeStr(node.getSize()), toAddr(node), visit(node.getValue()));
+    }
+
+    public void visit(Push node) {
+        println("push", visit(node.getValue()));
+    }
+
+    public void visit(Pop node) {
+        println("pop", node.getValue());
+    }
+
     // endregion
 
     /** pre-dump-elimate */
@@ -197,11 +474,21 @@ public class AssemblyDump implements IRVisitor {
     }
 
     // region useless
+    public String visit(StackSlot node) {
+        throw new CompileError("should not visit stack sslot node in nasm");
+    }
+
     public void visit(GlobalVarInit node) {
         // empty
     }
 
+    public void visit(MemQuad node) {
+        node.accept(this);
+    }
+
     public void visit(Quad node) {
+        if (node == null)
+            return;
         node.accept(this);
     }
 
@@ -209,43 +496,87 @@ public class AssemblyDump implements IRVisitor {
         node.accept(this);
     }
 
-    public void visit(RegValue node) {
-        node.accept(this);
+    public String visit(RegValue node) {
+        if (node == null)
+            return null;
+        return node.accept(this);
     }
 
-    public void visit(Register node) {
-        node.accept(this);
+    public String visit(Register node) {
+        return node.accept(this);
     }
 
-    public void visit(StaticData node) {
-        node.accept(this);
+    public String visit(StaticData node) {
+        return node.accept(this);
     }
     // endregion
 
-    // region Dump
-    public void println(String x) {
-        os.println(x);
+    /**
+     * Put all in idCounter
+     * <p>
+     * idCounter store: <id, cnt>
+     * <p>
+     * default id: id
+     * <p>
+     * recurence id: id_cnt
+     * <p>
+     * if id == "", just return _cnt
+     */
+    private String newId(String id) {
+        int nowCnt = idCounter.getOrDefault(id, 0) + 1;
+        idCounter.put(id, nowCnt); // overwrite
+        return id + "_" + nowCnt;
     }
 
-    public void printf(String str, Object... args) {
-        os.printf(str, args);
+    // region Dump
+
+    // private String toImm(Integer int) 0dxxx
+    // private String toReg(Register reg) getName
+
+    public void println(String x) {
+        os.println(x);
     }
 
     public void print(String str) {
         os.print(str);
     }
 
+    public void printf(String str, Object... args) {
+        os.printf(str, args);
+    }
+
+    /**
+     * @Format Normal: {@code \t\t inst \t\t arg1, arg2, ...}
+     */
+    public void print(String inst, Object... args) {
+        String s = (inst.length() > 4) ? "\t\t%s\t%s" : "\t\t%s\t\t%s";
+
+        s += (", %s").repeat(args.length - 1);
+
+        os.printf(s, inst, args);
+    }
+
+    /**
+     * @Format Normal: {@code \t\t inst \t\t arg1, arg2, ... \n}
+     */
+    public void println(String inst, Object... args) {
+        String s = (inst.length() > 4) ? "\t\t%s\t%s" : "\t\t%s\t\t%s";
+        s += (", %s").repeat(args.length - 1);
+
+        os.printf(s + "\n", inst, args);
+    }
+
     public void printLabel(String label) {
-        os.println("\t\t" + label);
+        os.print(label + ":");
     }
 
-    public void printQuad(String inst, String args) {
-        os.printf("\t\t%s\t%s\n", inst, args);
+    public void printlnLabel(String label) {
+        os.println(label + ":");
     }
 
-    /** order of nasm */
-    public void printOrder(String order, String args) {
-        os.printf("\t\t%s\t%s\n", order, args);
+    public void printlnComment(String cmt) {
+        os.println(";" + cmt);
     }
+
     // endregion
 }

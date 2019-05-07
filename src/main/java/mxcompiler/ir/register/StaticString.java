@@ -7,7 +7,7 @@ public class StaticString extends StaticData {
     private String val;
 
     public StaticString(String value) {
-        super("static_var", RegSize);
+        super("static_string", RegSize);
         this.val = value;
     }
 
@@ -15,8 +15,8 @@ public class StaticString extends StaticData {
         return val;
     }
 
-    public void accept(IRVisitor visitor) {
-        visitor.visit(this);
+    public String accept(IRVisitor visitor) {
+        return visitor.visit(this);
     }
 
     public void _dump(Dump d) {

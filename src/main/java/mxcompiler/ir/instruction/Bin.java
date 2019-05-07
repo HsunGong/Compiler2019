@@ -14,6 +14,8 @@ import mxcompiler.utils.Dump;
  * binary
  * <p>
  * No more LOGIC_AND("&&"), LOGIC_OR("||")
+ * <p>
+ * op Src, Dst
  */
 public class Bin extends Quad {
 

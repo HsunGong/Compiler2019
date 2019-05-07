@@ -1,6 +1,8 @@
 class test {
     test() {
-
+        string x = "ss";
+        int y = 0;
+        test2 z;
     }
     void name0(){}
     void name1(int x) {

@@ -43,8 +43,8 @@ public class PhysicalRegister extends Register {
         d.println("physical Reigst");
     }
 
-    public void accept(IRVisitor visitor) {
-        visitor.visit(this);
+    public String accept(IRVisitor visitor) {
+        return visitor.visit(this);
     }
 
     public PhysicalRegister copy() {

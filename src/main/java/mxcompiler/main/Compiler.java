@@ -3,7 +3,10 @@ package mxcompiler.main;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
@@ -78,6 +81,9 @@ public final class Compiler {
 		}
 	}
 
+    private static final String link_asm_name = "./src/main/java/mxcompiler/asm/BuiltIn.asm";
+
+
 	private void generateAssembly() throws Error {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("Generate asm begin");
@@ -88,6 +94,19 @@ public final class Compiler {
 		AssemblyDump asm = new AssemblyDump(irRoot, fileOut);
 		asm.dump();
 
+		// append builtIn function
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(link_asm_name));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                fileOut.println(line);
+            }
+            reader.close();
+        } catch (IOException e) {
+            throw new CompileError("IO exception when reading builtin functions from file");
+        }
+
+		
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> Generate asm end");
 	}
@@ -99,9 +118,14 @@ public final class Compiler {
 		UsagePreChecker usagePreChecker = new UsagePreChecker();
 		usagePreChecker.visit(astRoot);
 
-		IRBuilder treeIrBuilder = new IRBuilder();
+		IRBuilder treeIrBuilder = new IRBuilder(opts);
 		irRoot = treeIrBuilder.build(astRoot);
 
+		if (opts.dumpMode().contains(DumpMode.IRDump)
+				|| opts.dumpMode().contains(DumpMode.AllDump)) {
+			IRDump dump = new IRDump(dumpOut);
+			dump.visit(irRoot);
+		}
 
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println(">>> IR Builder end");

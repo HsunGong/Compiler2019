@@ -2,6 +2,9 @@ package mxcompiler.utils;
 
 /** a static class to store String */
 public class Tool {
+    public static final String STATIC_DATA = "__static_data_";
+    public static final String BLOCK = "__block_";
+
     // region builtIn
     // class
 
@@ -13,18 +16,17 @@ public class Tool {
     // function
     public static final String PRINT = "print";
     public static final String PRINTLN = "println";
-    public static final String PRINTINT = "printInt";
-    public static final String PRINTLNINT = "printlnInt";
+    public static final String PRINTINT = "_printInt";
+    public static final String PRINTLNINT = "_printlnInt";
     public static final String GETSTRING = "getString";
     public static final String GETINT = "getInt";
     public static final String TOSTRING = "toString";
-    
-    public static final String SUBSTRING = "subString";
+
+    public static final String SUBSTRING = "substring";
     public static final String PARSEINT = "parseInt";
     public static final String ORD = "ord";
     public static final String SIZE = "size";
     public static final String LENGTH = "length";
-
 
     public static final String STRING_CONCAT = "concat";
     public static final String STRING_EQUAL = "equal";
@@ -39,7 +41,7 @@ public class Tool {
     public static final String GETSTRING_KEY = GETSTRING;
     public static final String GETINT_KEY = GETINT;
     public static final String TOSTRING_KEY = TOSTRING;
-    
+
     public static final String SUBSTRING_KEY = STRING + DOMAIN + SUBSTRING;
     public static final String PARSEINT_KEY = STRING + DOMAIN + PARSEINT;
     public static final String ORD_KEY = STRING + DOMAIN + ORD;

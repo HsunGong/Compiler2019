@@ -19,7 +19,7 @@ public class BasicBlock {
 
     public BasicBlock(Function func, String name) {
         this.func = func;
-        this.name = name;
+        this.name = (name == null) ? "" : name;
     }
 
     public String getName() {

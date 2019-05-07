@@ -26,13 +26,13 @@ public interface IRVisitor {
     public void visit(Store node);
     public void visit(Uni node);
     
-    public void visit(IntImm node);
-    public void visit(PhysicalRegister node);
-    public void visit(Register node);
-    public void visit(RegValue node);
-    public void visit(StackSlot node);
-    public void visit(StaticData node);
-    public void visit(StaticString node);
-    public void visit(StaticVar node);
-    public void visit(VirtualRegister node);
+    public String visit(IntImm node);
+    public String visit(PhysicalRegister node);
+    public String visit(Register node);
+    public String visit(RegValue node);
+    public String visit(StackSlot node);
+    public String visit(StaticData node);
+    public String visit(StaticString node);
+    public String visit(StaticVar node);
+    public String visit(VirtualRegister node);
 }

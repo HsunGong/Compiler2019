@@ -17,8 +17,8 @@ public class VirtualRegister extends Register {
         d.println("virtual Reigst");
     }
 
-    public void accept(IRVisitor visitor) {
-        visitor.visit(this);
+    public String accept(IRVisitor visitor) {
+        return visitor.visit(this);
     }
 
     public VirtualRegister copy() {

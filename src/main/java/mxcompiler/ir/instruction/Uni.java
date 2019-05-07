@@ -22,7 +22,11 @@ public class Uni extends Quad {
             throw new CompileError("Error uni");
         this.dst = destion;
         this.rhs = object;
+
+        if (op != Op.NEGA || op != Op.BIT_NOT)
+            throw new CompileError("Error uni");
         this.op = op;
+        
         reloadUsedRegs();
     }
 

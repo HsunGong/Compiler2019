@@ -56,11 +56,18 @@ public class IRBuilder extends Visitor {
     /** only when {@link #visit(IdentifierExprNode)} */
     private boolean uselessStatic = false;
 
+    private final Option opts;
+
+    public IRBuilder(Option opts) {
+        this.opts = opts;
+    }
+
     public Root build(ASTNode node) {
         visit(node);
 
-        TwoRegOpTransformer();
-        FuncInlineProcess();
+        BinaryDstEqualLhs();
+        if (opts.OptimizationLevel() > 0 && opts.mode() != CompilerMode.Debug)
+            FuncInlineProcess();
         StaticDataProcess();
 
         return root;
@@ -132,8 +139,7 @@ public class IRBuilder extends Visitor {
 
         TypeNode returnType = new TypeNode(new VoidType(), null);
         List<VarDeclNode> params = new ArrayList<>();
-        FuncDeclNode funcNode = new FuncDeclNode(INIT_FUNC_NAME, returnType, params, body,
-                null);
+        FuncDeclNode funcNode = new FuncDeclNode(INIT_FUNC_NAME, returnType, params, body, null);
         FuncEntity funcEntity = new FuncEntity(funcNode);
         toplevelScope.put(INIT_FUNC_NAME, funcEntity);
 
@@ -177,8 +183,7 @@ public class IRBuilder extends Visitor {
                 }
 
                 visit(node.getInit());
-                dealAssign(vreg, 0, node.getInit(), node.getInit().getType().getRegSize(),
-                        false);
+                dealAssign(vreg, 0, node.getInit(), node.getInit().getType().getRegSize(), false);
             }
         }
     }
@@ -194,8 +199,7 @@ public class IRBuilder extends Visitor {
     }
 
     public void visit(FuncDeclNode node) {
-        String name = (curClass == null) ? node.getName()
-                : curClass.getDomain() + node.getName();
+        String name = (curClass == null) ? node.getName() : curClass.getDomain() + node.getName();
         curFunc = root.getFunc(name);
         curBB = curFunc.initStart();
 
@@ -221,9 +225,11 @@ public class IRBuilder extends Visitor {
 
         // region add inst
         // global init func
-        if (node.getName().equals("main"))
+        if (node.getName().equals("main")) {
+            VirtualRegister vreg = new VirtualRegister("main_func_return");
             curBB.addLastInst(
-                    new Funcall(curBB, root.getFunc(INIT_FUNC_NAME), new ArrayList<>(), null));
+                    new Funcall(curBB, root.getFunc(INIT_FUNC_NAME), new ArrayList<>(), vreg));
+        }
 
         visit(node.getBody());
 
@@ -441,8 +447,7 @@ public class IRBuilder extends Visitor {
     // endregion
 
     // region visit expr
-    private void dealSelfIncrDecr(ExprNode expr, ExprNode node, boolean isSuffix,
-            boolean isIncr) {
+    private void dealSelfIncrDecr(ExprNode expr, ExprNode node, boolean isSuffix, boolean isIncr) {
         boolean needMemOp = needMemoryAccess(expr);
         boolean tmpWantAddr = curWantAddr;
 
@@ -468,8 +473,7 @@ public class IRBuilder extends Visitor {
 
             VirtualRegister vreg = new VirtualRegister(null);
             curBB.addLastInst(new Bin(curBB, vreg, op, expr.regValue, one));
-            curBB.addLastInst(
-                    new Store(curBB, vreg, RegValue.RegSize, expr.regValue, expr.offset));
+            curBB.addLastInst(new Store(curBB, vreg, RegValue.RegSize, expr.regValue, expr.offset));
 
             if (!isSuffix)
                 expr.regValue = vreg;
@@ -523,8 +527,7 @@ public class IRBuilder extends Visitor {
     }
 
     public void visit(SuffixExprNode node) {
-        dealSelfIncrDecr(node.getExpr(), node, true,
-                node.getOp() == SuffixExprNode.Op.SUF_INC);
+        dealSelfIncrDecr(node.getExpr(), node, true, node.getOp() == SuffixExprNode.Op.SUF_INC);
     }
 
     public void visit(BoolLiteralExprNode node) {
@@ -854,8 +857,8 @@ public class IRBuilder extends Visitor {
             VirtualRegister vreg = new VirtualRegister(null);
             node.regValue = vreg;
             // Pre-calced: what if FIX: class.arr ?? (can not init ??)
-            curBB.addLastInst(new Load(curBB, vreg, memberEntity.getType().getRegSize(),
-                    classAddr, memberEntity.getCurOffset()));
+            curBB.addLastInst(new Load(curBB, vreg, memberEntity.getType().getRegSize(), classAddr,
+                    memberEntity.getCurOffset()));
 
             if (node.getThen() != null)
                 curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
@@ -882,8 +885,8 @@ public class IRBuilder extends Visitor {
         IntImm elementSize = new IntImm(node.getType().getRegSize());
 
         // vreg <- real-addr = addr + size*index
-        curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL,
-                node.getIndex().regValue, elementSize));
+        curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL, node.getIndex().regValue,
+                elementSize));
         curBB.addLastInst(
                 new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, node.getExpr().regValue, vreg));
 
@@ -891,8 +894,8 @@ public class IRBuilder extends Visitor {
             node.addrValue = vreg;
             node.offset = RegValue.RegSize;
         } else { // variable
-            curBB.addLastInst(new Load(curBB, vreg, node.getType().getRegSize(), vreg,
-                    RegValue.RegSize));
+            curBB.addLastInst(
+                    new Load(curBB, vreg, node.getType().getRegSize(), vreg, RegValue.RegSize));
 
             node.regValue = vreg;
             if (node.getThen() != null)
@@ -930,8 +933,8 @@ public class IRBuilder extends Visitor {
         curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, null));
     }
 
-    private void dealBuiltInFuncCall(FuncallExprNode node, ExprNode thisExpr,
-            FuncEntity entity, String keyName) {
+    private void dealBuiltInFuncCall(FuncallExprNode node, ExprNode thisExpr, FuncEntity entity,
+            String keyName) {
         boolean tmpWantAddr = curWantAddr;
         curWantAddr = false;
 
@@ -1137,8 +1140,7 @@ public class IRBuilder extends Visitor {
     public void visit(IdentifierExprNode node) {
         // set useless
         VarEntity varEntity = node.entity;
-        if ((varEntity.getType() instanceof ArrayType || varEntity.isGlobal)
-                && varEntity.unUsed) {
+        if ((varEntity.getType() instanceof ArrayType || varEntity.isGlobal) && varEntity.unUsed) {
             uselessStatic = true;
             return;
         }
@@ -1157,8 +1159,7 @@ public class IRBuilder extends Visitor {
                 node.regValue = memNode.regValue;
 
                 if (node.getThen() != null)
-                    curBB.setJump(
-                            new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
+                    curBB.setJump(new CJump(curBB, node.regValue, node.getThen(), node.getElse()));
             }
 
             // is actually this.identifier, which is a member accessing
@@ -1185,8 +1186,8 @@ public class IRBuilder extends Visitor {
         // vreg <- real-addr = addr + size*index
         curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.MUL, dim.regValue,
                 new IntImm(RegValue.RegSize)));
-        curBB.addLastInst(new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, vreg,
-                new IntImm(RegValue.RegSize)));
+        curBB.addLastInst(
+                new Bin(curBB, vreg, BinaryOpExprNode.Op.ADD, vreg, new IntImm(RegValue.RegSize)));
 
         curBB.addLastInst(new HeapAlloc(curBB, vreg, vreg)); // FIX: what is this ?
         curBB.addLastInst(new Store(curBB, dim.regValue, RegValue.RegSize, vreg, 0));
@@ -1221,8 +1222,8 @@ public class IRBuilder extends Visitor {
             curBB.addLastInst(new Bin(curBB, addrNow, BinaryOpExprNode.Op.ADD, addrNow,
                     new IntImm(RegValue.RegSize)));
             dealArrNew(node, null, addrNow, idx + 1);
-            curBB.addLastInst(new Bin(curBB, loop_idx, BinaryOpExprNode.Op.ADD, loop_idx,
-                    new IntImm(1)));
+            curBB.addLastInst(
+                    new Bin(curBB, loop_idx, BinaryOpExprNode.Op.ADD, loop_idx, new IntImm(1)));
             curBB.setJump(new Jump(curBB, condBB));
 
             curBB = afterBB;
@@ -1285,10 +1286,10 @@ public class IRBuilder extends Visitor {
             // why IntImm? if has branch, no need to care value
             // FIX: BUG: TODO:still messy
             if (needMemOp) {
-                thenBB.addLastInst(new Store(thenBB, new IntImm(1), RegValue.RegSize, destion,
-                        addrOffset));
-                elseBB.addLastInst(new Store(elseBB, new IntImm(0), RegValue.RegSize, destion,
-                        addrOffset));
+                thenBB.addLastInst(
+                        new Store(thenBB, new IntImm(1), RegValue.RegSize, destion, addrOffset));
+                elseBB.addLastInst(
+                        new Store(elseBB, new IntImm(0), RegValue.RegSize, destion, addrOffset));
             } else {
                 thenBB.addLastInst(new Move(thenBB, (VirtualRegister) destion, new IntImm(1)));
                 elseBB.addLastInst(new Move(elseBB, (VirtualRegister) destion, new IntImm(0)));
@@ -1345,7 +1346,7 @@ public class IRBuilder extends Visitor {
         b = tmp;
     }
 
-    private void TwoRegOpTransformer() {
+    private void BinaryDstEqualLhs() {
         for (Function irFunc : root.getFunc().values())
             for (BasicBlock bb : irFunc.getReversePostOrder()) {
                 ListIterator<Quad> iter = bb.getInsts().listIterator();
@@ -1617,8 +1618,7 @@ public class IRBuilder extends Visitor {
             VirtualRegister oldArgVreg = calleeFunc.argVregs.get(i);
             VirtualRegister newArgVreg = oldArgVreg.copy();
 
-            parent.addBeforeInst(iter,
-                    new Move(parent, newArgVreg, funcCallInst.getArgs().get(i)));
+            parent.addBeforeInst(iter, new Move(parent, newArgVreg, funcCallInst.getArgs().get(i)));
             renameMap.put(oldArgVreg, newArgVreg);
         }
 
@@ -1746,8 +1746,7 @@ public class IRBuilder extends Visitor {
                         renameMap.clear();
                         for (Register reg : usedRegisters) { // sel can optim regs
                             if (reg instanceof StaticData && !(reg instanceof StaticString))
-                                renameMap.put(reg,
-                                        getStaticDataVreg(funcInfo.dataVregMap, reg));
+                                renameMap.put(reg, getStaticDataVreg(funcInfo.dataVregMap, reg));
                             else
                                 renameMap.put(reg, reg);
                         }

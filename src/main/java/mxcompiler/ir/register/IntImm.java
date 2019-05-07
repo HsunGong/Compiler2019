@@ -19,8 +19,8 @@ public class IntImm extends RegValue {
         d.println("int imm");
     }
 
-    public void accept(IRVisitor visitor) {
-        visitor.visit(this);
+    public String accept(IRVisitor visitor) {
+        return visitor.visit(this);
     }
 
     public IntImm copy() {

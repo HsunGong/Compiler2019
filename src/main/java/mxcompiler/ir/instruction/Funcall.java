@@ -23,7 +23,7 @@ public class Funcall extends Quad {
         if (args == null)
             throw new CompileError("Funcall args should be empty not null");
         if (!(destion instanceof Register))
-            throw new CompileError("error pop");
+            throw new CompileError("error destion of funcall");
         this.args = args;
         this.dst = destion;
 

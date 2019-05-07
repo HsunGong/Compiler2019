@@ -9,7 +9,7 @@
 			"name": "CodeLens (Launch) - Compiler",
 			"request": "launch",
 			"mainClass": "mxcompiler.main.Compiler",
-			"args": "--debug --dump-all /home/xun/Documents/mxc/src/test/cases/tmp/test.in",
+			"args": "--debug --dump-ir /home/xun/Documents/mxc/src/test/cases/tmp/test.in -o /home/xun/Documents/mxc/src/test/cases/tmp/test.asm",
 			"projectName": "mxc"
 		},
 		{

@@ -13,7 +13,7 @@ public class Option {
 
 	/** only support 1 source file */
 	private InputStream src;
-	private String output = "a.out";
+	private String output = "./a.out";
 	private CompilerMode mode = null;
 	private List<DumpMode> dumpMode = new ArrayList<>();
 	private int level = 0;
@@ -41,7 +41,7 @@ public class Option {
 					if (args.hasNext()) {
 						output = args.next();
 					} else {
-						output = "a.out";
+						output = "./a.out";
 					}
 				} else if (arg.startsWith("-O")) {
 					String type = arg.substring(2);

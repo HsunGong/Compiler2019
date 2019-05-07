@@ -16,6 +16,7 @@ public class Root {
     /** pregs -> used for stack slot (defined once) */
     public PhysicalRegister preg0, preg1;
 
+    /** add builtIn func here */
     public Root() {
         initBuiltInFunc();
     }
