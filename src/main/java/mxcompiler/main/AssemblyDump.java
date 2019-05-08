@@ -307,7 +307,7 @@ public class AssemblyDump implements IRVisitor {
             // <rdx:rax> / rbx store rax(quotient), rdx(remain)
             println("idiv", "rbx");
 
-            println("mov", node.getDst(),
+            println("mov", visit(node.getDst()),
                     (node.getOp() == BinaryOpExprNode.Op.DIV) ? "rax" : "rdx");
             println("mov", "rdx", preg0.getName());
 
@@ -371,20 +371,21 @@ public class AssemblyDump implements IRVisitor {
         println("mov", visit(node.getDst()), visit(node.getRhs()));
     }
 
-    private String sizeStr(int memSize) {
+    /** include a empty symbol */
+    private String getSize(int memSize) {
         String sizeStr;
         switch (memSize) {
         case 1:
-            sizeStr = "byte";
+            sizeStr = "byte ";
             break;
         case 2:
-            sizeStr = "word";
+            sizeStr = "word ";
             break;
         case 4:
-            sizeStr = "dword";
+            sizeStr = "dword ";
             break;
         case 8:
-            sizeStr = "qword";
+            sizeStr = "qword ";
             break;
         default:
             throw new CompileError("invalid load size: " + memSize);
@@ -405,29 +406,29 @@ public class AssemblyDump implements IRVisitor {
         return "[" + addr + "]";
     }
 
-    private void printMove(String inst, String size, String dst, String ori) {
+    private void printMove(String inst, String arg1, String arg2) {
         if (inst != "mov")
             throw new CompileError("impossible");
 
-        os.printf("\t\t%s\t\t%s %s, %s\n", inst, size, ori);
+        os.printf("\t\t%s\t\t%s, %s\n", inst, arg1, arg2);
     }
 
     public void visit(Load node) {
         if (node.baseAddr instanceof StaticString) {
-            printMove("mov", visit(node.getDst()), sizeStr(node.getSize()), visit(node.baseAddr));
+            printMove("mov", visit(node.getDst()), getSize(node.getSize())+ visit(node.baseAddr));
             return;
         }
 
-        printMove("mov", visit(node.getDst()), sizeStr(node.getSize()), toAddr(node));
+        printMove("mov", visit(node.getDst()), getSize(node.getSize())+ toAddr(node));
     }
 
     public void visit(Store node) {
         if (node.baseAddr instanceof StaticString) {
-            printMove("mov", sizeStr(node.getSize()), visit(node.baseAddr), visit(node.getValue()));
+            printMove("mov", getSize(node.getSize()) + visit(node.baseAddr), visit(node.getValue()));
             return;
         }
 
-        printMove("mov", sizeStr(node.getSize()), toAddr(node), visit(node.getValue()));
+        printMove("mov", getSize(node.getSize()) + toAddr(node), visit(node.getValue()));
     }
 
     public void visit(Push node) {

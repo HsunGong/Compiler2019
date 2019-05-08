@@ -123,8 +123,7 @@ public class ResolverAndChecker extends Visitor {
 		try {
 			VarEntity entity = (curClass == null)
 					? new VarEntity(node.getName(), node.getType().getType())
-					: new VarEntity(node.getName(), node.getType().getType(),
-							curClass.getName());
+					: new VarEntity(node.getName(), node.getType().getType(), curClass.getName());
 
 			entity.isGlobal = (getCurScope() instanceof ToplevelScope);
 
@@ -237,8 +236,8 @@ public class ResolverAndChecker extends Visitor {
 			if (!node.hasReturn()) { // may be construct
 				// can not be construct 1-type
 				if (curClass == null)
-					throw new SemanticError("Construct Function " + node.getName()
-							+ " do not belong to class");
+					throw new SemanticError(
+							"Construct Function " + node.getName() + " do not belong to class");
 
 				// can not be construct 2-type
 				if (!node.getName().equals(curClass.getName()))
@@ -320,9 +319,9 @@ public class ResolverAndChecker extends Visitor {
 							|| node.getType().getType() instanceof ArrayType);
 
 				if (!valid)
-					throw new SemanticError("Invalid variable init value: expected "
-							+ node.getType().getType().toString() + " but got "
-							+ node.getInit().getType().toString());
+					throw new SemanticError("Invalid variable init value: expected <"
+							+ node.getType().getType().toString() + "> but got <"
+							+ node.getInit().getType().toString() + ">");
 			}
 		} catch (SemanticError e) {
 			throw new SemanticError("VarEntity Check " + e);
@@ -414,15 +413,13 @@ public class ResolverAndChecker extends Visitor {
 	@Override
 	public void visit(ContinueStmtNode node) {
 		if (loop <= 0)
-			throw new SemanticError(
-					"Continue statement cannot be used outside of loop statement");
+			throw new SemanticError("Continue statement cannot be used outside of loop statement");
 	}
 
 	@Override
 	public void visit(BreakStmtNode node) {
 		if (loop <= 0)
-			throw new SemanticError(
-					"Break statement cannot be used outside of loop statement");
+			throw new SemanticError("Break statement cannot be used outside of loop statement");
 	}
 
 	@Override
@@ -441,8 +438,7 @@ public class ResolverAndChecker extends Visitor {
 					|| node.getExpr().getType() instanceof VoidType)
 				valid = false;
 			else if (node.getExpr().getType() instanceof MNullType)
-				valid = (curReturnType instanceof ClassType
-						|| curReturnType instanceof ArrayType);
+				valid = (curReturnType instanceof ClassType || curReturnType instanceof ArrayType);
 			else if (!(node.getExpr().getType().isEqual(curReturnType)))
 				valid = false;
 		}
@@ -464,8 +460,8 @@ public class ResolverAndChecker extends Visitor {
 			throw new SemanticError("Operator " + node.getOp().toString()
 					+ " cannot be applied to type " + node.getExpr().getType().toString());
 		if (!(node.getExpr().isLeftValue()))
-			throw new SemanticError("Operator " + node.getOp().toString()
-					+ " cannot be applied to right value");
+			throw new SemanticError(
+					"Operator " + node.getOp().toString() + " cannot be applied to right value");
 
 		node.setType(new IntType());
 		node.setIsLeftValue(false);
@@ -535,8 +531,7 @@ public class ResolverAndChecker extends Visitor {
 	public void visit(FuncallExprNode node) {
 		visit(node.getExpr());
 		if (!(node.getExpr().getType() instanceof FuncType))
-			throw new SemanticError(
-					node.getExpr().getType().toString() + " is not funcall expr");
+			throw new SemanticError(node.getExpr().getType().toString() + " is not funcall expr");
 
 		try {
 
@@ -552,8 +547,8 @@ public class ResolverAndChecker extends Visitor {
 			int firstParaIdx = node.funcEntity.isMember() ? 1 : 0;
 			if (paraNum - firstParaIdx != node.getParam().size())
 				throw new SemanticError(node.getLocation().toString()
-						+ "Function call has inconsistent number of arguments, expected "
-						+ paraNum + " but got " + node.getParam().size());
+						+ "Function call has inconsistent number of arguments, expected " + paraNum
+						+ " but got " + node.getParam().size());
 
 			// check param type
 			boolean valid;
@@ -716,8 +711,8 @@ public class ResolverAndChecker extends Visitor {
 
 			if (!valid)
 				throw new SemanticError("Operator " + node.getOp().toString()
-						+ " cannot be applied to different types" + lhsType.toString()
-						+ " and " + rhsType.toString());
+						+ " cannot be applied to different types" + lhsType.toString() + " and "
+						+ rhsType.toString());
 
 			node.setType(new BoolType());
 			node.setIsLeftValue(false);
@@ -904,8 +899,7 @@ public class ResolverAndChecker extends Visitor {
 
 			// type = new StringType();
 			params = Arrays.asList(new VarEntity(Scope.BuiltIn.THIS.toString(), type),
-					new VarEntity("left", new IntType()),
-					new VarEntity("right", new IntType()));
+					new VarEntity("left", new IntType()), new VarEntity("right", new IntType()));
 			returnType = new StringType();
 			name = "substring";
 			putBuiltInFunc(stringEntity.getScope(), name, params, returnType);

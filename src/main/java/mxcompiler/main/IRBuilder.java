@@ -569,7 +569,80 @@ public class IRBuilder extends Visitor {
         visit(node.getRhs());
     }
 
-    private void dealBinaryOp(BinaryOpExprNode node) {
+    private void dealCmpOp(BinaryOpExprNode node) {
+        if (node.getLhs().getType() instanceof StringType) {
+            dealStringBinaryOp(node);
+            return;
+        }
+
+        visit(node.getLhs());
+        visit(node.getRhs());
+        RegValue lhs = node.getLhs().regValue, rhs = node.getRhs().regValue;
+        RegValue tmp;
+
+        boolean bothConst = lhs instanceof IntImm && rhs instanceof IntImm;
+        int lhsImm = 0, rhsImm = 0;
+        if (lhs instanceof IntImm)
+            lhsImm = ((IntImm) lhs).getValue();
+        if (rhs instanceof IntImm)
+            rhsImm = ((IntImm) rhs).getValue();
+
+        BinaryOpExprNode.Op op = node.getOp();
+        switch (op) {
+        case GREATER:
+            tmp = new IntImm((lhsImm > rhsImm) ? 1 : 0);
+            if (!bothConst && lhs instanceof IntImm) {
+                op = BinaryOpExprNode.Op.LESS;
+            }
+            break;
+        case LESS:
+            tmp = new IntImm((lhsImm < rhsImm) ? 1 : 0);
+            if (!bothConst && lhs instanceof IntImm) {
+                op = BinaryOpExprNode.Op.GREATER;
+            }
+            break;
+        case GREATER_EQUAL:
+            tmp = new IntImm((lhsImm >= rhsImm) ? 1 : 0);
+            if (!bothConst && lhs instanceof IntImm) {
+                op = BinaryOpExprNode.Op.LESS_EQUAL;
+            }
+            break;
+        case LESS_EQUAL:
+            tmp = new IntImm((lhsImm <= rhsImm) ? 1 : 0);
+            if (!bothConst && lhs instanceof IntImm) {
+                op = BinaryOpExprNode.Op.GREATER_EQUAL;
+            }
+            break;
+        case EQUAL:
+            tmp = new IntImm((lhsImm == rhsImm) ? 1 : 0);
+            break;
+        case INEQUAL:
+            tmp = new IntImm((lhsImm != rhsImm) ? 1 : 0);
+            break;
+        default:
+            throw new CompileError("Never happen binary not found");
+        }
+        if (!bothConst && lhs instanceof IntImm) { // solved: swap
+            RegValue tt = lhs;
+            lhs = rhs;
+            rhs = tt;
+        }
+
+        if (bothConst) {
+            node.regValue = tmp;
+        } else {
+            VirtualRegister vreg = new VirtualRegister(null);
+
+            curBB.addLastInst(new Cmp(curBB, vreg, op, lhs, rhs));
+            if (node.getThen() != null) { // will jump
+                curBB.setJump(new CJump(curBB, vreg, node.getThen(), node.getElse()));
+            } else { // will not jump
+                node.regValue = vreg;
+            }
+        }
+    }
+
+    private void dealBinOp(BinaryOpExprNode node) {
         if (node.getLhs().getType() instanceof StringType) {
             dealStringBinaryOp(node);
             return;
@@ -644,49 +717,6 @@ public class IRBuilder extends Visitor {
         case BIT_XOR:
             tmp = new IntImm(lhsImm ^ rhsImm);
             break;
-
-        case GREATER:
-            tmp = new IntImm((lhsImm > rhsImm) ? 1 : 0);
-            if (!bothConst && lhs instanceof IntImm) {
-                swap(rhs, lhs);
-                op = BinaryOpExprNode.Op.LESS;
-            }
-            break;
-        case LESS:
-            tmp = new IntImm((lhsImm < rhsImm) ? 1 : 0);
-            if (!bothConst && lhs instanceof IntImm) {
-                swap(rhs, lhs);
-                op = BinaryOpExprNode.Op.GREATER;
-            }
-            break;
-        case GREATER_EQUAL:
-            tmp = new IntImm((lhsImm >= rhsImm) ? 1 : 0);
-            if (!bothConst && lhs instanceof IntImm) {
-                swap(rhs, lhs);
-                op = BinaryOpExprNode.Op.LESS_EQUAL;
-            }
-            break;
-        case LESS_EQUAL:
-            tmp = new IntImm((lhsImm <= rhsImm) ? 1 : 0);
-            if (!bothConst && lhs instanceof IntImm) {
-                swap(rhs, lhs);
-                op = BinaryOpExprNode.Op.GREATER_EQUAL;
-            }
-            break;
-        case EQUAL:
-            tmp = new IntImm((lhsImm == rhsImm) ? 1 : 0);
-            if (!bothConst && lhs instanceof IntImm) {
-                swap(rhs, lhs);
-            }
-            break;
-
-        case INEQUAL:
-            tmp = new IntImm((lhsImm != rhsImm) ? 1 : 0);
-            if (!bothConst && lhs instanceof IntImm) {
-                swap(rhs, lhs);
-            }
-            break;
-
         default:
             throw new CompileError("Never happen binary not found");
         }
@@ -695,24 +725,8 @@ public class IRBuilder extends Visitor {
             node.regValue = tmp;
         } else {
             VirtualRegister vreg = new VirtualRegister(null);
-
-            if (op != BinaryOpExprNode.Op.EQUAL || op != BinaryOpExprNode.Op.INEQUAL
-                    || op != BinaryOpExprNode.Op.LESS_EQUAL || op != BinaryOpExprNode.Op.LESS
-                    || op != BinaryOpExprNode.Op.GREATER_EQUAL
-                    || op != BinaryOpExprNode.Op.GREATER) {
-                node.regValue = vreg;
-                curBB.addLastInst(new Bin(curBB, vreg, op, lhs, rhs));
-
-            } else { // cmp
-
-                curBB.addLastInst(new Cmp(curBB, vreg, op, lhs, rhs));
-                if (node.getThen() != null) { // will jump
-                    curBB.setJump(new CJump(curBB, vreg, node.getThen(), node.getElse()));
-                } else { // will not jump
-                    node.regValue = vreg;
-                }
-
-            }
+            node.regValue = vreg;
+            curBB.addLastInst(new Bin(curBB, vreg, op, lhs, rhs));
         }
     }
 
@@ -736,9 +750,12 @@ public class IRBuilder extends Visitor {
 
             rhsImm = ((StaticString) rhs).getValue();
         }
+        if(lhsImm == null) lhsImm = "";
+        if(rhsImm == null) rhsImm = "";
 
         Function calleeFunc;
         RegValue tmpReg;
+        ExprNode tmp;
 
         switch (node.getOp()) {
         case ADD:
@@ -770,17 +787,17 @@ public class IRBuilder extends Visitor {
         case GREATER:
             tmpReg = new IntImm(lhsImm.compareTo(rhsImm) > 0 ? 1 : 0);
 
-            // tmp = node.getLhs();
-            // node.setLhs(node.getRhs());
-            // node.setRhs(tmp);
-            swap(node.getLhs(), node.getRhs());
-            // FIX: Right ??
+            tmp = node.getLhs();
+            node.setLhs(node.getRhs());
+            node.setRhs(tmp);
+            // Solved: swap
             calleeFunc = root.getBuiltInFunc(Tool.STRING_LESS_KEY);
             break;
         case GREATER_EQUAL:
             tmpReg = new IntImm(lhsImm.compareTo(rhsImm) >= 0 ? 1 : 0);
-
-            swap(node.getLhs(), node.getRhs());
+            tmp = node.getLhs();
+            node.setLhs(node.getRhs());
+            node.setRhs(tmp);
             calleeFunc = root.getBuiltInFunc(Tool.STRING_LESS_EQUAL_KEY);
             break;
         default:
@@ -812,7 +829,6 @@ public class IRBuilder extends Visitor {
         case LOGIC_OR:
             dealLogicalBinaryOp(node);
             break;
-
         case MUL:
         case DIV:
         case MOD:
@@ -823,13 +839,15 @@ public class IRBuilder extends Visitor {
         case BIT_AND:
         case BIT_OR:
         case BIT_XOR:
+            dealBinOp(node);
+            break;
         case GREATER:
         case LESS:
         case GREATER_EQUAL:
         case LESS_EQUAL:
         case EQUAL:
         case INEQUAL:
-            dealBinaryOp(node);
+            dealCmpOp(node);
             break;
         }
     }
@@ -1115,7 +1133,8 @@ public class IRBuilder extends Visitor {
         visit(node.getRhs());
 
         // if (node.getRhs() instanceof BoolLiteralExprNode) {
-        //     node.regValue = new IntImm(((BoolLiteralExprNode) node.getRhs()).getValue() ? 1 : 0);
+        // node.regValue = new IntImm(((BoolLiteralExprNode)
+        // node.getRhs()).getValue() ? 1 : 0);
         // }
         // Remain to do: int a = 1, b = 2; -> int c = a + b ?
 
@@ -1343,12 +1362,13 @@ public class IRBuilder extends Visitor {
         return node.isNeedMemOp();
     }
 
-    private void swap(Object a, Object b) {
-        Object tmp;
-        tmp = a;
-        a = b;
-        b = tmp;
-    }
+    // Solved : useless or construct a wrapper
+    // private void swap(Wrapper a, Wrapper b) {
+    // Object tmp;
+    // tmp = a.data;
+    // a.data = b.data;
+    // b.data = tmp;
+    // }
 
     private void BinaryDstEqualLhs() {
         for (Function irFunc : root.getFunc().values())
@@ -1361,28 +1381,28 @@ public class IRBuilder extends Visitor {
                         continue;
 
                     Bin binInst = (Bin) next;
-                    RegValue dst = binInst.getDst();
-                    RegValue lhs = binInst.getLhs();
-                    if (dst == lhs)
+                    if (binInst.getDst() == binInst.getLhs())
                         continue;
-                    RegValue rhs = binInst.getRhs();
 
-                    if (dst == rhs) {
-                        if (binInst.isCommutative())
-                            swap(lhs, rhs);
-                        else {
+                    if (binInst.getDst() == binInst.getRhs()) {
+                        if (binInst.isCommutative()) { // Solved : swap
+                            RegValue tmp = binInst.getLhs();
+                            binInst.setLhs(binInst.getRhs());
+                            binInst.setRhs(tmp);
+                        } else {
                             VirtualRegister vreg = new VirtualRegister("rhs_backup");
-                            bb.addBeforeInst(iter, new Move(bb, vreg, rhs));
-                            bb.addBeforeInst(iter, new Move(bb, dst, lhs));
+                            bb.addBeforeInst(iter, new Move(bb, vreg, binInst.getRhs()));
+                            bb.addBeforeInst(iter,
+                                    new Move(bb, binInst.getDst(), binInst.getLhs()));
 
-                            binInst.setLhs(dst);
+                            binInst.setLhs(binInst.getDst());
                             binInst.setRhs(vreg);
                         }
                     } else if (binInst.getOp() != BinaryOpExprNode.Op.DIV
                             && binInst.getOp() != BinaryOpExprNode.Op.MOD) {
-                        bb.addBeforeInst(iter, new Move(bb, dst, lhs));
+                        bb.addBeforeInst(iter, new Move(bb, binInst.getDst(), binInst.getLhs()));
 
-                        binInst.setLhs(dst);
+                        binInst.setLhs(binInst.getDst());
                     }
                 }
             }

@@ -1,19 +1,38 @@
 
 
 
+int main()
+{
+    int[][] a = new int[100][];
+    int i;
+	int j;
+    for (i = 0; i < 100; i++)
+        a[i] = new int[100];
+    int sum = 0;
 
-int main() {
-    int a = 20;
-    int b = 10;
-    int c = a + b;
-    
-    println(toString(c));
+    for (i = 0;i < 100;i++)
+        for (j = 0;j < 100;j++)
+            a[i][j] = 0;
+    int quotient;
+    int remainder;
+    for (i = 0;i < 100;i++)
+    	if (i > 20 && i < 80) {
+        	for (j = 0;j < 100;j++)
+            	if (j > 5 || i < 90) {
+                    quotient = j * 4 / 100;
+                    remainder = j * 4 % 100;
+                	a[i + quotient][remainder] = j + (100 - 1 + 1 - 1 + 1) / 2;
+                }
+    	}
 
-// int f = a + b;
-
-//    int x = a + b;
-    
-  //  println(toString(f));
+    for (i = 0;i < 100;i++)
+        for (j = 0;j < 100;j++)
+            sum = sum + a[i][j];
+    println(toString(sum));
 }
 
 // end up with check rsp rbp --? func stack
+
+// inline func (no param)
+
+// print, println, getInt, getString, toString, parseInt, ord, substring, length

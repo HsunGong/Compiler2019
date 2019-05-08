@@ -7,14 +7,204 @@ func main
   %main_entry:
 	funcall null <- call _init_func
 	 args: 
-	move $a <- 20
-	move $b <- 10
-	move $vreg <- $a
-	OP-ADD $vreg = $vreg ADD $b
-	move $c <- $vreg
+	move $vreg <- 100
+	OP-MUL $vreg = $vreg MUL 8
+	OP-ADD $vreg = $vreg ADD 8
+	alloc $vreg <size $vreg>
+	store $vreg[0] <- 100 <size 8>
+	move $vreg_2 <- $vreg
+	move $a <- $vreg_2
+	move $i <- 0
+	move $j <- 0
+	move $i <- 0
+	jump %for_cond
+
+  %for_cond:
+	OP-LESS $vreg_3 = $i LESS 100
+	cjump <if> $vreg_3 <then> %for_body <else> %for_after
+
+  %for_after:
+	move $sum <- 0
+	move $i <- 0
+	jump %for_cond_2
+
+  %for_cond_2:
+	OP-LESS $vreg_4 = $i LESS 100
+	cjump <if> $vreg_4 <then> %for_body_2 <else> %for_after_2
+
+  %for_after_2:
+	move $quotient <- 0
+	move $remainder <- 0
+	move $i <- 0
+	jump %for_cond_3
+
+  %for_cond_3:
+	OP-LESS $vreg_5 = $i LESS 100
+	cjump <if> $vreg_5 <then> %for_body_3 <else> %for_after_3
+
+  %for_after_3:
+	move $i <- 0
+	jump %for_cond_4
+
+  %for_cond_4:
+	OP-LESS $vreg_6 = $i LESS 100
+	cjump <if> $vreg_6 <then> %for_body_4 <else> %for_after_4
+
+  %for_after_4:
 	funcall null <- call _printlnInt
-	 args:  $c
+	 args:  $sum
 	return 0
+
+  %for_body_4:
+	move $j <- 0
+	jump %for_cond_5
+
+  %for_cond_5:
+	OP-LESS $vreg_7 = $j LESS 100
+	cjump <if> $vreg_7 <then> %for_body_5 <else> %for_after_5
+
+  %for_after_5:
+	jump %for_incr
+
+  %for_incr:
+	move $vreg_8 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond_4
+
+  %for_body_5:
+	move $vreg_9 <- $i
+	OP-MUL $vreg_9 = $vreg_9 MUL 8
+	OP-ADD $vreg_9 = $vreg_9 ADD $a
+	load $vreg_9 <- $vreg_9[8] <size 8>
+	move $vreg_10 <- $j
+	OP-MUL $vreg_10 = $vreg_10 MUL 8
+	OP-ADD $vreg_10 = $vreg_10 ADD $vreg_9
+	load $vreg_10 <- $vreg_10[8] <size 8>
+	move $vreg_11 <- $sum
+	OP-ADD $vreg_11 = $vreg_11 ADD $vreg_10
+	move $sum <- $vreg_11
+	jump %for_incr_2
+
+  %for_incr_2:
+	move $vreg_12 <- $j
+	OP-ADD $j = $j ADD 1
+	jump %for_cond_5
+
+  %for_body_3:
+	OP-GREATER $vreg_13 = $i GREATER 20
+	cjump <if> $vreg_13 <then> %and_lhs_true <else> %if_after
+
+  %and_lhs_true:
+	OP-LESS $vreg_14 = $i LESS 80
+	cjump <if> $vreg_14 <then> %if_then <else> %if_after
+
+  %if_then:
+	move $j <- 0
+	jump %for_cond_6
+
+  %for_cond_6:
+	OP-LESS $vreg_15 = $j LESS 100
+	cjump <if> $vreg_15 <then> %for_body_6 <else> %for_after_6
+
+  %for_after_6:
+	jump %if_after
+
+  %if_after:
+	jump %for_incr_3
+
+  %for_incr_3:
+	move $vreg_16 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond_3
+
+  %for_body_6:
+	OP-GREATER $vreg_17 = $j GREATER 5
+	cjump <if> $vreg_17 <then> %if_then_2 <else> %or_lhs_false
+
+  %or_lhs_false:
+	OP-LESS $vreg_18 = $i LESS 90
+	cjump <if> $vreg_18 <then> %if_then_2 <else> %if_after_2
+
+  %if_then_2:
+	move $vreg_19 <- $j
+	OP-MUL $vreg_19 = $vreg_19 MUL 4
+	OP-DIV $vreg_20 = $vreg_19 DIV 100
+	move $quotient <- $vreg_20
+	move $vreg_21 <- $j
+	OP-MUL $vreg_21 = $vreg_21 MUL 4
+	OP-MOD $vreg_22 = $vreg_21 MOD 100
+	move $remainder <- $vreg_22
+	move $vreg_23 <- $i
+	OP-ADD $vreg_23 = $vreg_23 ADD $quotient
+	move $vreg_24 <- $vreg_23
+	OP-MUL $vreg_24 = $vreg_24 MUL 8
+	OP-ADD $vreg_24 = $vreg_24 ADD $a
+	load $vreg_24 <- $vreg_24[8] <size 8>
+	move $vreg_25 <- $remainder
+	OP-MUL $vreg_25 = $vreg_25 MUL 8
+	OP-ADD $vreg_25 = $vreg_25 ADD $vreg_24
+	move $vreg_26 <- $j
+	OP-ADD $vreg_26 = $vreg_26 ADD 50
+	store $vreg_25[8] <- $vreg_26 <size 8>
+	jump %if_after_2
+
+  %if_after_2:
+	jump %for_incr_4
+
+  %for_incr_4:
+	move $vreg_27 <- $j
+	OP-ADD $j = $j ADD 1
+	jump %for_cond_6
+
+  %for_body_2:
+	move $j <- 0
+	jump %for_cond_7
+
+  %for_cond_7:
+	OP-LESS $vreg_28 = $j LESS 100
+	cjump <if> $vreg_28 <then> %for_body_7 <else> %for_after_7
+
+  %for_after_7:
+	jump %for_incr_5
+
+  %for_incr_5:
+	move $vreg_29 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond_2
+
+  %for_body_7:
+	move $vreg_30 <- $i
+	OP-MUL $vreg_30 = $vreg_30 MUL 8
+	OP-ADD $vreg_30 = $vreg_30 ADD $a
+	load $vreg_30 <- $vreg_30[8] <size 8>
+	move $vreg_31 <- $j
+	OP-MUL $vreg_31 = $vreg_31 MUL 8
+	OP-ADD $vreg_31 = $vreg_31 ADD $vreg_30
+	store $vreg_31[8] <- 0 <size 8>
+	jump %for_incr_6
+
+  %for_incr_6:
+	move $vreg_32 <- $j
+	OP-ADD $j = $j ADD 1
+	jump %for_cond_7
+
+  %for_body:
+	move $vreg_33 <- $i
+	OP-MUL $vreg_33 = $vreg_33 MUL 8
+	OP-ADD $vreg_33 = $vreg_33 ADD $a
+	move $vreg_34 <- 100
+	OP-MUL $vreg_34 = $vreg_34 MUL 8
+	OP-ADD $vreg_34 = $vreg_34 ADD 8
+	alloc $vreg_34 <size $vreg_34>
+	store $vreg_34[0] <- 100 <size 8>
+	move $vreg_35 <- $vreg_34
+	store $vreg_33[8] <- $vreg_35 <size 8>
+	jump %for_incr_7
+
+  %for_incr_7:
+	move $vreg_36 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond
 
 func _init_func
  argVregs:	
