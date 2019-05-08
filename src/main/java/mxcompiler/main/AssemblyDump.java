@@ -44,10 +44,10 @@ public class AssemblyDump implements IRVisitor {
         preg0 = node.preg0;
         preg1 = node.preg1;
 
-        idMap.put(node.getFunc().get("main").start, "main");
+        idMap.put(node.getFunc().get("main").getStart(), "main");
 
         // define functions
-        printlnComment(" Main Function");
+        printlnComment("Main Function");
         println("global", "main");
         println("extern", "malloc");
         println("");
@@ -55,7 +55,7 @@ public class AssemblyDump implements IRVisitor {
         // text
         println("section", ".text");
         println("");
-        
+
         for (Map.Entry<String, Function> func : node.getFunc().entrySet())
             if (!func.getKey().equals("main"))
                 visit(func.getValue());
@@ -87,7 +87,7 @@ public class AssemblyDump implements IRVisitor {
     }
 
     public void visit(Function node) {
-        printlnComment(" function " + node.getName());
+        printlnComment("function " + node.getName());
         println("");
 
         int bbIdx = 0; // ???
@@ -119,7 +119,7 @@ public class AssemblyDump implements IRVisitor {
         if (node.getFunc().isBuiltIn())
             println("call", node.getFunc().getBuiltInLabel());
         else
-            println("call", bbId(node.getFunc().start));
+            println("call", bbId(node.getFunc().getStart()));
     }
 
     public void visit(HeapAlloc node) {
@@ -552,7 +552,7 @@ public class AssemblyDump implements IRVisitor {
      */
     public void print(String inst, Object... args) {
         String s = "\t\t" + inst;
-        s += (inst.length() > 4) ? "\t%s" : "\t\t%s";
+        s += (inst.length() > 8) ? "\t%s" : "\t\t%s";
         s += (", %s").repeat(args.length - 1);
 
         os.printf(s, inst, args);
@@ -563,7 +563,7 @@ public class AssemblyDump implements IRVisitor {
      */
     public void println(String inst, Object... args) {
         String s = "\t\t" + inst;
-        s += (inst.length() >= 4) ? "\t\t%s" : "\t\t\t%s";
+        s += (inst.length() > 8) ? "\t%s" : "\t\t%s";
         s += (", %s").repeat(args.length - 1);
 
         os.printf(s + "\n", args);
@@ -578,7 +578,7 @@ public class AssemblyDump implements IRVisitor {
     }
 
     public void printlnComment(String cmt) {
-        os.println(";" + cmt);
+        os.println("# " + cmt);
     }
 
     // endregion

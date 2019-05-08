@@ -267,9 +267,9 @@ public class IRBuilder extends Visitor {
             }
 
             mergeEnd.setJump(new Return(mergeEnd, retReg));
-            curFunc.end = mergeEnd;
+            curFunc.setEnd(mergeEnd); // Tag
         } else
-            curFunc.end = curFunc.returns.get(0).getParent();
+            curFunc.setEnd(curFunc.returns.get(0).getParent()); // Tag
         // endregion
 
         curFunc = null;
@@ -921,7 +921,7 @@ public class IRBuilder extends Visitor {
             // print(toString(n)); -> printInt(n);
             ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
             visit(intExpr);
-            calleeFunc = root.getBuiltInFunc(funcName + "Int");
+            calleeFunc = root.getBuiltInFunc("_" + funcName + "Int");
             vArgs.add(intExpr.regValue);
         } else {
             visit(arg);
@@ -1113,6 +1113,11 @@ public class IRBuilder extends Visitor {
             node.getRhs().setElse(new BasicBlock(curFunc, null));
         }
         visit(node.getRhs());
+
+        // if (node.getRhs() instanceof BoolLiteralExprNode) {
+        //     node.regValue = new IntImm(((BoolLiteralExprNode) node.getRhs()).getValue() ? 1 : 0);
+        // }
+        // Remain to do: int a = 1, b = 2; -> int c = a + b ?
 
         RegValue destion;
         int addrOffset;
@@ -1352,7 +1357,7 @@ public class IRBuilder extends Visitor {
 
                 while (iter.hasNext()) { // Solved: iter.next outside
                     Quad next = iter.next();
-                    if (!(next instanceof Bin))
+                    if (!(next instanceof Bin) || next instanceof Cmp)
                         continue;
 
                     Bin binInst = (Bin) next;
@@ -1416,8 +1421,9 @@ public class IRBuilder extends Visitor {
             }
         }
 
-        bakFunc.start = (BasicBlock) bbRenameMap.get(func.start);
-        bakFunc.end = (BasicBlock) bbRenameMap.get(func.end);
+        // Tag
+        bakFunc.setStart((BasicBlock) bbRenameMap.get(func.getStart()));
+        bakFunc.setEnd((BasicBlock) bbRenameMap.get(func.getEnd()));
         bakFunc.argVregs = func.argVregs;
         return bakFunc;
     }
@@ -1503,7 +1509,7 @@ public class IRBuilder extends Visitor {
 
             // del-func
             for (String funcName : unCalledFuncs)
-                root.delFunc(funcName);
+                root.delFunc(funcName); // Tag
         } while (changed);
 
         root.updateCalleeSet();
@@ -1589,10 +1595,10 @@ public class IRBuilder extends Visitor {
         List<BasicBlock> inlineBBpostOrder = calleeFunc.getReversePostOrder();
 
         Map<Object, Object> renameMap = new HashMap<>();
-        BasicBlock oldEndBB = calleeFunc.end;
+        BasicBlock oldEndBB = calleeFunc.getEnd();
         BasicBlock newEndBB = new BasicBlock(callerFunc, oldEndBB.getName());
         renameMap.put(oldEndBB, newEndBB);
-        renameMap.put(calleeFunc.start, parent);
+        renameMap.put(calleeFunc.getStart(), parent); // Tag
 
         if (oldEndBB == parent)
             oldEndBB = newEndBB;
@@ -1764,7 +1770,7 @@ public class IRBuilder extends Visitor {
 
             // load static data at the beginning of function--with a lambda
 
-            BasicBlock startBB = irFunc.start;
+            BasicBlock startBB = irFunc.getStart(); // Tag
             LinkedList<Quad> insts = startBB.getInsts();
             funcInfo.dataVregMap.forEach((sData, vReg) -> {
                 insts.addFirst(new Load(startBB, vReg, RegValue.RegSize, sData,
@@ -1835,10 +1841,9 @@ public class IRBuilder extends Visitor {
                     for (StaticData staticData : loadStaticDataSet) {
                         if (staticData instanceof StaticString)
                             continue;
-                        bb.addAfterInst(iter,
-                                new Load(bb, callerInfo.dataVregMap.get(staticData),
-                                        RegValue.RegSize, staticData,
-                                        staticData instanceof StaticString), false);
+                        bb.addAfterInst(iter, new Load(bb, callerInfo.dataVregMap.get(staticData),
+                                RegValue.RegSize, staticData, staticData instanceof StaticString),
+                                false);
                     }
                 }
             }

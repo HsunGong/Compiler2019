@@ -18,7 +18,7 @@ public class Function {
     public List<Return> returns = new ArrayList<>();
 
     // public Function() {
-    //     entity = null;
+    // entity = null;
     // }
 
     public Function(String name, String builtInLabel) {
@@ -44,7 +44,7 @@ public class Function {
         return name;
     }
 
-    /** genFirstBB */ 
+    /** genFirstBB */
     public BasicBlock initStart() {
         start = new BasicBlock(this, entity.getName() + "_entry");
         return start;
@@ -69,8 +69,24 @@ public class Function {
     // endregion
 
     // region BB-list and BB-order
-    public BasicBlock start = null;
-    public BasicBlock end = null;
+    private BasicBlock start = null;
+    private BasicBlock end = null;
+
+    public BasicBlock getStart() {
+        return start;
+    }
+
+    public BasicBlock getEnd() {
+        return end;
+    }
+
+    public void setStart(BasicBlock bb) {
+        this.start = bb;
+    }
+
+    public void setEnd(BasicBlock bb) {
+        this.end = bb;
+    }
 
     private List<BasicBlock> reversePostOrder = null;
     private List<BasicBlock> reversePreOrder = null;

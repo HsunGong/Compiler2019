@@ -98,8 +98,11 @@ public final class Compiler {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("Generate asm begin");
 
-		MemAllocator allocator = new MemAllocator(irRoot);
-		allocator.execute();
+		RegisterAllocator regAllocator = new RegisterAllocator(irRoot, opts);
+		regAllocator.execute();
+
+		MemAndStack stackAllocator = new MemAndStack(irRoot);
+		stackAllocator.execute();
 
 		AssemblyDump asm = new AssemblyDump(fileOut, opts);
 		asm.dump(irRoot);

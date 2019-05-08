@@ -52,10 +52,12 @@ public class Bin extends Quad {
 
     public void setLhs(RegValue lhs) {
         this.lhs = lhs;
+        reloadUsedRegs();
     }
 
     public void setRhs(RegValue rhs) {
         this.rhs = rhs;
+        reloadUsedRegs();
     }
 
     /**

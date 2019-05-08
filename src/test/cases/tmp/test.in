@@ -3,8 +3,17 @@
 
 
 int main() {
-    string s = toString(10);
-    println(s);
+    int a = 20;
+    int b = 10;
+    int c = a + b;
+    
+    println(toString(c));
+
+// int f = a + b;
+
+//    int x = a + b;
+    
+  //  println(toString(f));
 }
 
 // end up with check rsp rbp --? func stack

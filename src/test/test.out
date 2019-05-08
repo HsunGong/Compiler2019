@@ -5,13 +5,20 @@ func main
  argVregs:	
  blocks
   %main_entry:
-	jump %_init_func_entry
-
-  %_init_func_entry:
-	funcall $toString <- call toString
-	 args:  10
-	move $s <- $toString
-	funcall null <- call println
-	 args:  $s
+	funcall null <- call _init_func
+	 args: 
+	move $a <- 20
+	move $b <- 10
+	move $vreg <- $a
+	OP-ADD $vreg = $vreg ADD $b
+	move $c <- $vreg
+	funcall null <- call _printlnInt
+	 args:  $c
 	return 0
+
+func _init_func
+ argVregs:	
+ blocks
+  %_init_func_entry:
+	no return
 
