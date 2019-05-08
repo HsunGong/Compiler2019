@@ -5,7 +5,7 @@
 
 set -e
 cd "$(dirname "$0")"
-export CCHK="java -classpath ./lib/antlr-4.7.2-complete.jar:./bin mxcompiler.main.Compiler --test -o out.asm"
+export CCHK="java -classpath ./lib/antlr-4.7.2-complete.jar:./bin mxcompiler.main.Compiler --test -o out.asm -O1"
 $CCHK
 cat out.asm
 rm -f out.asm

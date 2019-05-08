@@ -48,7 +48,7 @@ public class Option {
 					if (!type.matches("^([0123s]|)$")) {
 						throw new OptionError("unknown optimization switch: " + arg);
 					}
-					level = (type.equals("0") ? 0 : 1);
+					level = (type.equals("s") ? 3 : Integer.parseInt(type));
 				} else if (arg.equals("--version") || arg.equals("-v")) {
 					System.out.printf("%s version %s\n", Compiler.ProgName, Compiler.Version);
 					System.exit(0);
