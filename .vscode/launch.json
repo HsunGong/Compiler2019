@@ -14,6 +14,14 @@
 		},
 		{
 			"type": "java",
+			"name": "Debug-Optim",
+			"request": "launch",
+			"mainClass": "mxcompiler.main.Compiler",
+			"args": "--debug -O2 --dump-ir /home/xun/Documents/mxc/src/test/cases/tmp/test.in -o /home/xun/Documents/mxc/src/test/cases/tmp/test.asm",
+			"projectName": "mxc"
+		},
+		{
+			"type": "java",
 			"name": "OutPut",
 			"request": "launch",
 			"mainClass": "mxcompiler.main.Compiler",

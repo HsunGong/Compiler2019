@@ -654,7 +654,7 @@ public class IRBuilder extends Visitor {
         RegValue tmp;
 
         boolean bothConst = lhs instanceof IntImm && rhs instanceof IntImm;
-        int lhsImm = 0, rhsImm = 0;
+        int lhsImm = 0, rhsImm = 1; // default with 1 , but unuse
         if (lhs instanceof IntImm)
             lhsImm = ((IntImm) lhs).getValue();
         if (rhs instanceof IntImm)
@@ -1510,7 +1510,6 @@ public class IRBuilder extends Visitor {
                                 || calleeInfo.numInst + funcInfo.numInst > MAX_FUNC_INST)
                             continue;
 
-                        iter.previous();
                         iter = inlineFuncall(iter);
 
                         changed = true;
@@ -1573,9 +1572,7 @@ public class IRBuilder extends Visitor {
                                 || calleeInfo.numInst + funcInfo.numInst > MAX_FUNC_INST)
                             continue;
 
-                        ListIterator<Quad> newIter = bb.getInsts()
-                                .listIterator(iter.previousIndex());
-                        iter = inlineFuncall(newIter);
+                        iter = inlineFuncall(iter);
                         changed = true;
                         thisFuncChanged = true;
                         funcInfo.numInst += calleeInfo.numInst;
@@ -1599,13 +1596,14 @@ public class IRBuilder extends Visitor {
      * 
      * <pre>
      * // before: inst(selected) iter inst2
-     * // before: newIter inst(selected) inst2
+     * // before: iter inst(selected) inst2
      * iter = inlineFuncall(iter)
      * </pre>
      * 
-     * @Return newIter of newEnd's FirstInst
+     * @Return iter of newEnd's FirstInst
      */
     private ListIterator<Quad> inlineFuncall(ListIterator<Quad> iter) {
+        iter.previous();
         Funcall funcCallInst = (Funcall) iter.next();
         BasicBlock parent = funcCallInst.getParent(); // or newStartBB
 
