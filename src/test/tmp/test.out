@@ -1,148 +1,470 @@
 Global static Data
+	space @c 8
+	space @ans 8
+	space @visit 8
+	space @pre 8
+	space @f 8
+	space @i 8
+	space @j 8
+	space @open 8
+	space @closed 8
 Global static string
 >>>>>>>>>>>      Decl of functions      <<<<<<<<<<<<
-func gcd
- argVregs:	$x $y 
+func build
+ argVregs:	$start $ending 
  blocks
-  %gcd_entry:
-	OP-MOD $vreg = $x MOD $y
-	OP-EQUAL $vreg_2 = $vreg EQUAL 0
-	cjump <if> $vreg_2 <then> %if_then <else> %if_else
+  %build_entry:
+	load $j <- @j[0] <size 8>
+	load $i <- @i[0] <size 8>
+	load $c <- @c[0] <size 8>
+	move $i <- 1
+	jump %for_cond
 
-  %if_else:
-	OP-MOD $vreg_3 = $x MOD $y
-	move $x_2 <- $y
-	move $y_2 <- $vreg_3
-	OP-MOD $vreg_4 = $x_2 MOD $y_2
-	OP-EQUAL $vreg_5 = $vreg_4 EQUAL 0
-	cjump <if> $vreg_5 <then> %if_then_2 <else> %if_else_2
+  %for_cond:
+	OP-LESS_EQUAL $vreg = $i LESS_EQUAL 49
+	cjump <if> $vreg <then> %for_body <else> %for_after
 
-  %if_then_2:
-	move $return_value <- $y_2
-	jump %gcd_end
+  %for_body:
+	move $j <- 50
+	jump %for_cond_2
 
-  %if_else_2:
-	OP-MOD $vreg_6 = $x_2 MOD $y_2
-	move $x_3 <- $y_2
-	move $y_3 <- $vreg_6
-	OP-MOD $vreg_7 = $x_3 MOD $y_3
-	OP-EQUAL $vreg_8 = $vreg_7 EQUAL 0
-	cjump <if> $vreg_8 <then> %if_then_3 <else> %if_else_3
+  %for_cond_2:
+	move $vreg_2 <- 98
+	OP-SUB $vreg_2 = $vreg_2 SUB $i
+	move $vreg_3 <- $vreg_2
+	OP-ADD $vreg_3 = $vreg_3 ADD 1
+	OP-LESS_EQUAL $vreg_4 = $j LESS_EQUAL $vreg_3
+	cjump <if> $vreg_4 <then> %for_body_2 <else> %for_after_2
 
-  %if_else_3:
-	OP-MOD $vreg_9 = $x_3 MOD $y_3
-	move $x_4 <- $y_3
-	move $y_4 <- $vreg_9
-	OP-MOD $vreg_10 = $x_4 MOD $y_4
-	OP-EQUAL $vreg_11 = $vreg_10 EQUAL 0
-	cjump <if> $vreg_11 <then> %if_then_4 <else> %if_else_4
+  %for_after_2:
+	jump %for_incr
 
-  %if_then_4:
-	move $return_value_2 <- $y_4
-	jump %gcd_end_2
+  %for_incr:
+	move $vreg_5 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond
 
-  %if_else_4:
-	OP-MOD $vreg_12 = $x_4 MOD $y_4
-	funcall $vreg_13 <- call gcd
-	 args:  $y_4 $vreg_12
-	move $return_value_2 <- $vreg_13
-	jump %gcd_end_2
+  %for_body_2:
+	move $vreg_6 <- $i
+	OP-MUL $vreg_6 = $vreg_6 MUL 8
+	OP-ADD $vreg_6 = $vreg_6 ADD $c
+	load $vreg_6 <- $vreg_6[8] <size 8>
+	move $vreg_7 <- $j
+	OP-MUL $vreg_7 = $vreg_7 MUL 8
+	OP-ADD $vreg_7 = $vreg_7 ADD $vreg_6
+	store $vreg_7[8] <- 1 <size 8>
+	jump %for_incr_2
 
-  %gcd_end_2:
-	move $vreg_14 <- $return_value_2
-	move $return_value_3 <- $vreg_14
-	jump %gcd_end_3
+  %for_incr_2:
+	move $vreg_8 <- $j
+	OP-ADD $j = $j ADD 1
+	jump %for_cond_2
 
-  %if_then_3:
-	move $return_value_3 <- $y_3
-	jump %gcd_end_3
+  %for_after:
+	move $i <- 1
+	jump %for_cond_3
 
-  %gcd_end_3:
-	move $vreg_15 <- $return_value_3
-	move $return_value <- $vreg_15
-	jump %gcd_end
+  %for_cond_3:
+	OP-LESS_EQUAL $vreg_9 = $i LESS_EQUAL 49
+	cjump <if> $vreg_9 <then> %for_body_3 <else> %for_after_3
 
-  %gcd_end:
-	move $vreg_16 <- $return_value
-	move $return_value_4 <- $vreg_16
-	jump %gcd_end_4
+  %for_after_3:
+	move $i <- 50
+	jump %for_cond_4
+
+  %for_cond_4:
+	OP-LESS_EQUAL $vreg_10 = $i LESS_EQUAL 98
+	cjump <if> $vreg_10 <then> %for_body_4 <else> %for_after_4
+
+  %for_after_4:
+	store @i[0] <- $i <size 8>
+	store @j[0] <- $j <size 8>
+	return 0
+
+  %for_body_4:
+	move $vreg_11 <- $i
+	OP-MUL $vreg_11 = $vreg_11 MUL 8
+	OP-ADD $vreg_11 = $vreg_11 ADD $c
+	load $vreg_11 <- $vreg_11[8] <size 8>
+	move $vreg_12 <- $ending
+	OP-MUL $vreg_12 = $vreg_12 MUL 8
+	OP-ADD $vreg_12 = $vreg_12 ADD $vreg_11
+	store $vreg_12[8] <- 1 <size 8>
+	jump %for_incr_3
+
+  %for_incr_3:
+	move $vreg_13 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond_4
+
+  %for_body_3:
+	move $vreg_14 <- $start
+	OP-MUL $vreg_14 = $vreg_14 MUL 8
+	OP-ADD $vreg_14 = $vreg_14 ADD $c
+	load $vreg_14 <- $vreg_14[8] <size 8>
+	move $vreg_15 <- $i
+	OP-MUL $vreg_15 = $vreg_15 MUL 8
+	OP-ADD $vreg_15 = $vreg_15 ADD $vreg_14
+	store $vreg_15[8] <- 1 <size 8>
+	jump %for_incr_4
+
+  %for_incr_4:
+	move $vreg_16 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond_3
+
+func find
+ argVregs:	$ending $start $flag 
+ blocks
+  %find_entry:
+	load $closed <- @closed[0] <size 8>
+	load $open <- @open[0] <size 8>
+	load $j <- @j[0] <size 8>
+	load $f <- @f[0] <size 8>
+	load $visit <- @visit[0] <size 8>
+	load $i <- @i[0] <size 8>
+	load $pre <- @pre[0] <size 8>
+	load $c <- @c[0] <size 8>
+	move $open <- 0
+	move $closed <- 1
+	move $i <- 1
+	jump %for_cond_5
+
+  %for_cond_5:
+	OP-LESS_EQUAL $vreg = $i LESS_EQUAL $ending
+	cjump <if> $vreg <then> %for_body_5 <else> %for_after_5
+
+  %for_after_5:
+	move $vreg_2 <- 1
+	OP-MUL $vreg_2 = $vreg_2 MUL 8
+	OP-ADD $vreg_2 = $vreg_2 ADD $f
+	store $vreg_2[8] <- $start <size 8>
+	move $vreg_3 <- $start
+	OP-MUL $vreg_3 = $vreg_3 MUL 8
+	OP-ADD $vreg_3 = $vreg_3 ADD $visit
+	store $vreg_3[8] <- 1 <size 8>
+	move $vreg_4 <- $start
+	OP-MUL $vreg_4 = $vreg_4 MUL 8
+	OP-ADD $vreg_4 = $vreg_4 ADD $pre
+	store $vreg_4[8] <- 0 <size 8>
+	move $flag <- 0
+	jump %while_cond
+
+  %while_cond:
+	OP-LESS $vreg_5 = $open LESS $closed
+	cjump <if> $vreg_5 <then> %and_lhs_true <else> %while_after
+
+  %and_lhs_true:
+	OP-EQUAL $vreg_6 = $flag EQUAL 0
+	cjump <if> $vreg_6 <then> %while_body <else> %while_after
+
+  %while_after:
+	store @i[0] <- $i <size 8>
+	store @j[0] <- $j <size 8>
+	store @open[0] <- $open <size 8>
+	store @closed[0] <- $closed <size 8>
+	return $flag
+
+  %while_body:
+	move $vreg_7 <- $open
+	OP-ADD $open = $open ADD 1
+	move $vreg_8 <- $open
+	OP-MUL $vreg_8 = $vreg_8 MUL 8
+	OP-ADD $vreg_8 = $vreg_8 ADD $f
+	load $vreg_8 <- $vreg_8[8] <size 8>
+	move $i <- $vreg_8
+	move $j <- 1
+	jump %for_cond_6
+
+  %for_cond_6:
+	OP-LESS_EQUAL $vreg_9 = $j LESS_EQUAL $ending
+	cjump <if> $vreg_9 <then> %for_body_6 <else> %for_after_6
+
+  %for_body_6:
+	move $vreg_10 <- $i
+	OP-MUL $vreg_10 = $vreg_10 MUL 8
+	OP-ADD $vreg_10 = $vreg_10 ADD $c
+	load $vreg_10 <- $vreg_10[8] <size 8>
+	move $vreg_11 <- $j
+	OP-MUL $vreg_11 = $vreg_11 MUL 8
+	OP-ADD $vreg_11 = $vreg_11 ADD $vreg_10
+	load $vreg_11 <- $vreg_11[8] <size 8>
+	OP-GREATER $vreg_12 = $vreg_11 GREATER 0
+	cjump <if> $vreg_12 <then> %and_lhs_true_2 <else> %if_after
+
+  %and_lhs_true_2:
+	move $vreg_13 <- $j
+	OP-MUL $vreg_13 = $vreg_13 MUL 8
+	OP-ADD $vreg_13 = $vreg_13 ADD $visit
+	load $vreg_13 <- $vreg_13[8] <size 8>
+	OP-EQUAL $vreg_14 = $vreg_13 EQUAL 0
+	cjump <if> $vreg_14 <then> %if_then <else> %if_after
 
   %if_then:
-	move $return_value_4 <- $y
-	jump %gcd_end_4
+	move $vreg_15 <- $j
+	OP-MUL $vreg_15 = $vreg_15 MUL 8
+	OP-ADD $vreg_15 = $vreg_15 ADD $visit
+	store $vreg_15[8] <- 1 <size 8>
+	move $vreg_16 <- $closed
+	OP-ADD $closed = $closed ADD 1
+	move $vreg_17 <- $closed
+	OP-MUL $vreg_17 = $vreg_17 MUL 8
+	OP-ADD $vreg_17 = $vreg_17 ADD $f
+	store $vreg_17[8] <- $j <size 8>
+	move $vreg_18 <- $j
+	OP-MUL $vreg_18 = $vreg_18 MUL 8
+	OP-ADD $vreg_18 = $vreg_18 ADD $pre
+	store $vreg_18[8] <- $i <size 8>
+	OP-EQUAL $vreg_19 = $closed EQUAL $ending
+	cjump <if> $vreg_19 <then> %if_then_2 <else> %if_after_2
 
-  %gcd_end_4:
-	return $return_value_4
+  %if_then_2:
+	move $flag <- 1
+	jump %if_after_2
+
+  %if_after_2:
+	jump %if_after
+
+  %if_after:
+	jump %for_incr_5
+
+  %for_incr_5:
+	move $vreg_20 <- $j
+	OP-ADD $j = $j ADD 1
+	jump %for_cond_6
+
+  %for_after_6:
+	jump %while_cond
+
+  %for_body_5:
+	move $vreg_21 <- $i
+	OP-MUL $vreg_21 = $vreg_21 MUL 8
+	OP-ADD $vreg_21 = $vreg_21 ADD $visit
+	store $vreg_21[8] <- 0 <size 8>
+	jump %for_incr_6
+
+  %for_incr_6:
+	move $vreg_22 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond_5
+
+func improve
+ argVregs:	$ending 
+ blocks
+  %improve_entry:
+	load $j <- @j[0] <size 8>
+	load $ans <- @ans[0] <size 8>
+	load $i <- @i[0] <size 8>
+	load $pre <- @pre[0] <size 8>
+	load $c <- @c[0] <size 8>
+	move $i <- $ending
+	move $vreg <- $ans
+	OP-ADD $ans = $ans ADD 1
+	jump %while_cond_2
+
+  %while_cond_2:
+	move $vreg_2 <- $i
+	OP-MUL $vreg_2 = $vreg_2 MUL 8
+	OP-ADD $vreg_2 = $vreg_2 ADD $pre
+	load $vreg_2 <- $vreg_2[8] <size 8>
+	OP-GREATER $vreg_3 = $vreg_2 GREATER 0
+	cjump <if> $vreg_3 <then> %while_body_2 <else> %while_after_2
+
+  %while_body_2:
+	move $vreg_4 <- $i
+	OP-MUL $vreg_4 = $vreg_4 MUL 8
+	OP-ADD $vreg_4 = $vreg_4 ADD $pre
+	load $vreg_4 <- $vreg_4[8] <size 8>
+	move $j <- $vreg_4
+	move $vreg_5 <- $j
+	OP-MUL $vreg_5 = $vreg_5 MUL 8
+	OP-ADD $vreg_5 = $vreg_5 ADD $c
+	load $vreg_5 <- $vreg_5[8] <size 8>
+	move $vreg_6 <- $i
+	OP-MUL $vreg_6 = $vreg_6 MUL 8
+	OP-ADD $vreg_6 = $vreg_6 ADD $vreg_5
+	load $vreg_6 <- $vreg_6[8] <size 8>
+	move $vreg_7 <- $vreg_6
+	move $vreg_8 <- $j
+	OP-MUL $vreg_8 = $vreg_8 MUL 8
+	OP-ADD $vreg_8 = $vreg_8 ADD $c
+	load $vreg_8 <- $vreg_8[8] <size 8>
+	move $vreg_9 <- $i
+	OP-MUL $vreg_9 = $vreg_9 MUL 8
+	OP-ADD $vreg_9 = $vreg_9 ADD $vreg_8
+	move $vreg_10 <- $vreg_6
+	OP-SUB $vreg_10 = $vreg_10 SUB 1
+	store $vreg_6[8] <- $vreg_10 <size 8>
+	move $vreg_11 <- $i
+	OP-MUL $vreg_11 = $vreg_11 MUL 8
+	OP-ADD $vreg_11 = $vreg_11 ADD $c
+	load $vreg_11 <- $vreg_11[8] <size 8>
+	move $vreg_12 <- $j
+	OP-MUL $vreg_12 = $vreg_12 MUL 8
+	OP-ADD $vreg_12 = $vreg_12 ADD $vreg_11
+	load $vreg_12 <- $vreg_12[8] <size 8>
+	move $vreg_13 <- $vreg_12
+	move $vreg_14 <- $i
+	OP-MUL $vreg_14 = $vreg_14 MUL 8
+	OP-ADD $vreg_14 = $vreg_14 ADD $c
+	load $vreg_14 <- $vreg_14[8] <size 8>
+	move $vreg_15 <- $j
+	OP-MUL $vreg_15 = $vreg_15 MUL 8
+	OP-ADD $vreg_15 = $vreg_15 ADD $vreg_14
+	move $vreg_16 <- $vreg_12
+	OP-ADD $vreg_16 = $vreg_16 ADD 1
+	store $vreg_12[8] <- $vreg_16 <size 8>
+	move $i <- $j
+	jump %while_cond_2
+
+  %while_after_2:
+	store @i[0] <- $i <size 8>
+	store @ans[0] <- $ans <size 8>
+	store @j[0] <- $j <size 8>
+	return 0
+
+func origin
+ argVregs:	$N 
+ blocks
+  %origin_entry:
+	load $j <- @j[0] <size 8>
+	load $i <- @i[0] <size 8>
+	load $c <- @c[0] <size 8>
+	move $vreg <- $N
+	OP-MUL $vreg = $vreg MUL 8
+	OP-ADD $vreg = $vreg ADD 8
+	alloc $vreg <size $vreg>
+	store $vreg[0] <- $N <size 8>
+	move $vreg_2 <- $vreg
+	move $c <- $vreg_2
+	move $i <- 0
+	jump %for_cond_7
+
+  %for_cond_7:
+	OP-LESS $vreg_3 = $i LESS $N
+	cjump <if> $vreg_3 <then> %for_body_7 <else> %for_after_7
+
+  %for_after_7:
+	store @c[0] <- $c <size 8>
+	store @i[0] <- $i <size 8>
+	store @j[0] <- $j <size 8>
+	no return
+
+  %for_body_7:
+	move $vreg_4 <- $i
+	OP-MUL $vreg_4 = $vreg_4 MUL 8
+	OP-ADD $vreg_4 = $vreg_4 ADD $c
+	move $vreg_5 <- $N
+	OP-MUL $vreg_5 = $vreg_5 MUL 8
+	OP-ADD $vreg_5 = $vreg_5 ADD 8
+	alloc $vreg_5 <size $vreg_5>
+	store $vreg_5[0] <- $N <size 8>
+	move $vreg_6 <- $vreg_5
+	store $vreg_4[8] <- $vreg_6 <size 8>
+	move $j <- 0
+	jump %for_cond_8
+
+  %for_cond_8:
+	OP-LESS $vreg_7 = $j LESS $N
+	cjump <if> $vreg_7 <then> %for_body_8 <else> %for_after_8
+
+  %for_after_8:
+	jump %for_incr_7
+
+  %for_incr_7:
+	move $vreg_8 <- $i
+	OP-ADD $i = $i ADD 1
+	jump %for_cond_7
+
+  %for_body_8:
+	move $vreg_9 <- $i
+	OP-MUL $vreg_9 = $vreg_9 MUL 8
+	OP-ADD $vreg_9 = $vreg_9 ADD $c
+	load $vreg_9 <- $vreg_9[8] <size 8>
+	move $vreg_10 <- $j
+	OP-MUL $vreg_10 = $vreg_10 MUL 8
+	OP-ADD $vreg_10 = $vreg_10 ADD $vreg_9
+	store $vreg_10[8] <- 0 <size 8>
+	jump %for_incr_8
+
+  %for_incr_8:
+	move $vreg_11 <- $j
+	OP-ADD $j = $j ADD 1
+	jump %for_cond_8
 
 func main
  argVregs:	
  blocks
   %main_entry:
-	jump %_init_func_entry
+	load $ans <- @ans[0] <size 8>
+	funcall null <- call _init_func
+	 args: 
+	load $ans <- @ans[0] <size 8>
+	funcall $vreg <- call origin
+	 args:  110
+	move $k <- 0
+	move $start <- 0
+	move $ending <- 0
+	move $flag <- 0
+	move $i1 <- 0
+	move $k <- 0
+	move $start <- 99
+	move $ending <- 100
+	move $flag <- 0
+	funcall $vreg_2 <- call build
+	 args:  $start $ending
+	jump %while_cond_3
 
-  %_init_func_entry:
-	move $x <- 10
-	move $y <- 1
-	OP-MOD $vreg = $x MOD $y
-	OP-EQUAL $vreg_2 = $vreg EQUAL 0
-	cjump <if> $vreg_2 <then> %if_then_5 <else> %if_else_5
+  %while_cond_3:
+	funcall $vreg_3 <- call find
+	 args:  $ending $start $flag
+	OP-GREATER $vreg_4 = $vreg_3 GREATER 0
+	cjump <if> $vreg_4 <then> %while_body_3 <else> %while_after_3
 
-  %if_else_5:
-	OP-MOD $vreg_3 = $x MOD $y
-	funcall $vreg_4 <- call gcd
-	 args:  $y $vreg_3
-	move $return_value <- $vreg_4
-	jump %gcd_end_5
-
-  %if_then_5:
-	move $return_value <- $y
-	jump %gcd_end_5
-
-  %gcd_end_5:
-	move $vreg_5 <- $return_value
+  %while_after_3:
 	funcall null <- call _printlnInt
-	 args:  $vreg_5
-	move $x_2 <- 34986
-	move $y_2 <- 3087
-	OP-MOD $vreg_6 = $x_2 MOD $y_2
-	OP-EQUAL $vreg_7 = $vreg_6 EQUAL 0
-	cjump <if> $vreg_7 <then> %if_then_6 <else> %if_else_6
-
-  %if_then_6:
-	move $return_value_2 <- $y_2
-	jump %gcd_end_6
-
-  %if_else_6:
-	OP-MOD $vreg_8 = $x_2 MOD $y_2
-	funcall $vreg_9 <- call gcd
-	 args:  $y_2 $vreg_8
-	move $return_value_2 <- $vreg_9
-	jump %gcd_end_6
-
-  %gcd_end_6:
-	move $vreg_10 <- $return_value_2
-	funcall null <- call _printlnInt
-	 args:  $vreg_10
-	move $x_3 <- 2907
-	move $y_3 <- 1539
-	OP-MOD $vreg_11 = $x_3 MOD $y_3
-	OP-EQUAL $vreg_12 = $vreg_11 EQUAL 0
-	cjump <if> $vreg_12 <then> %if_then_7 <else> %if_else_7
-
-  %if_else_7:
-	OP-MOD $vreg_13 = $x_3 MOD $y_3
-	funcall $vreg_14 <- call gcd
-	 args:  $y_3 $vreg_13
-	move $return_value_3 <- $vreg_14
-	jump %gcd_end_7
-
-  %if_then_7:
-	move $return_value_3 <- $y_3
-	jump %gcd_end_7
-
-  %gcd_end_7:
-	move $vreg_15 <- $return_value_3
-	funcall null <- call _printlnInt
-	 args:  $vreg_15
+	 args:  $ans
 	return 0
+
+  %while_body_3:
+	funcall $vreg_5 <- call improve
+	 args:  $ending
+	load $ans <- @ans[0] <size 8>
+	jump %while_cond_3
+
+func _init_func
+ argVregs:	
+ blocks
+  %_init_func_entry:
+	load $f <- @f[0] <size 8>
+	load $visit <- @visit[0] <size 8>
+	load $ans <- @ans[0] <size 8>
+	load $pre <- @pre[0] <size 8>
+	move $ans <- 0
+	move $vreg <- 110
+	OP-MUL $vreg = $vreg MUL 8
+	OP-ADD $vreg = $vreg ADD 8
+	alloc $vreg <size $vreg>
+	store $vreg[0] <- 110 <size 8>
+	move $vreg_2 <- $vreg
+	move $visit <- $vreg_2
+	move $vreg_3 <- 110
+	OP-MUL $vreg_3 = $vreg_3 MUL 8
+	OP-ADD $vreg_3 = $vreg_3 ADD 8
+	alloc $vreg_3 <size $vreg_3>
+	store $vreg_3[0] <- 110 <size 8>
+	move $vreg_4 <- $vreg_3
+	move $pre <- $vreg_4
+	move $vreg_5 <- 110
+	OP-MUL $vreg_5 = $vreg_5 MUL 8
+	OP-ADD $vreg_5 = $vreg_5 ADD 8
+	alloc $vreg_5 <size $vreg_5>
+	store $vreg_5[0] <- 110 <size 8>
+	move $vreg_6 <- $vreg_5
+	move $f <- $vreg_6
+	store @pre[0] <- $pre <size 8>
+	store @ans[0] <- $ans <size 8>
+	store @visit[0] <- $visit <size 8>
+	store @f[0] <- $f <size 8>
+	no return
 

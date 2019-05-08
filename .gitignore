@@ -10,6 +10,7 @@ ref.tar
 .project
 
 /src/test/compiler-offline-judge/
-
+#/src/test/cases/
+/src/test/tmp/
 
 eclipse-formatter.xml

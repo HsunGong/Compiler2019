@@ -110,6 +110,12 @@ public class AssemblyDump implements IRVisitor {
     }
 
     public void visit(BasicBlock node) {
+        if (node.getInsts().size() == 0)
+            return;
+        if (opts.OptimizationLevel() > 0) {
+        } else {
+        }
+
         printlnLabel(bbId(node));
         node.getInsts().forEach(inst -> visit(inst));
         // println("");
@@ -415,16 +421,17 @@ public class AssemblyDump implements IRVisitor {
 
     public void visit(Load node) {
         if (node.baseAddr instanceof StaticString) {
-            printMove("mov", visit(node.getDst()), getSize(node.getSize())+ visit(node.baseAddr));
+            printMove("mov", visit(node.getDst()), getSize(node.getSize()) + visit(node.baseAddr));
             return;
         }
 
-        printMove("mov", visit(node.getDst()), getSize(node.getSize())+ toAddr(node));
+        printMove("mov", visit(node.getDst()), getSize(node.getSize()) + toAddr(node));
     }
 
     public void visit(Store node) {
         if (node.baseAddr instanceof StaticString) {
-            printMove("mov", getSize(node.getSize()) + visit(node.baseAddr), visit(node.getValue()));
+            printMove("mov", getSize(node.getSize()) + visit(node.baseAddr),
+                    visit(node.getValue()));
             return;
         }
 
@@ -486,7 +493,7 @@ public class AssemblyDump implements IRVisitor {
     }
 
     public void visit(GlobalVarInit node) {
-        // empty
+        throw new CompileError("should not visit stack sslot node in nasm");
     }
 
     public void visit(MemQuad node) {

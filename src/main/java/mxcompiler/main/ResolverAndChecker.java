@@ -383,7 +383,7 @@ public class ResolverAndChecker extends Visitor {
 	@Override
 	public void visit(ForStmtNode node) {
 		visit(node.getCond());
-		if (!(node.getCond().getType() instanceof BoolType))
+		if (node.getCond() != null && !(node.getCond().getType() instanceof BoolType))
 			throw new SemanticError(
 					"Condition expression of for loop statement should have type \"bool\"");
 
@@ -391,7 +391,7 @@ public class ResolverAndChecker extends Visitor {
 		visit(node.getInit());
 		visit(node.getIncr());
 
-		if (!node.getVar().isEmpty()) {
+		if (node.getVar() != null && !node.getVar().isEmpty()) {
 			pushScope();
 			// visitDeclList(node.getVar());
 			for (VarDeclNode var : node.getVar()) {
@@ -400,9 +400,11 @@ public class ResolverAndChecker extends Visitor {
 			}
 			popScope();
 
-			if (!(node.getBody() instanceof BlockStmtNode))
-				throw new CompileError("Body is not block");
-			((BlockStmtNode) node.getBody()).setScope((LocalScope) getCurScope());
+			if (node.getBody() != null) {
+				if (!(node.getBody() instanceof BlockStmtNode))
+					throw new CompileError("Body is not block");
+				((BlockStmtNode) node.getBody()).setScope((LocalScope) getCurScope());
+			}
 		}
 
 		++loop;

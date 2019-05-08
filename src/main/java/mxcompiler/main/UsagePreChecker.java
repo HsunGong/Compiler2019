@@ -40,7 +40,7 @@ public class UsagePreChecker extends Visitor {
             if (usedStaticSet.contains(varEntity))
                 continue;
             varEntity.unUsed = true;
-            System.out.println("unUsedStatic: " + varEntity.getName());
+            // System.out.println("unUsedStatic: " + varEntity.getName());
         }
     }
 
