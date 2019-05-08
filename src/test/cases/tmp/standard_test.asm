@@ -1,69 +1,83 @@
-; Main Function
-		global		main
-		extern		malloc
+		global	main
 
-		section		.text
+		extern	malloc
 
-; function main
+		section	.text
+
+# function main
 
 main:
-		push		rbx
-		push		rbp
-		sub			rsp, 8
-		mov			rbp, rsp
-		add			rsp, 8
-		pop			rbp
-		pop			rbx
-__b__init_func_entry_1:
-		push		r9
-		push		0
-		mov			rdi, 10
-		call		_Z8toStringi
-		add			rsp, 8
-		pop			r9
-		mov			r9, rax
-		push		r9
-		push		0
-		mov			rdi, r9
-		call		_Z7printlnPc
-		add			rsp, 8
-		pop			r9
-		mov			rax, 0
+		push	rbx
+		push	rbp
+		sub		rsp, 8
+		mov		rbp, rsp
+		call	__block___init_func_entry_1
+		push	r9
+		push	0
+		mov		rdi, 10
+		call	_Z8toStringi
+		add		rsp, 8
+		pop		r9
+		mov		r9, rax
+		push	r9
+		push	0
+		mov		rdi, r9
+		call	_Z7printlnPc
+		add		rsp, 8
+		pop		r9
+		mov		rax, 0
+		add		rsp, 8
+		pop		rbp
+		pop		rbx
 		ret
 
 
-; built-in functions
+# function __init_func
 
-; default rel
-
-        global __builtin_string_concat
-        global __builtin_string_equal
-        global __builtin_string_inequal
-        global __builtin_string_less
-        global __builtin_string_less_equal
-        global _Z5printPc
-        global _Z7printlnPc
-        global _Z8printInti
-        global _Z10printlnInti
-        global _Z9getStringv
-        global _Z6getIntv
-        global _Z8toStringi
-        global _Z27__member___string_substringPcii
-        global _Z26__member___string_parseIntPc
-        global _Z21__member___string_ordPci
-
-        extern getchar
-        extern strlen
-        extern scanf
-        extern __stack_chk_fail
-        extern putchar
-        extern puts
-        extern printf
-        extern strcmp
-        extern malloc
+__block___init_func_entry_1:
+		push	rbx
+		push	rbp
+		sub		rsp, 8
+		mov		rbp, rsp
+		add		rsp, 8
+		pop		rbp
+		pop		rbx
+		ret
 
 
-        section .text   
+
+# built-in functions
+
+default rel
+
+global __builtin_string_concat
+global __builtin_string_equal
+global __builtin_string_unequal
+global __builtin_string_less
+global __builtin_string_less_equal
+global _Z5printPc
+global _Z7printlnPc
+global _Z8printInti
+global _Z10printlnInti
+global _Z9getStringv
+global _Z6getIntv
+global _Z8toStringi
+global _Z27__member___string_substringPcii
+global _Z26__member___string_parseIntPc
+global _Z21__member___string_ordPci
+
+extern getchar
+extern strlen
+extern scanf
+extern __stack_chk_fail
+extern putchar
+extern puts
+extern printf
+extern strcmp
+extern malloc
+
+
+SECTION .text   
 
 __builtin_string_concat:
         push    rbp
@@ -163,7 +177,7 @@ __builtin_string_equal:
         ret
 
 
-__builtin_string_inequal:
+__builtin_string_unequal:
         push    rbp
         mov     rbp, rsp
         sub     rsp, 16
@@ -760,14 +774,15 @@ _Z21__member___string_ordPci:
 
 
 
-        section .data   
+SECTION .data   
 
 
-        section .bss    
+SECTION .bss    
 
 
-        section .rodata 
+SECTION .rodata 
 
 L_043:
         db 25H, 73H, 00H
+
 

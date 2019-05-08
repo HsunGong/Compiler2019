@@ -55,11 +55,12 @@ public class AssemblyDump implements IRVisitor {
         // text
         println("section", ".text");
         println("");
+        
         for (Map.Entry<String, Function> func : node.getFunc().entrySet())
             if (!func.getKey().equals("main"))
                 visit(func.getValue());
-
         visit(node.getFunc().get("main"));
+
         println("");
 
         // data
@@ -87,6 +88,7 @@ public class AssemblyDump implements IRVisitor {
 
     public void visit(Function node) {
         printlnComment(" function " + node.getName());
+        println("");
 
         int bbIdx = 0; // ???
         for (BasicBlock bb : node.getReversePostOrder()) {
@@ -561,7 +563,7 @@ public class AssemblyDump implements IRVisitor {
      */
     public void println(String inst, Object... args) {
         String s = "\t\t" + inst;
-        s += (inst.length() > 4) ? "\t%s" : "\t\t%s";
+        s += (inst.length() >= 4) ? "\t\t%s" : "\t\t\t%s";
         s += (", %s").repeat(args.length - 1);
 
         os.printf(s + "\n", args);

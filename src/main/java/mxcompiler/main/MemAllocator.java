@@ -518,7 +518,7 @@ public class MemAllocator {
         // update color after setting stack
         for (BasicBlock bb : func.getReversePreOrder()) {
             ListIterator<Quad> iter = bb.getInsts().listIterator();
-            while (iter.hasNext())
+            while (iter.hasNext()) // Solved: iter.next outside
                 updateInstruction(func, iter);
         }
     }
@@ -583,7 +583,7 @@ public class MemAllocator {
         if (definedReg instanceof VirtualRegister) {
             Register color = vregInfoMap.get(definedReg).color;
             if (color instanceof StackSlot) {
-                bb.addAfterInst(iter, new Store(bb, preg0, RegSize, color, 0));
+                bb.addAfterInst(iter, new Store(bb, preg0, RegSize, color, 0), false);
                 color = preg0;
             }
 
@@ -676,7 +676,7 @@ public class MemAllocator {
             enterBB.addBeforeInst(firstIter, new Move(enterBB, rbp, rsp));
             for (BasicBlock bb : func.getReversePostOrder()) {
                 ListIterator<Quad> iter = bb.getInsts().listIterator();
-                while (iter.hasNext()) {
+                while (iter.hasNext()) { // Solved: iter.next outside
                     Quad inst = iter.next();
                     if (inst instanceof Funcall) {
                         dealCallee(func, info, (Funcall) inst, iter);
@@ -722,8 +722,13 @@ public class MemAllocator {
 
             // will work ??
             lastIter.previous();
-            info.usedCalleeSaveRegs
-                    .forEach(preg -> enterBB.addAfterInst(lastIter, new Pop(enterBB, preg)));
+            for (PhysicalRegister preg : info.usedCalleeSaveRegs) {
+                enterBB.addAfterInst(lastIter, new Pop(enterBB, preg), true);
+            }
+            // info.usedCalleeSaveRegs
+            // .forEach(preg -> enterBB.addAfterInst(lastIter, new Pop(enterBB,
+            // preg)));
+            return;
         }
     }
 
@@ -732,6 +737,9 @@ public class MemAllocator {
      */
     private void dealCallee(Function func, FuncInfo callerInfo, Funcall inst,
             ListIterator<Quad> iter) {
+        Quad nextInst = iter.next();
+        iter.previous();
+
         int callerArgSize = func.argVregs.size();
         BasicBlock parent = inst.getParent();
 
@@ -840,7 +848,7 @@ public class MemAllocator {
 
         // get return value from where funcal store
         if (inst.getDst() != null)
-            parent.addAfterInst(iter, new Move(parent, inst.getDst(), rax));
+            parent.addAfterInst(iter, new Move(parent, inst.getDst(), rax), true);
 
         // NOTE: BUG: order error ???
 
@@ -850,25 +858,33 @@ public class MemAllocator {
                 continue;
 
             if (calleeInfo.recursiveUsedRegs.contains(preg))
-                parent.addAfterInst(iter, new Pop(parent, preg));
+                parent.addAfterInst(iter, new Pop(parent, preg), true);
         }
 
         // restore argument registers to Line: 758
         for (int i = 0; i < callerArgPregNum; ++i)
-            parent.addAfterInst(iter, new Pop(parent, arg6.get(i)));
+            parent.addAfterInst(iter, new Pop(parent, arg6.get(i)), true);
 
         // remove extra args and restore rsp to Line: 765, Line: 775
         if (calleeInfo.numExtraArgs > 0 || extraPush) {
             int numPushArg = extraPush ? calleeInfo.numExtraArgs + 1 : calleeInfo.numExtraArgs;
             IntImm vv = new IntImm(numPushArg * RegSize);
-            parent.addAfterInst(iter, new Bin(parent, rsp, BinaryOpExprNode.Op.ADD, rsp, vv));
+            parent.addAfterInst(iter, new Bin(parent, rsp, BinaryOpExprNode.Op.ADD, rsp, vv), true);
         }
         // endregion
+
+        // check iter is stick at Funcall ??
+        while (iter.hasNext() && nextInst != iter.next()) {
+        }
+        iter.previous();
     }
 
-    /** for alloc memory */
+    /** for alloc memory, call malloc */
     private void dealHeapAlloc(Function func, FuncInfo info, HeapAlloc inst,
             ListIterator<Quad> iter) {
+        Quad nextInst = iter.next();
+        iter.previous();
+
         BasicBlock parent = inst.getParent();
 
         // region before inst
@@ -892,19 +908,26 @@ public class MemAllocator {
         // region after inst
 
         // return Value
-        parent.addAfterInst(iter, new Move(parent, inst.getDst(), rax));
+        parent.addAfterInst(iter, new Move(parent, inst.getDst(), rax), true);
 
         // but sometimes may not change -> TODO: optim ???
         for (PhysicalRegister preg : info.usedCallerSaveRegs)
-            parent.addAfterInst(iter, new Pop(parent, preg));
+            parent.addAfterInst(iter, new Pop(parent, preg), true);
 
         // restore rsp from align
         // can also do this with Pop
         if (callerSaveNum % 2 != 0) {
             IntImm offset = new IntImm(RegSize);
-            parent.addAfterInst(iter, new Bin(parent, rsp, BinaryOpExprNode.Op.ADD, rsp, offset));
+            parent.addAfterInst(iter, new Bin(parent, rsp, BinaryOpExprNode.Op.ADD, rsp, offset),
+                    true);
         }
         // endregion
+
+        // check iter is stick at HeapAlloc ??
+        while (iter.hasNext() && nextInst != iter.next()) {
+        }
+        iter.previous();
+
     }
     // endregion
 }

@@ -1350,7 +1350,7 @@ public class IRBuilder extends Visitor {
             for (BasicBlock bb : irFunc.getReversePostOrder()) {
                 ListIterator<Quad> iter = bb.getInsts().listIterator();
 
-                while (iter.hasNext()) {
+                while (iter.hasNext()) { // Solved: iter.next outside
                     Quad next = iter.next();
                     if (!(next instanceof Bin))
                         continue;
@@ -1835,10 +1835,10 @@ public class IRBuilder extends Visitor {
                     for (StaticData staticData : loadStaticDataSet) {
                         if (staticData instanceof StaticString)
                             continue;
-                        bb.addAfterInst(iter, // FIX:here
+                        bb.addAfterInst(iter,
                                 new Load(bb, callerInfo.dataVregMap.get(staticData),
                                         RegValue.RegSize, staticData,
-                                        staticData instanceof StaticString));
+                                        staticData instanceof StaticString), false);
                     }
                 }
             }

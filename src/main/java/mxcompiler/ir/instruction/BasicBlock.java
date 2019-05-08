@@ -160,17 +160,22 @@ public class BasicBlock {
      * append
      * <p>
      * illigal: don't have iter.next() after origin
+     * <p>
+     * stick means stick on cur iter
      * 
      * <pre>
      * // origin: iter inst(will select) inst2
      * inst = iter.next(); inst ...
      * // before: inst(select) iter inst2
      * bb.addBeforeInst(iter, new_inst)
-     * // after: inst(select) new_inst iter inst2
+     * // if(!stick) after: inst(select) new_inst iter inst2
+     * // if(stick)  after: inst(select) iter new_inst inst2
      * </pre>
      */
-    public void addAfterInst(ListIterator<Quad> iter, Quad newInst) {
+    public void addAfterInst(ListIterator<Quad> iter, Quad newInst, boolean stick) {
         iter.add(newInst);
+        if (stick)
+            iter.previous();
     }
 
     /**
