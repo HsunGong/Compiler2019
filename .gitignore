@@ -1,14 +1,15 @@
-.settings
-.vscode
+.settings/
+.vscode/
 
 ref.tar
 
-target/
-bin/
+/target/
+/bin/
 
 .classpath
 .project
 
-/src/test/compiler-offline-judge
+/src/test/compiler-offline-judge/
+
 
 eclipse-formatter.xml
