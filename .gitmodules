@@ -1,0 +1,3 @@
+[submodule "src/test/compiler-offline-judge"]
+	path = src/test/compiler-offline-judge
+	url = git@github.com:XunGong99/compiler-offline-judge.git
