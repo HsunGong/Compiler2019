@@ -558,23 +558,29 @@ public class AssemblyDump implements IRVisitor {
     /**
      * @Format Normal: {@code \t\t inst \t\t arg1, arg2, ...}
      */
-    public void print(String inst, Object... args) {
-        String s = "\t\t" + inst;
-        s += (inst.length() > 8) ? "\t%s" : "\t\t%s";
-        s += (", %s").repeat(args.length - 1);
+    public void print(String inst, String... args) {
+        // s += (inst.length() > 8) ? "\t%s" : "\t\t%s";
+        // s += (", %s").repeat(args.length - 1);
+        // os.printf(pp.toString(), inst, args);
 
-        os.printf(s, inst, args);
+        StringBuilder pp = new StringBuilder("\t\t" + inst);
+        pp.append((inst.length() > 8) ? "\t" : "\t\t" + args[0]);
+        for(int i = 1; i < args.length; ++i)
+            pp.append(", " + args[i]);
+        
+        os.print(pp.toString());
     }
 
     /**
      * @Format Normal: {@code \t\t inst \t\t arg1, arg2, ... \n}
      */
     public void println(String inst, Object... args) {
-        String s = "\t\t" + inst;
-        s += (inst.length() > 8) ? "\t%s" : "\t\t%s";
-        s += (", %s").repeat(args.length - 1);
-
-        os.printf(s + "\n", args);
+        StringBuilder pp = new StringBuilder("\t\t" + inst);
+        pp.append((inst.length() > 8) ? "\t" : "\t\t" + args[0]);
+        for(int i = 1; i < args.length; ++i)
+            pp.append(", " + args[i]);
+        
+        os.println(pp.toString());
     }
 
     public void printLabel(String label) {

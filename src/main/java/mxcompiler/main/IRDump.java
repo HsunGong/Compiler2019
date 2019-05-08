@@ -285,31 +285,38 @@ public class IRDump implements IRVisitor, Dump {
     // endregion
 
     // region print
-    private String t = "\t";
-    private int tab = 0;
+    private final String t = "\t";
+	private StringBuilder tab;
 
-    public void addTab() {
-        ++tab;
-    }
+	public void addTab() {
+		// ++tab;
+		tab.append(t);
+	}
 
-    public void delTab() {
-        --tab;
-    }
+	public void delTab() {
+		// --tab;
+		tab.delete(tab.length() - t.length(), tab.length());
+	}
 
-    public String getTab() {
-        return t.repeat(tab);
-    }
+	public String getTab() {
+		// return t.repeat(tab);
+		return tab.toString();
+	}
 
-    public void println(String x) {
-        os.println(getTab() + x);
-    }
+	public void println(String x) {
+		os.println(getTab() + x);
+	}
 
-    public void printf(String str, Object... args) {
-        os.printf(getTab() + str, args);
-    }
+	public void printplainln(String x) {
+		os.println(x);
+	}
 
-    public void print(String str) {
-        os.print(getTab() + str);
-    }
+	public void printf(String str, Object... args) {
+		os.printf(getTab() + str, args);
+	}
+
+	public void print(String str) {
+		os.print(getTab() + str);
+	}
     // endregion
 }
