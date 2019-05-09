@@ -18,5 +18,6 @@ ref.tar
 *.asm
 *.log
 *.debug
+*.o
 
 eclipse-formatter.xml
