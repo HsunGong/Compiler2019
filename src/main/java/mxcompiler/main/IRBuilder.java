@@ -472,7 +472,7 @@ public class IRBuilder extends Visitor {
 
             VirtualRegister vreg = new VirtualRegister(null);
             curBB.addLastInst(new Bin(curBB, vreg, op, expr.regValue, one));
-            curBB.addLastInst(new Store(curBB, vreg, RegValue.RegSize, expr.regValue, expr.offset));
+            curBB.addLastInst(new Store(curBB, vreg, RegValue.RegSize, expr.addrValue, expr.offset));
 
             if (!isSuffix)
                 expr.regValue = vreg;
