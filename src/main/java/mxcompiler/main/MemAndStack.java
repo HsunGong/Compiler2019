@@ -57,7 +57,8 @@ public class MemAndStack {
                     info.usedCallerSaveRegs.add(preg);
             }
             // deal rbx if (!root.hasDivShiftInst) ??
-            info.usedCalleeSaveRegs.add(rbx); // maybe not use ??
+            //if (!info.usedCalleeSaveRegs.contains(rbx))
+            info.usedCalleeSaveRegs.add(rbx); // maybe have used ??, no need to add again
             info.usedCalleeSaveRegs.add(rbp);
 
             // stackSlot

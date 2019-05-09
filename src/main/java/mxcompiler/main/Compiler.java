@@ -66,8 +66,8 @@ public final class Compiler {
 
 	}
 
-	private File debugOut = new File("/home/xun/tmp/debug.log");
-	private File dumpFile = new File("./src/test/tmp/test.out");
+	private File debugOut = new File("./src/test/tmp/test.debug");
+	private File dumpFile = new File("./src/test/tmp/test.dump");
 
 	private InputStream fileIn;
 	private PrintStream fileOut;

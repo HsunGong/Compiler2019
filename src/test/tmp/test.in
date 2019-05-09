@@ -14,7 +14,7 @@ void origin(int N)
     for (i = 0; i < N; i ++ ) {
 		c[i] = new int[N];
         for (j = 0; j < N; j ++ )
-        c[i][j] = 0;
+            c[i][j] = 0;
     }	
 }
 
@@ -34,16 +34,20 @@ int build(int start, int ending) {
 int find(int ending, int start, int flag) {
     open = 0;
     closed = 1;
+
     for (i = 1; i <= ending; i++) {
         visit[i] = 0;
     }
+
     f[1]=start;
     visit[start]=1;
     pre[start]=0;
     flag=0;
+
     while (open<closed && flag==0) {
         open++;
         i=f[open];
+
         for (j = 1; j <= ending; j++)
             if (c[i][j]>0 && visit[j]==0) {
                 visit[j]=1;
@@ -53,6 +57,7 @@ int find(int ending, int start, int flag) {
                 if (closed==ending) flag=1;
             }
     }
+
     return flag;
 }
 
@@ -63,13 +68,15 @@ int improve(int ending) {
         j=pre[i];
         c[j][i]--;
         c[i][j]++;
-        i=j;
+        i = j;
     }
     return 0;
 }
 
 int main() {
 	origin(110);
+    int i;
+    
     int k;
 	int start;
 	int ending;
@@ -82,10 +89,15 @@ int main() {
     flag = 0;
 
     build(start, ending);
-    while (find(ending, start, flag)>0) {
+    
+    
+    int a = find(ending, start, flag);
+    while (a > 0) {
         improve(ending);
+        a = find(ending, start, flag);
     }
-	println(toString(ans));
+	
+    println(toString(ans));
     return 0;
 }
 

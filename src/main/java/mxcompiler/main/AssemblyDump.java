@@ -478,6 +478,8 @@ public class AssemblyDump implements IRVisitor {
                     // double load a to b or store a to b
                     remove = true;
                 }
+            } else if (inst instanceof Push || inst instanceof Pop) {
+
             }
 
             if (remove)
@@ -565,9 +567,9 @@ public class AssemblyDump implements IRVisitor {
 
         StringBuilder pp = new StringBuilder("\t\t" + inst);
         pp.append((inst.length() > 8) ? "\t" : "\t\t" + args[0]);
-        for(int i = 1; i < args.length; ++i)
+        for (int i = 1; i < args.length; ++i)
             pp.append(", " + args[i]);
-        
+
         os.print(pp.toString());
     }
 
@@ -577,9 +579,9 @@ public class AssemblyDump implements IRVisitor {
     public void println(String inst, Object... args) {
         StringBuilder pp = new StringBuilder("\t\t" + inst);
         pp.append((inst.length() > 8) ? "\t" : "\t\t" + args[0]);
-        for(int i = 1; i < args.length; ++i)
+        for (int i = 1; i < args.length; ++i)
             pp.append(", " + args[i]);
-        
+
         os.println(pp.toString());
     }
 

@@ -9,12 +9,21 @@ import mxcompiler.ir.register.*;
 import mxcompiler.ir.instruction.*;
 import mxcompiler.utils.Dump;
 
+// ************************************************************************************************
+// This file is used to print out IR in the format of LeLeIR (LeLe -> Lequn Chen)
+// so that one can use LLIRInterpreter to test IR.
+// Actually LeLeIR is more like MIPS rather than NASM assembly, but for test purpose it's enough.
+// [repo of LLIRInterpreter] https://github.com/abcdabcd987/LLIRInterpreter
+// credit to Lequn Chen (@abcdabcd987)
+// ************************************************************************************************
+
 
 public class IRDump implements IRVisitor, Dump {
     private PrintStream os;
 
     public IRDump(PrintStream os) {
         this.os = os;
+        tab = new StringBuilder();
     }
 
     private Map<BasicBlock, String> bbMap = new HashMap<>();
@@ -27,7 +36,7 @@ public class IRDump implements IRVisitor, Dump {
 
     private Set<BasicBlock> bbVisited = new HashSet<>();
 
-    private boolean isStaticDef, isStaticStr;
+    private boolean isStaticDef;
 
     private String genID(String name, Map<String, Integer> cnt) {
         int cntName = cnt.getOrDefault(name, 0) + 1;
@@ -79,172 +88,264 @@ public class IRDump implements IRVisitor, Dump {
     @Override
     public void visit(Root node) {
         // Static Data
-        println("Global static Data");
-        addTab();
         isStaticDef = true;
-        node.getStaticDataList().forEach(data -> visit(data));
+        for (StaticData staticData : node.getStaticDataList()) {
+            staticData.accept(this);
+        }
         isStaticDef = false;
-        delTab();
-
-        println("Global static string");
-        addTab();
-        isStaticStr = true;
-        node.getStaticStr().values().forEach(data -> visit(data));
-        isStaticStr = false;
-        delTab();
-
-        println(">>>>>>>>>>>      Decl of functions      <<<<<<<<<<<<");
-        node.getFunc().values().forEach(data -> visit(data));
+        for (StaticString staticStr : node.getStaticStr().values()) {
+            staticStr.accept(this);
+        }
+        os.println();
+        for (Function func : node.getFunc().values()) {
+            func.accept(this);
+        }
     }
 
     @Override
     public void visit(Function node) {
         vregMap = new IdentityHashMap<>();
         vregCnt = new HashMap<>();
-
-        printf("func %s\n", node.getName());
-        printf(" argVregs:\t");
-        node.argVregs.forEach(arg -> os.printf("$%s ", getVRegID(arg)));
-        os.println("");
-
-        println(" blocks");
-        node.getReversePostOrder().forEach(bb -> visit(bb));
+        os.printf("func %s ", node.getName());
+        for (VirtualRegister paraVReg : node.argVregs) {
+            os.printf("$%s ", getVRegID(paraVReg));
+        }
+        os.printf("{\n");
+        for (BasicBlock bb : node.getReversePostOrder()) {
+            bb.accept(this);
+        }
+        os.printf("}\n\n");
     }
 
     @Override
     public void visit(BasicBlock node) {
         if (bbVisited.contains(node))
             return;
-
         bbVisited.add(node);
-        println("  %" + getBBID(node) + ":");
-
-        addTab();
-        node.getInsts().forEach(inst -> visit(inst));
-        delTab();
-
-        println(""); // ???
+        os.println("%" + getBBID(node) + ":");
+        for (Quad inst : node.getInsts()) {
+            inst.accept(this);
+        }
     }
 
-    public void visit(HeapAlloc node) {
-        printf("alloc %s <size %s>\n", visit(node.getDst()), visit(node.getAllocSize()));
-    }
-
-    public void visit(Funcall node) {
-        printf("funcall %s <- call %s\n", visit(node.getDst()), node.getFunc().getName());
-        printf(" args: ");
-        node.getArgs().forEach(arg -> os.printf(" %s", visit(arg)));
+    @Override
+    public void visit(CJump node) {
+        os.print("    br ");
+        node.getCond().accept(this);
+        os.println(" %" + getBBID(node.getThen()) + " %" + getBBID(node.getElse()));
         os.println();
     }
 
-    // region jump
-    public void visit(Return node) {
-        if (node.getReturnValue() == null) {
-            printf("no return\n");
-            return;
-        }
-
-        String ret = visit(node.getReturnValue());
-        printf("return %s\n", ret);
-    }
-
+    @Override
     public void visit(Jump node) {
-        printf("jump %%%s\n", getBBID(node.getTarget()));
+        os.printf("    jump %%%s\n\n", getBBID(node.getTarget()));
     }
 
-    public void visit(CJump node) {
-        String a = "%" + getBBID(node.getThen());
-        String b = "%" + getBBID(node.getElse());
-
-        printf("cjump <if> %s <then> %s <else> %s\n", visit(node.getCond()), a, b);
-    }
-    // endregion
-
-    // region regValues
-    public String visit(IntImm node) {
-        return Integer.toString(node.getValue());
-    }
-
-    public String visit(PhysicalRegister node) {
-        return "$" + node.getName();
+    @Override
+    public void visit(Return node) {
+        os.print("    ret ");
+        if (node.getReturnValue() != null) {
+            node.getReturnValue().accept(this);
+        } else {
+            os.print("0");
+        }
+        os.println();
+        os.println();
     }
 
-    public String visit(VirtualRegister node) {
-        return "$" + getVRegID(node);
-    }
-
-    public String visit(StaticVar node) {
-        if (isStaticDef) {
-            printf("space @%s %d\n", getStaticDataID(node), node.getSize());
-            return null;
-        } else
-            return "@" + getStaticDataID(node);
-    }
-
-    public String visit(StaticString node) {
-        if (isStaticDef) {
-            printf("asciiz @%s %s\n", getStaticDataID(node), node.getValue());
-            return null;
-        } else if (isStaticStr) {
-            printf("@%s %s\n", getStaticDataID(node), node.getValue());
-            return null;
-        } else
-            return String.format("@%s %s", getStaticDataID(node), node.getValue());
-    }
-    // endregion
-
-    // region op
+    @Override
     public void visit(Uni node) {
-        String op = node.getOp().toString();
-        printf("OP-%s %s = %s%s\n", op, visit(node.getDst()), op, visit(node.getRhs()));
+        os.print("    ");
+        String op = null;
+        switch (node.getOp()) {
+        case NEGA:
+            op = "neg";
+            break;
+        case BIT_NOT:
+            op = "not";
+            break;
+        }
+        node.getDst().accept(this);
+        os.printf(" = %s ", op);
+        node.getRhs().accept(this);
+        os.println();
     }
 
-    public void visit(Cmp node) {
-        String op = node.getOp().toString();
-        String dst = visit(node.getDst());
-        printf("OP-%s %s = %s %s %s\n", op, dst, visit(node.getLhs()), op, visit(node.getRhs()));
-    }
-
+    @Override
     public void visit(Bin node) {
         if (node instanceof Cmp)
-            visit((Cmp) node);
-
-        String op = node.getOp().toString();
-        String dst = visit(node.getDst());
-        printf("OP-%s %s = %s %s %s\n", op, dst, visit(node.getLhs()), op, visit(node.getRhs()));
+            node.accept(this);
+        os.print("    ");
+        String op = null;
+        switch (node.getOp()) {
+        case ADD:
+            op = "add";
+            break;
+        case SUB:
+            op = "sub";
+            break;
+        case MUL:
+            op = "mul";
+            break;
+        case DIV:
+            op = "div";
+            break;
+        case MOD:
+            op = "rem";
+            break;
+        case SH_L:
+            op = "shl";
+            break;
+        case SH_R:
+            op = "shr";
+            break;
+        case BIT_AND:
+            op = "and";
+            break;
+        case BIT_OR:
+            op = "or";
+            break;
+        case BIT_XOR:
+            op = "xor";
+            break;
+        }
+        node.getDst().accept(this);
+        os.printf(" = %s ", op);
+        node.getLhs().accept(this);
+        os.printf(" ");
+        node.getRhs().accept(this);
+        os.println();
     }
 
-    // endregion
+    @Override
+    public void visit(Cmp node) {
+        os.print("    ");
+        String op = null;
+        switch (node.getOp()) {
+        case EQUAL:
+            op = "seq";
+            break;
+        case INEQUAL:
+            op = "sne";
+            break;
+        case GREATER:
+            op = "sgt";
+            break;
+        case GREATER_EQUAL:
+            op = "sge";
+            break;
+        case LESS:
+            op = "slt";
+            break;
+        case LESS_EQUAL:
+            op = "sle";
+            break;
+        }
+        node.getDst().accept(this);
+        os.printf(" = %s ", op);
+        node.getLhs().accept(this);
+        os.printf(" ");
+        node.getRhs().accept(this);
+        os.println();
+    }
 
-    // region mem
+    @Override
     public void visit(Move node) {
-        printf("move %s <- %s\n", visit(node.getDst()), visit(node.getRhs()));
+        os.print("    ");
+        node.getDst().accept(this);
+        os.print(" = move ");
+        node.getRhs().accept(this);
+        os.println();
     }
 
+    @Override
     public void visit(Load node) {
-        String dst = visit(node.getDst());
-        String addr = visit(node.baseAddr);
-
-        printf("load %s <- %s[%d] <size %d>\n", dst, addr, node.offset, node.getSize());
+        os.print("    ");
+        node.getDst().accept(this);
+        os.printf(" = load %d ", node.getSize());
+        node.baseAddr.accept(this);
+        os.println(" " + node.offset);
     }
 
+    @Override
     public void visit(Store node) {
-        String val = visit(node.getValue());
-        String addr = visit(node.baseAddr);
-
-        printf("store %s[%d] <- %s <size %d>\n", addr, node.offset, val, node.getSize());
+        os.printf("    store %d ", node.getSize());
+        node.baseAddr.accept(this);
+        os.print(" ");
+        node.getValue().accept(this);
+        os.println(" " + node.offset);
     }
 
-    public void visit(Push node) {
-        printf("push %s", visit(node.getValue()));
+    @Override
+    public void visit(Funcall node) {
+        os.print("    ");
+        if (node.getDst() != null) {
+            node.getDst().accept(this);
+            os.print(" = ");
+        }
+        os.printf("call %s ", node.getFunc().getName());
+        for (RegValue arg : node.getArgs()) {
+            arg.accept(this);
+            os.print(" ");
+        }
+        os.println();
     }
 
-    public void visit(Pop node) {
-        printf("pop %s", visit(node.getValue()));
+    @Override
+    public void visit(HeapAlloc node) {
+        os.print("    ");
+        node.getDst().accept(this);
+        os.print(" = alloc ");
+        node.getAllocSize().accept(this);
+        os.println();
     }
-    // endregion
+
+    @Override
+    public String visit(VirtualRegister node) {
+        os.print("$" + getVRegID(node));
+        return null;
+    }
+
+    @Override
+    public String visit(IntImm node) {
+        os.print(node.getValue());
+        return null;
+    }
+
+    @Override
+    public String visit(StaticVar node) {
+        if (isStaticDef)
+            os.printf("space @%s %d\n", getStaticDataID(node), node.getSize());
+        else
+            os.print("@" + getStaticDataID(node));
+        return null;
+    }
+
+    @Override
+    public String visit(StaticString node) {
+        if (isStaticDef)
+            os.printf("asciiz @%s %s\n", getStaticDataID(node), node.getValue());
+        else
+            os.print("@" + getStaticDataID(node));
+        return null;
+    }
+
+    @Override
+    public String visit(PhysicalRegister node) {
+        // no actions
+        return null;
+    }
 
     // region useless
+    @Override
+    public void visit(Push node) {
+        // no actions
+    }
+
+    @Override
+    public void visit(Pop node) {
+    }
+
     public String visit(StackSlot node) {
         throw new CompileError("should not visit stack slot node in nasm");
     }
@@ -274,7 +375,7 @@ public class IRDump implements IRVisitor, Dump {
     }
 
     public String visit(Register node) {
-                if (node == null)
+        if (node == null)
             return null;
         return node.accept(this);
     }
@@ -286,37 +387,37 @@ public class IRDump implements IRVisitor, Dump {
 
     // region print
     private final String t = "\t";
-	private StringBuilder tab;
+    private StringBuilder tab;
 
-	public void addTab() {
-		// ++tab;
-		tab.append(t);
-	}
+    public void addTab() {
+        // ++tab;
+        tab.append(t);
+    }
 
-	public void delTab() {
-		// --tab;
-		tab.delete(tab.length() - t.length(), tab.length());
-	}
+    public void delTab() {
+        // --tab;
+        tab.delete(tab.length() - t.length(), tab.length());
+    }
 
-	public String getTab() {
-		// return t.repeat(tab);
-		return tab.toString();
-	}
+    public String getTab() {
+        // return t.repeat(tab);
+        return tab.toString();
+    }
 
-	public void println(String x) {
-		os.println(getTab() + x);
-	}
+    public void println(String x) {
+        os.println(getTab() + x);
+    }
 
-	public void printplainln(String x) {
-		os.println(x);
-	}
+    public void printplainln(String x) {
+        os.println(x);
+    }
 
-	public void printf(String str, Object... args) {
-		os.printf(getTab() + str, args);
-	}
+    public void printf(String str, Object... args) {
+        os.printf(getTab() + str, args);
+    }
 
-	public void print(String str) {
-		os.print(getTab() + str);
-	}
+    public void print(String str) {
+        os.print(getTab() + str);
+    }
     // endregion
 }
