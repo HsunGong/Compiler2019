@@ -3,6 +3,7 @@
 
 ref.tar
 
+/test.bash
 /target/
 /bin/
 
