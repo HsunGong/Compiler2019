@@ -928,37 +928,26 @@ public class IRBuilder extends Visitor {
      * println(A + B); -> print(A); println(B);
      */
     private void dealPrintFuncCall(ExprNode arg, String funcName) {
-        if (opts.OptimizationLevel() > 0) {
-            if (arg instanceof BinaryOpExprNode) {
-                dealPrintFuncCall(((BinaryOpExprNode) arg).getLhs(), "print");
-                dealPrintFuncCall(((BinaryOpExprNode) arg).getRhs(), funcName);
-                return;
-            }
+        if (arg instanceof BinaryOpExprNode) {
+            dealPrintFuncCall(((BinaryOpExprNode) arg).getLhs(), "print");
+            dealPrintFuncCall(((BinaryOpExprNode) arg).getRhs(), funcName);
+            return;
         }
 
         Function calleeFunc;
         List<RegValue> vArgs = new ArrayList<>();
-        if (opts.OptimizationLevel() > 0) {
 
-            if (arg instanceof FuncallExprNode
-                    && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
-                // print(toString(n)); -> printInt(n);
-                ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
-                visit(intExpr);
-                calleeFunc = root.getBuiltInFunc("_" + funcName + "Int");
-                vArgs.add(intExpr.regValue);
-            } else {
-                visit(arg);
-                calleeFunc = root.getBuiltInFunc(funcName);
-                vArgs.add(arg.regValue);
-            }
-
+        if (arg instanceof FuncallExprNode
+                && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
+            // print(toString(n)); -> printInt(n);
+            ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
+            visit(intExpr);
+            calleeFunc = root.getBuiltInFunc("_" + funcName + "Int");
+            vArgs.add(intExpr.regValue);
         } else {
-
             visit(arg);
             calleeFunc = root.getBuiltInFunc(funcName);
             vArgs.add(arg.regValue);
-
         }
 
         curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, null));
