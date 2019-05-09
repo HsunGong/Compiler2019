@@ -63,7 +63,6 @@ public final class Compiler {
 			else
 				throw new Error(e);
 		}
-
 	}
 
 	private File debugOut = new File("./src/test/tmp/test.debug");

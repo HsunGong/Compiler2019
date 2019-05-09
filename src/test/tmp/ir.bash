@@ -4,20 +4,17 @@
 
 name=$1
 
-if [ x$2 != x ]; then
-	outName=$2
-else
-	outName="a.out"
-fi
-
 echo "input:" $name
-echo "output:" $outName
+curPath="../../../../tmp"
+exefile="../java/mxcompiler/ir/src/LLIRInterpreter.java"
+exePath="../java/mxcompiler/ir/src"
 
-if [ test -f "$name.dump" ] && [ test -f "../llir/src/LLIRInterpreter.java"  ] ; then
-	exefile="../llir/src/LLIRInterpreter.java"
-	javac exefile 
+if [[ -f $name.dump && -f $exefile ]]; then
+	cd $exePath/
+	java *.java  < $curPath/$name.dump
+	# java -cp $exePath/ mxcompiler/ir/src/LLIRInterpreter < $name.dump
 
-	./$outName
+	# rm -f $exePath/*.class
 
 fi
 
