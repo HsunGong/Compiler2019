@@ -46,16 +46,16 @@ public final class Compiler {
 					: new FileInputStream(opts.sourceFile());
 
 			this.fileOut = new PrintStream(new FileOutputStream(opts.outputFile(), false));
-			
+
 			this.dumpOut = new PrintStream(new FileOutputStream(dumpFile, false));
-			
+
 			compile();
 
 			fileOut.close();
 			dumpOut.close();
-			
+
 			// if (opts.mode().equals(CompilerMode.Debug)) {
-			// 	Files.copy(opts.outputFile().toPath(), debugOut.toPath());
+			// Files.copy(opts.outputFile().toPath(), debugOut.toPath());
 			// }
 		} catch (Exception | Error e) {
 			if (opts.mode().equals(CompilerMode.Default))
@@ -143,6 +143,11 @@ public final class Compiler {
 				|| opts.dumpMode().contains(DumpMode.AllDump)) {
 			IRDump dump = new IRDump(dumpOut);
 			dump.visit(irRoot);
+		} else if (opts.mode() == CompilerMode.Default) {
+			IRLeLeDump dump = new IRLeLeDump(dumpOut);
+			dump.visit(irRoot);
+			System.out.println(">>> Generate asm end");
+			return;
 		}
 
 		if (opts.mode().equals(CompilerMode.Debug))

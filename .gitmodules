@@ -1,3 +1,6 @@
 [submodule "src/test/compiler-offline-judge"]
 	path = src/test/compiler-offline-judge
 	url = git@github.com:XunGong99/compiler-offline-judge.git
+[submodule "src/test/llir"]
+	path = src/test/java/mxcompiler
+	url = https://github.com/abcdabcd987/LLIRInterpreter
