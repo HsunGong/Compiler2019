@@ -1,5 +1,5 @@
 .settings/
-.vscode/
+**/.vscode/
 
 ref.tar
 
@@ -11,6 +11,12 @@ ref.tar
 
 /src/test/compiler-offline-judge/
 #/src/test/cases/
-/src/test/tmp/
+
+*.in
+*.dump
+*.out
+*.asm
+*.log
+*.debug
 
 eclipse-formatter.xml
