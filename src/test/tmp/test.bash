@@ -38,11 +38,11 @@ gcc $t_output.o -no-pie -o b.out
 
 
 echo ">>> my default out"
-timeout ./a.out
+time ./a.out
 
 
 echo ">>> standard out"
-timeout ./b.out
+time ./b.out
 
 rm -f *.o *.out
 

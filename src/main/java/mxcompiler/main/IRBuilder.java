@@ -938,21 +938,23 @@ public class IRBuilder extends Visitor {
         Function calleeFunc;
         List<RegValue> vArgs = new ArrayList<>();
 
-        if (opts.mode() == CompilerMode.Debug) {
+        if (opts.mode() == CompilerMode.LLIR) {
             visit(arg);
             calleeFunc = root.getBuiltInFunc(funcName);
             vArgs.add(arg.regValue);
-        } else if (arg instanceof FuncallExprNode
-                && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
-            // print(toString(n)); -> printInt(n);
-            ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
-            visit(intExpr);
-            calleeFunc = root.getBuiltInFunc("_" + funcName + "Int");
-            vArgs.add(intExpr.regValue);
         } else {
-            visit(arg);
-            calleeFunc = root.getBuiltInFunc(funcName);
-            vArgs.add(arg.regValue);
+            if (arg instanceof FuncallExprNode
+                    && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
+                // print(toString(n)); -> printInt(n);
+                ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
+                visit(intExpr);
+                calleeFunc = root.getBuiltInFunc("_" + funcName + "Int");
+                vArgs.add(intExpr.regValue);
+            } else {
+                visit(arg);
+                calleeFunc = root.getBuiltInFunc(funcName);
+                vArgs.add(arg.regValue);
+            }
         }
 
         curBB.addLastInst(new Funcall(curBB, calleeFunc, vArgs, null));
@@ -1626,8 +1628,8 @@ public class IRBuilder extends Visitor {
         renameMap.put(oldEndBB, newEndBB);
         renameMap.put(calleeFunc.getStart(), parent); // Tag
 
-        if (oldEndBB == parent)
-            oldEndBB = newEndBB;
+        if (callerFunc.getEnd() == parent)
+            callerFunc.setEnd(newEndBB);
 
         // add after-funcall insts into new end(first)
         Map<Object, Object> callBBRenameMap = Collections.singletonMap(parent, newEndBB);

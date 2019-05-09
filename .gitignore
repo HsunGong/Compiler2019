@@ -20,4 +20,6 @@ ref.tar
 *.debug
 *.o
 
+*.class
+
 eclipse-formatter.xml

@@ -12,7 +12,7 @@ import java.util.HashMap;
  * default-mode: run normal, can dump out, can run asm
  */
 enum CompilerMode {
-	Default("-C"), Debug("--debug"), Test("--test");
+	Default("-C"), Debug("--debug"), Test("--test"), LLIR("--llir");
 
 	static private Map<String, CompilerMode> modes;
 	static {

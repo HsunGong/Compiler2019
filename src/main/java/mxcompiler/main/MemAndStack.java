@@ -29,7 +29,6 @@ public class MemAndStack {
         return;
     }
 
-    // region deal Funcall
     /** Info of Regs */
     private class FuncInfo {
         List<PhysicalRegister> usedCallerSaveRegs = new ArrayList<>();
@@ -364,6 +363,5 @@ public class MemAndStack {
         iter.previous();
 
     }
-    // endregion
 
 }
