@@ -472,7 +472,8 @@ public class IRBuilder extends Visitor {
 
             VirtualRegister vreg = new VirtualRegister(null);
             curBB.addLastInst(new Bin(curBB, vreg, op, expr.regValue, one));
-            curBB.addLastInst(new Store(curBB, vreg, RegValue.RegSize, expr.addrValue, expr.offset));
+            curBB.addLastInst(
+                    new Store(curBB, vreg, RegValue.RegSize, expr.addrValue, expr.offset));
 
             if (!isSuffix)
                 expr.regValue = vreg;
@@ -937,7 +938,11 @@ public class IRBuilder extends Visitor {
         Function calleeFunc;
         List<RegValue> vArgs = new ArrayList<>();
 
-        if (arg instanceof FuncallExprNode
+        if (opts.mode() == CompilerMode.Debug) {
+            visit(arg);
+            calleeFunc = root.getBuiltInFunc(funcName);
+            vArgs.add(arg.regValue);
+        } else if (arg instanceof FuncallExprNode
                 && ((FuncallExprNode) arg).funcEntity.getName() == "toString") {
             // print(toString(n)); -> printInt(n);
             ExprNode intExpr = ((FuncallExprNode) arg).getParam().get(0);
