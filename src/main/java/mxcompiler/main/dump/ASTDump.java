@@ -1,4 +1,4 @@
-package mxcompiler.main;
+package mxcompiler.main.dump;
 
 import java.io.PrintStream;
 import java.util.List;

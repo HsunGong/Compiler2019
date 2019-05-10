@@ -1,4 +1,4 @@
-package mxcompiler.main;
+package mxcompiler.main.dump;
 
 import java.io.PrintStream;
 import java.util.*;
@@ -18,10 +18,10 @@ import mxcompiler.utils.Dump;
 // ************************************************************************************************
 
 
-public class IRDump implements IRVisitor, Dump {
+public class IRLeLeDump implements IRVisitor, Dump {
     private PrintStream os;
 
-    public IRDump(PrintStream os) {
+    public IRLeLeDump(PrintStream os) {
         this.os = os;
         tab = new StringBuilder();
     }

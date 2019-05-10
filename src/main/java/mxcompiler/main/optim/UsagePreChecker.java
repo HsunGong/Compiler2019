@@ -1,4 +1,4 @@
-package mxcompiler.main;
+package mxcompiler.main.optim;
 
 import java.util.*;
 

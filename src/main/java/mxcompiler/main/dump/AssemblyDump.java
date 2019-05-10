@@ -1,4 +1,4 @@
-package mxcompiler.main;
+package mxcompiler.main.dump;
 
 import java.util.*;
 
@@ -17,11 +17,9 @@ import java.io.*;
 
 public class AssemblyDump implements IRVisitor {
     private final PrintStream os;
-    private final Option opts;
 
-    public AssemblyDump(PrintStream x, Option opts) {
+    public AssemblyDump(PrintStream x) {
         os = x;
-        this.opts = opts;
     }
 
     public void dump(Root root) {
@@ -112,9 +110,6 @@ public class AssemblyDump implements IRVisitor {
     public void visit(BasicBlock node) {
         if (node.getInsts().size() == 0)
             return;
-        if (opts.OptimizationLevel() > 0) {
-        } else {
-        }
 
         printlnLabel(bbId(node));
         node.getInsts().forEach(inst -> visit(inst));

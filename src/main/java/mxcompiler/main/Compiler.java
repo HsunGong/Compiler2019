@@ -19,6 +19,8 @@ import mxcompiler.ir.Root;
 import mxcompiler.main.CompilerMode.DumpMode;
 import mxcompiler.ast.*;
 
+import mxcompiler.main.dump.*;
+import mxcompiler.main.optim.*;
 
 public final class Compiler {
 	static final public String ProgName = "mxc";
@@ -103,7 +105,7 @@ public final class Compiler {
 		MemAndStack stackAllocator = new MemAndStack(irRoot);
 		stackAllocator.execute();
 
-		AssemblyDump asm = new AssemblyDump(fileOut, opts);
+		AssemblyDump asm = new AssemblyDump(fileOut);
 		asm.dump(irRoot);
 
 		// append builtIn function
