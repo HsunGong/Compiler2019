@@ -34,13 +34,12 @@ public class AssemblyDump implements IRVisitor {
     private Map<String, Integer> idCounter = new HashMap<>();
     /** object -> id */
     private Map<Object, String> idMap = new HashMap<>();
-    private PhysicalRegister preg0, preg1;
+    private PhysicalRegister preg0;
     private boolean isBssSection, isDataSection;
 
     /** only for user-functions(no builtIn func) */
     public void visit(Root node) {
         preg0 = node.preg0;
-        preg1 = node.preg1;
 
         idMap.put(node.getFunc().get("main").getStart(), "main");
 

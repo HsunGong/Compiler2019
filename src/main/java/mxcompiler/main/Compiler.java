@@ -22,6 +22,7 @@ import mxcompiler.ast.*;
 import mxcompiler.main.dump.*;
 import mxcompiler.main.optim.*;
 
+
 public final class Compiler {
 	static final public String ProgName = "mxc";
 	static final public String Version = "1.0.0";
@@ -99,11 +100,16 @@ public final class Compiler {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("Generate asm begin");
 
-		RegisterAllocator regAllocator = new RegisterAllocator(irRoot, opts);
+		RegisterAllocator regAllocator = new RegisterAllocator(irRoot);
 		regAllocator.execute();
 
 		MemAndStack stackAllocator = new MemAndStack(irRoot);
 		stackAllocator.execute();
+
+		if (opts.OptimizationLevel() > 0) {
+			ElimateMemQuad elimateMemQuad = new ElimateMemQuad(irRoot);
+			elimateMemQuad.execute();
+		}
 
 		AssemblyDump asm = new AssemblyDump(fileOut);
 		asm.dump(irRoot);
@@ -134,11 +140,20 @@ public final class Compiler {
 		if (opts.mode().equals(CompilerMode.Debug))
 			System.out.println("IR Builder begin");
 
-		UsagePreChecker usagePreChecker = new UsagePreChecker();
-		usagePreChecker.visit(astRoot);
+		if (opts.OptimizationLevel() > 0) {
+			UsagePreChecker usagePreChecker = new UsagePreChecker();
+			usagePreChecker.visit(astRoot);
+		}
 
 		IRBuilder treeIrBuilder = new IRBuilder(opts);
 		irRoot = treeIrBuilder.build(astRoot);
+		if (opts.OptimizationLevel() > 0) {
+			ElimateMutliStaticData elimateMutliStaticData = new ElimateMutliStaticData(irRoot);
+			elimateMutliStaticData.execute();
+
+			FuncallInline funcallInline = new FuncallInline(irRoot);
+			funcallInline.execute();
+		}
 
 		if (opts.dumpMode().contains(DumpMode.IRDump)
 				|| opts.dumpMode().contains(DumpMode.AllDump)) {

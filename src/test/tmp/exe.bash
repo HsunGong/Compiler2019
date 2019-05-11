@@ -12,7 +12,7 @@ else
 	exit 1
 fi
 
-if [ ! -f "$1.asm" ]; then
+if [ ! -f "$1.log" ]; then
 	echo "No such .asm file"
 	exit 1
 fi
@@ -28,7 +28,7 @@ echo "output:" $outName
 
 rm -f $name.o $outName
 
-nasm -felf64 $name.asm 
+nasm -felf64 $name.log
 
 # ld $name.o 
 gcc $name.o -no-pie

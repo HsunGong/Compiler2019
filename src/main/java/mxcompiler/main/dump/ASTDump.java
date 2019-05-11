@@ -333,16 +333,16 @@ public class ASTDump extends Visitor implements Dump {
 			printplainln(" null");
 	}
 
-	private void printStmtList(String s, List<StmtNode> list) {
-		print(s);
-		if (list != null && !list.isEmpty()) {
-			printplainln("");
-			for (StmtNode param : list) {
-				visit(param);
-			}
-		} else
-			printplainln(" null");
-	}
+	// private void printStmtList(String s, List<StmtNode> list) {
+	// 	print(s);
+	// 	if (list != null && !list.isEmpty()) {
+	// 		printplainln("");
+	// 		for (StmtNode param : list) {
+	// 			visit(param);
+	// 		}
+	// 	} else
+	// 		printplainln(" null");
+	// }
 
 	private void printExprList(String s, List<ExprNode> list) {
 		print(s);

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mxcompiler.ast.statement.BlockStmtNode;
-import mxcompiler.utils.type.NullType;
 import mxcompiler.utils.type.Type;
 import mxcompiler.ast.*;
 import mxcompiler.utils.Dump;

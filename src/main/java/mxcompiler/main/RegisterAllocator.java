@@ -13,12 +13,10 @@ import java.util.*;
 
 public class RegisterAllocator {
     private final Root root;
-    private final Option opts;
     int MaxNumFuncArgs = 3;
 
-    public RegisterAllocator(Root root, Option opts) {
+    public RegisterAllocator(Root root) {
         this.root = root;
-        this.opts = opts;
     }
 
     public void execute() throws Error {
@@ -47,13 +45,6 @@ public class RegisterAllocator {
 
                 // Tag : has order ?
                 insts.addFirst(new Load(parent, argVreg, RegSize, argSlot, 0));
-                // ListIterator<Quad> firstIter = startBB.getInsts().listIterator();
-                // firstIter.next();
-                // funcInfo.dataVregMap.forEach((sData, vReg) -> {
-                // startBB.addBeforeInst(firstIter, new Load(startBB, vReg,
-                // RegValue.RegSize,
-                // sData, sData instanceof StaticString));
-                // });
             }
 
             if (size > 0)
@@ -197,10 +188,6 @@ public class RegisterAllocator {
 
         // init Vreg Node and Start Vreg Node
         vregNodes.addAll(vregInfoMap.keySet());
-        /**
-         * vregNodes.forEach(vreg -> { if (vregInfoMap.get(vreg).degree <
-         * numColors) startVregNodes.add(vreg); });
-         */
         vregNodes.stream().filter(vreg -> (vregInfoMap.get(vreg).degree < numColors))
                 .forEach(startVregNodes::add);
 
@@ -309,13 +296,6 @@ public class RegisterAllocator {
                 }
             }
 
-            // FIX: UGLY: why can not ??
-            // List<Register> usedRegs = inst.getUsedRegisters();
-            // for (int i = 0; i < usedRegs.size(); ++i) {
-            // // can check args 1 to 6 is PhysicalRegister
-            // if (usedRegs.get(i) instanceof VirtualRegister)
-            // usedRegs.set(i, vregInfoMap.get(usedRegs.get(i)).color);
-            // }
         } else { // rename used registers
             List<Register> usedRegs = inst.getUsedRegisters();
             if (!usedRegs.isEmpty()) {

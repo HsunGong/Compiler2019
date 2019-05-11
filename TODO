@@ -1,16 +1,51 @@
+OutLine:
+	✔ ResolverAndChecker @done(05-10 20)
+	✔ UsagePreChecker @done(05-10 20)
+	✔ IRBuilder @done(05-10 20)
+	✔ FuncallInline @done(05-10 20)
+	✔ ElimateMutliStaticData @done(05-10 20)
+	✔ RegisterAllocator @done(05-10 20)
+	✔ MemAndStack @done(05-10 20)
+	✔ ElimateMemQuad @done(05-11 09)
+	✔ AssemblyDump @done(05-10 20)
+
+			if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+		new StupidBranchFucker(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+		new OrphanFuncFucker(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+		new InlineProcessor(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+//		new ExprMerger(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+
+		new BinaryOpProcessor(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+		new StaticDataProcessor(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+		new FuncArgProcessor(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+		new RegLifetimeAnalyser(ir).run();
+		if (irOutS != null) (new IRPrinter(irOutS)).visit(ir);
+		new RegisterAllocator(ir).run();
+
+Optim:
+	☐ Change Allocator @started(05-10 10) @today 
+
+
 Projects:
-	☐ Semantic analysis @started(19-03-05 18:58)
+	✔ Semantic analysis @started(19-03-05 18:58) @done(05-10 10) @lasted()
 		✔ Generate Simple antlr @started(19-03-04 17) @done(19-03-13 21) @lasted(1w2d3h46m41s)
-		☐ Generate AST nodes and Type nodes for at most 1 day @started(19-03-16 14)
-	☐ IR generate
-	☐ ASM Code
+		✔ Generate AST nodes and Type nodes for at most 1 day @started(19-03-16 14) @done(05-10 10) @lasted()
+	✔ IR generate @done(05-10 10)
+	✔ ASM Code @done(05-10 10)
 	☐ code optimize
-TODO|FIXME|FIX|BUG|UGLY|HACK|NOTE|IDEA|REVIEW|DEBUG|OPTIMIZE
+	TODO|FIXME|FIX|BUG|UGLY|HACK|NOTE|IDEA|REVIEW|DEBUG|OPTIMIZE
 
 Parser: 
 	✔ change antlr extension to use @started(19-03-05 18) @done(19-03-05 18) @lasted(54m24s)
 
-ASTNode: @today 
+ASTNode:
     ✔ Node       @done(03-16 14)
         ✔ AST (programNode) @done(03-16 17)
         ✔ Decl(define) @done(03-16 16)
@@ -163,7 +198,7 @@ TypeResolve:
 	✔ new ClassVarMemberScanner(globalScope).visit(ast); @done(03-24 13)
 	Do tormorrow:
 	✔ new FunctionScopeScanner(globalScope).visit(ast); @high @today @started(03-24 20) @done(03-25 20) @lasted(1d8m44s)
-	☐ new StaticUsagePreScanner(globalScope).visit(ast);
+	✔ new StaticUsagePreScanner(globalScope).visit(ast); @done(05-10 10)
 	
 
 	✔ FIX: all VarEntity's type is varType, and baseType is selfdefined @started(03-24 09) @done(03-24 09) @lasted(47m29s)
@@ -192,30 +227,9 @@ TypeResolve:
 		✔ 	Can not find right class		ClassEntity classEntity = (ClassEntity) scopeStack.getFirst().get(className); @done(03-27 09)
 
 ✔ What if change Mnull into null? @done(04-06 10)
-
-
-        GlobalScopePreScanner globalScopePreScanner = new GlobalScopePreScanner();
-        globalScopePreScanner.visit(ast);
-        Scope globalScope = globalScopePreScanner.getScope();
-        new ClassVarMemberScanner(globalScope).visit(ast);
-        new FunctionScopeScanner(globalScope).visit(ast);
-        ✘ new StaticUsagePreScanner(globalScope).visit(ast); @cancelled(04-06 10)
-        IRBuilder irBuilder = new IRBuilder(globalScope);
-        irBuilder.visit(ast);
-        ✔ IRRoot ir = irBuilder.getIR(); @done(05-08 15)
-        ✘ new TwoRegOpTransformer(ir).run(); @cancelled(04-06 10)
-        ✘ if (Configuration.isEnableFunctionInline()) new FunctionInlineProcessor(ir).run(); @cancelled(04-06 10)
-        ✘ if (irOutS != null) new IRPrinter(irOutS).visit(ir); @cancelled(04-06 10)
-        ✘ new StaticDataProcessor(ir).run(); @cancelled(04-28 20)
-        ✘ new RegisterPreprocessor(ir).run(); @cancelled(05-02 09)
-        ✘ new RegLivelinessAnalysis(ir).run(); @cancelled(05-02 09)
-        ✔ new RegisterAllocator(ir).run(); @done(05-08 15)
-        ✔ new NASMTransformer(ir).run(); @done(05-08 15)
-        ✔ new ExtraInstructionOptimizer(ir).run(); @done(05-08 15)
-		✔ new NASMPrinter(nasmOutS).visit(ir); @done(05-08 15)
 		
-		☐ too much call stacks for compilers: change visit into accept. @started(05-08 15)
-		☐ UGLY: change all invalid into valid @started(05-08 15)
+		✔ too much call stacks for compilers: change visit into accept. @started(05-08 15) @done(05-10 10) @lasted(1d19h3m48s)
+		✔ UGLY: change all invalid into valid @started(05-08 15) @done(05-10 10) @lasted(1d19h3m48s)
 		
 		
 		R0  R1  R2  R3  R4  R5  R6  R7  R8  R9  R10  R11  R12  R13  R14  R15
