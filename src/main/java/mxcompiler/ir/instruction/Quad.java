@@ -34,7 +34,10 @@ abstract public class Quad {
      * <p>
      * change everything(BB, regValue) if has in renameMap
      */
-    public abstract Quad copyRename(Map<Object, Object> renameMap);
+    public Quad copyRename(Map<Object, Object> renameMap) {
+        parent = (BasicBlock) renameMap.getOrDefault(parent, parent);
+        return this;
+    }
 
     // public Set<VirtualRegister> liveIn = null, liveOut = null;
     protected List<Register> usedRegisters = new ArrayList<>();

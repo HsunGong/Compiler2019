@@ -110,6 +110,9 @@ public class AssemblyDump implements IRVisitor {
         if (node.getInsts().size() == 0)
             return;
 
+        // if(node.hasJump()) 
+        //     throw new CompileError("error block");
+
         printlnLabel(bbId(node));
         node.getInsts().forEach(inst -> visit(inst));
         // println("");

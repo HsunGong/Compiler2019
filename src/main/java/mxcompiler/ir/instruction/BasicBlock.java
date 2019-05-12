@@ -34,7 +34,7 @@ public class BasicBlock {
     private Set<BasicBlock> prev = new HashSet<>();
     private Set<BasicBlock> next = new HashSet<>(); // may be linked-List
 
-    private void addPrev(BasicBlock bb) {
+    public void addPrev(BasicBlock bb) {
         prev.add(bb);
     }
 
@@ -44,7 +44,7 @@ public class BasicBlock {
             bb.addPrev(this);
     }
 
-    private void delPrev(BasicBlock bb) {
+    public void delPrev(BasicBlock bb) {
         prev.remove(bb);
     }
 

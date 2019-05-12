@@ -34,6 +34,14 @@ public class Move extends MemQuad {
         return rhs;
     }
 
+    /**
+     * @param rhs
+     *                the rhs to set
+     */
+    public void setRhs(RegValue rhs) {
+        this.rhs = rhs;
+    }
+
     /** {@inheritDoc} */
     @Override
     public Move copyRename(Map<Object, Object> renameMap) {

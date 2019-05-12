@@ -8,6 +8,8 @@ import mxcompiler.error.CompileError;
 import mxcompiler.ir.*;
 import mxcompiler.ir.instruction.*;
 import mxcompiler.ir.register.*;
+import mxcompiler.main.optim.MergeBB;
+
 import java.util.*;
 
 
@@ -25,6 +27,9 @@ public class RegisterAllocator {
 
         Lifeness life = new Lifeness(root);
         life.execute();
+
+        // MergeBB merge = new MergeBB(root);
+        // merge.execute();
 
         PaintColors();
 

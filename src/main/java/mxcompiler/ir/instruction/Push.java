@@ -15,11 +15,6 @@ public class Push extends Quad {
         this.val = value;
     }
 
-    @Override
-    public Quad copyRename(Map<Object, Object> renameMap) {
-        return null;
-    }
-
     public RegValue getValue() {
         return val;
     }

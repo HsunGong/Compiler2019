@@ -56,6 +56,10 @@ public class IRBuilder extends Visitor {
     /** only when {@link #visit(IdentifierExprNode)} */
     private boolean uselessStatic = false;
 
+    private boolean isInForStmt = false;
+    private List<String> forVarName = new ArrayList<>();
+    private List<Integer> forVarNum = new ArrayList<>();
+
     private final Option opts;
 
     public IRBuilder(Option opts) {
@@ -304,6 +308,7 @@ public class IRBuilder extends Visitor {
 
     // FIX: for and while --> optim ?? by do while
     public void visit(ForStmtNode node) {
+        isInForStmt = true;
         BasicBlock condBB, incrBB, bodyBB, afterBB;
         ExprNode cond = node.getCond(), incr = node.getIncr();
 
@@ -318,6 +323,8 @@ public class IRBuilder extends Visitor {
         // TODO: change into stack
         BasicBlock tmpLoopStepBB = curLoopStepBB;
         BasicBlock tmpLoopAfterBB = curLoopAfterBB;
+        BasicBlock tmpCurBB = curBB;
+
         curLoopStepBB = incrBB;
         curLoopAfterBB = afterBB;
         // region deal loop
@@ -348,11 +355,38 @@ public class IRBuilder extends Visitor {
             visit(node.getBody());
         if (!curBB.hasJump())
             curBB.setJump(new Jump(curBB, incrBB));
+
+        // Quad dd = (Move) null; -> is OK
+        ListIterator<Quad> iter = tmpCurBB.getInsts().listIterator(tmpCurBB.getInsts().size() - 1);
+        Quad move = iter.hasPrevious() ? iter.previous() : null;
+        if (move instanceof Move && node.getInit() instanceof AssignExprNode
+                && node.getCond() instanceof BinaryOpExprNode
+                && ((BinaryOpExprNode) node.getCond()).getOp() == BinaryOpExprNode.Op.LESS)
+            if (((BinaryOpExprNode) node.getCond()).getLhs() instanceof IdentifierExprNode
+                    && ((AssignExprNode) node.getInit()).getLhs() instanceof IdentifierExprNode) {
+                IdentifierExprNode condition = (IdentifierExprNode) ((BinaryOpExprNode) node
+                        .getCond()).getLhs();
+                IdentifierExprNode init = (IdentifierExprNode) ((AssignExprNode) node.getInit())
+                        .getLhs();
+
+                if (condition.getIdentifier().equals(init.getIdentifier())) {
+                    for (int i = 0; i < forVarName.size(); ++i) {
+                        if (init.getIdentifier().equals(forVarName.get(i))) {
+                            ((Move) move).setRhs(new IntImm(forVarNum.get(i)));
+                            forVarName.remove(i);
+                            forVarNum.remove(i);
+                            break;
+                        }
+                    }
+                }
+            }
+
         curBB = afterBB;
 
         // endregion
         curLoopStepBB = tmpLoopStepBB;
         curLoopAfterBB = tmpLoopAfterBB;
+        isInForStmt = false;
     }
 
     public void visit(WhileStmtNode node) {
@@ -399,6 +433,18 @@ public class IRBuilder extends Visitor {
         visit(cond);
         if (cond instanceof BoolLiteralExprNode)
             curBB.setJump(new CJump(curBB, cond.regValue, cond.getElse(), cond.getThen()));
+
+        if (isInForStmt && node.getCond() instanceof BinaryOpExprNode
+                && ((BinaryOpExprNode) node.getCond())
+                        .getOp() == BinaryOpExprNode.Op.GREATER_EQUAL) {
+            if (((BinaryOpExprNode) node.getCond()).getLhs() instanceof IdentifierExprNode
+                    && ((BinaryOpExprNode) node.getCond()).getRhs() instanceof IntLiteralExprNode) {
+                forVarName.add(((IdentifierExprNode) ((BinaryOpExprNode) node.getCond()).getLhs())
+                        .getIdentifier());
+                forVarNum.add(((IntLiteralExprNode) ((BinaryOpExprNode) node.getCond()).getRhs())
+                        .getValue());
+            }
+        }
 
         // then
         curBB = thenBB;

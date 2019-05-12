@@ -20,12 +20,6 @@ public class Pop extends Quad {
         this.val = preg;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public Quad copyRename(Map<Object, Object> renameMap) {
-        return null; // FIX: throw error ??
-    }
-
     public PhysicalRegister getValue() {
         return (PhysicalRegister) val;
     }
