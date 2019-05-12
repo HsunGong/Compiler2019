@@ -22,7 +22,7 @@ public class RegisterAllocator {
     public void execute() throws Error {
         // pre analysis
         AllocateNaiveArgs();
-        
+
         Lifeness life = new Lifeness(root);
         life.execute();
 
@@ -74,6 +74,14 @@ public class RegisterAllocator {
         // pre analysis-getConclusion
         this.physicalRegs = new ArrayList<>(generalRegs);
 
+        if (MaxNumFuncArgs >= 1)
+            physicalRegs.remove(rdi);
+        if (MaxNumFuncArgs >= 2)
+            physicalRegs.remove(rsi);
+        if (MaxNumFuncArgs >= 3)
+            physicalRegs.remove(rdx);
+        if (MaxNumFuncArgs >= 4)
+            physicalRegs.remove(rcx);
         if (MaxNumFuncArgs >= 5)
             physicalRegs.remove(r8);
         if (MaxNumFuncArgs >= 6)

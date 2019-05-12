@@ -54,10 +54,10 @@ public class x86_64RegisterSet {
         List<PhysicalRegister> calleeSave = new ArrayList<>();
         List<PhysicalRegister> arg6Regs = new ArrayList<>();
         
-        rdi = new PhysicalRegister("rdi", false, true, false, 0);
-        rsi = new PhysicalRegister("rsi", false, true, false, 1);
-        rdx = new PhysicalRegister("rdx", false, true, false, 2);
-        rcx = new PhysicalRegister("rcx", false, true, false, 3);
+        rdi = new PhysicalRegister("rdi", true, true, false, 0);
+        rsi = new PhysicalRegister("rsi", true, true, false, 1);
+        rdx = new PhysicalRegister("rdx", true, true, false, 2);
+        rcx = new PhysicalRegister("rcx", true, true, false, 3);
         
         
         rax = new PhysicalRegister("rax", false, true, false, -1);
