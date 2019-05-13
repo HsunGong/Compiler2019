@@ -147,13 +147,27 @@ public final class Compiler {
 
 		IRBuilder treeIrBuilder = new IRBuilder(opts);
 		irRoot = treeIrBuilder.build(astRoot);
+
+		BinaryDstEqualLhs binaryDstEqualLhs = new BinaryDstEqualLhs(irRoot);
+		binaryDstEqualLhs.execute();
+
 		if (opts.OptimizationLevel() > 0) {
-			ElimateMutliStaticData elimateMutliStaticData = new ElimateMutliStaticData(irRoot);
-			elimateMutliStaticData.execute();
+			ElimateCJump elimateCJump = new ElimateCJump(irRoot);
+			elimateCJump.execute();
+
+			// DealFunc dealFunc = new DealFunc(irRoot);
+			// dealFunc.execute();
 
 			FuncallInline funcallInline = new FuncallInline(irRoot);
 			funcallInline.execute();
+
 		}
+		binaryDstEqualLhs.execute();
+
+		ElimateMutliStaticData elimateMutliStaticData = new ElimateMutliStaticData(irRoot);
+		elimateMutliStaticData.execute();
+
+		// binaryDstEqualLhs.execute();
 
 		if (opts.dumpMode().contains(DumpMode.IRDump)
 				|| opts.dumpMode().contains(DumpMode.AllDump)) {

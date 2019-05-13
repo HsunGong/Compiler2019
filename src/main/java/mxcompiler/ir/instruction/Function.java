@@ -21,6 +21,8 @@ public class Function {
     // entity = null;
     // }
 
+    public boolean single = false;
+
     public Function(String name, String builtInLabel) {
         this.name = name;
         this.builtInLabel = builtInLabel;

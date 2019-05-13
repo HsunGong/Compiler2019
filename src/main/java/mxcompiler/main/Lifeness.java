@@ -31,9 +31,9 @@ public class Lifeness {
                 if (irFunc.isBuiltIn())
                     continue;
 
-                tryEliminate(irFunc);
+                delete(irFunc);
 
-                removeBlankBB(irFunc);
+                delBB(irFunc);
 
                 livenessAnalysis(irFunc);
             }
@@ -117,7 +117,7 @@ public class Lifeness {
     }
 
     /** eliminate useless inst and for-Body */
-    private void tryEliminate(Function func) {
+    private void delete(Function func) {
         List<BasicBlock> reversePreOrder = func.getReversePreOrder();
 
         // eliminate inst
@@ -140,22 +140,22 @@ public class Lifeness {
         }
 
         // eliminate for-BBs
-        for (Root.ForRecord forRec : root.forRecMap.values()) {
-            if (forRec.processed)
+        for (Root.ForRecord record : root.forRecMap.values()) {
+            if (record.processed)
                 continue;
-            if (forRec.cond == null || forRec.incr == null || forRec.body == null
-                    || forRec.after == null)
+            if (record.cond == null || record.incr == null || record.body == null
+                    || record.after == null)
                 continue;
 
             boolean hasSideEffect = false;
 
             List<BasicBlock> bbList = new ArrayList<>();
-            bbList.add(forRec.cond);
-            bbList.add(forRec.incr);
-            bbList.add(forRec.body);
-            bbList.add(forRec.after);
+            bbList.add(record.cond);
+            bbList.add(record.incr);
+            bbList.add(record.body);
+            bbList.add(record.after);
 
-            Quad afterFirstInst = forRec.after.getInsts().getFirst();
+            Quad afterFirstInst = record.after.getInsts().getFirst();
 
             for (BasicBlock bb : bbList) {
                 for (Quad inst : bb.getInsts()) {
@@ -197,15 +197,15 @@ public class Lifeness {
             }
 
             if (!hasSideEffect) {
-                forRec.cond.clearInsts();
-                forRec.cond.setJump(new Jump(forRec.cond, forRec.after));
-                forRec.processed = true;
+                record.cond.clearInsts();
+                record.cond.setJump(new Jump(record.cond, record.after));
+                record.processed = true;
             }
         }
     }
 
     // "from" -> "to" via jumpTarget
-    private BasicBlock replaceJumpTarget(BasicBlock from) {
+    private BasicBlock replaceTarget(BasicBlock from) {
         BasicBlock to = from, query = jumpTargetMap.get(from);
 
         while (query != null) {
@@ -218,7 +218,7 @@ public class Lifeness {
 
     private Map<BasicBlock, BasicBlock> jumpTargetMap = new HashMap<>();
 
-    private void removeBlankBB(Function func) {
+    private void delBB(Function func) {
         jumpTargetMap.clear();
         // put blank bb into jumpTargetMap
         for (BasicBlock bb : func.getReversePostOrder()) {
@@ -236,12 +236,12 @@ public class Lifeness {
             Quad inst = bb.getInsts().getLast();
             if (inst instanceof Jump) {
                 Jump jumpInst = (Jump) inst;
-                jumpInst.setTarget(replaceJumpTarget(jumpInst.getTarget()));
+                jumpInst.setTarget(replaceTarget(jumpInst.getTarget()));
 
             } else if (inst instanceof CJump) {
                 CJump jumpInst = (CJump) inst;
-                jumpInst.setThen(replaceJumpTarget(jumpInst.getThen()));
-                jumpInst.setElse(replaceJumpTarget(jumpInst.getElse()));
+                jumpInst.setThen(replaceTarget(jumpInst.getThen()));
+                jumpInst.setElse(replaceTarget(jumpInst.getElse()));
 
                 if (jumpInst.getThen() == jumpInst.getElse())
                     bb.replaceInst(bb.getInsts().listIterator(bb.getInsts().size()),

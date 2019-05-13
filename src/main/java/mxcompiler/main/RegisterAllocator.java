@@ -71,41 +71,41 @@ public class RegisterAllocator {
     }
 
     // region allocate-interference-graph
-    private List<PhysicalRegister> physicalRegs; // general regs not r**
+    private List<PhysicalRegister> phyRegs; // general regs not r**
     private PhysicalRegister preg0, preg1; // used for stack slot
     private int numColors; // can defined once
 
     private void PaintColors() {
         // pre analysis-getConclusion
-        this.physicalRegs = new ArrayList<>(generalRegs);
+        this.phyRegs = new ArrayList<>(generalRegs);
 
         if (MaxNumFuncArgs >= 1)
-            physicalRegs.remove(rdi);
+            phyRegs.remove(rdi);
         if (MaxNumFuncArgs >= 2)
-            physicalRegs.remove(rsi);
+            phyRegs.remove(rsi);
         if (MaxNumFuncArgs >= 3)
-            physicalRegs.remove(rdx);
+            phyRegs.remove(rdx);
         if (MaxNumFuncArgs >= 4)
-            physicalRegs.remove(rcx);
+            phyRegs.remove(rcx);
         if (MaxNumFuncArgs >= 5)
-            physicalRegs.remove(r8);
+            phyRegs.remove(r8);
         if (MaxNumFuncArgs >= 6)
-            physicalRegs.remove(r9);
+            phyRegs.remove(r9);
 
         if (root.hasDivShiftInst) {
-            preg0 = physicalRegs.get(0);
-            preg1 = physicalRegs.get(1);
+            preg0 = phyRegs.get(0);
+            preg1 = phyRegs.get(1);
         } else {
             preg0 = rbx;
-            preg1 = physicalRegs.get(0);
+            preg1 = phyRegs.get(0);
         }
 
         root.preg0 = preg0;
         root.preg1 = preg1;
-        this.physicalRegs.remove(preg0);
-        this.physicalRegs.remove(preg1);
+        this.phyRegs.remove(preg0);
+        this.phyRegs.remove(preg1);
 
-        numColors = this.physicalRegs.size();
+        numColors = this.phyRegs.size();
 
         for (Function func : root.getFunc().values())
             Allocate(func);
@@ -268,7 +268,7 @@ public class RegisterAllocator {
                 // real paint color
                 if (vregInfo.color == null) {
                     // allocate preg by order
-                    for (PhysicalRegister preg : physicalRegs)
+                    for (PhysicalRegister preg : phyRegs)
                         if (!usedColors.contains(preg)) {
                             vregInfo.color = preg;
                             break;
